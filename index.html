@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Biodata Kegiatan - Tim Kerja Pembelajaran dan Penilaian 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --blue: #1A5FB4;
+    --blue-dark: #0D4A96;
+    --blue-light: #EEF4FF;
+    --blue-border: #C5D8F5;
+    --red: #C0392B;
+    --gray-bg: #F0F2F5;
+    --gray-border: #D8DBE2;
+    --gray-text: #6B7280;
+    --input-bg: #F8FAFC;
+    --text: #1A1A2E;
+    --white: #FFFFFF;
+    --radius: 8px;
+  }
+
+  body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background: var(--gray-bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 0 0 64px;
+  }
+
+  .container {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 0 16px;
+  }
+
+  /* ── LOGO HEADER ── */
+  .logo-header {
+    background: var(--white);
+    border-bottom: 1px solid var(--gray-border);
+    margin-bottom: 28px;
+    text-align: center;
+    line-height: 0;
+  }
+  .logo-header img {
+    width: 100%;
+    max-width: 760px;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+  }
+  .logo-fallback {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    padding: 18px 24px;
+    line-height: 1.4;
+  }
+  .logo-fallback svg { width: 48px; height: 48px; flex-shrink: 0; }
+  .logo-fallback strong { display: block; font-size: 18px; font-weight: 700; color: var(--blue); }
+  .logo-fallback span { font-size: 12px; color: var(--gray-text); }
+
+  /* ── PAGE TITLE ── */
+  .page-title { text-align: center; margin-bottom: 22px; }
+  .page-title h1 { font-size: 22px; font-weight: 700; color: var(--text); line-height: 1.4; margin-bottom: 6px; }
+  .page-title p { font-size: 13.5px; color: var(--gray-text); line-height: 1.5; }
+
+  /* ── CARD ── */
+  .card { background: var(--white); border-radius: 12px; border: 1px solid var(--gray-border); overflow: hidden; margin-bottom: 14px; }
+  .card-accent { height: 3px; background: linear-gradient(90deg, var(--blue) 0%, #5B9BD5 100%); }
+  .card-body { padding: 22px 26px 26px; }
+
+  /* ── SECTION HEADER ── */
+  .section-header { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; }
+  .section-icon { width: 30px; height: 30px; background: var(--blue-light); border-radius: 7px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .section-icon svg { width: 15px; height: 15px; fill: var(--blue); }
+  .section-header h2 { font-size: 15px; font-weight: 700; color: var(--blue); }
+
+  /* ── FIELDS ── */
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 560px) {
+    .field-row { grid-template-columns: 1fr; }
+    .card-body { padding: 18px 16px 22px; }
+    .page-title h1 { font-size: 18px; }
+  }
+
+  .field { margin-bottom: 14px; }
+  .field:last-child { margin-bottom: 0; }
+
+  .field label { display: block; font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 8px; margin-top:8px; }
+  .field label .req { color: var(--red); margin-left: 2px; }
+  .field .hint { font-size: 11.5px; color: var(--gray-text); margin-bottom: 5px; margin-top: -2px; line-height: 1.4; }
+
+  .field input,
+  .field select,
+  .field textarea {
+    width: 100%;
+    height: 42px;
+    border: 1.5px solid var(--gray-border);
+    border-radius: var(--radius);
+    padding: 0 13px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 13.5px;
+    color: var(--text);
+    background: var(--input-bg);
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+  .field textarea { height: auto; padding: 11px 13px; resize: vertical; min-height: 78px; line-height: 1.5; }
+  .field input::placeholder, .field textarea::placeholder { color: #B8C0CC; }
+  .field input:focus, .field select:focus, .field textarea:focus {
+    border-color: var(--blue);
+    box-shadow: 0 0 0 3px rgba(26,95,180,0.1);
+    background: var(--white);
+  }
+  .field select {
+    background-color: var(--input-bg);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%236B7280'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 13px center;
+    padding-right: 34px;
+    cursor: pointer;
+  }
+  .field select:disabled { opacity: 0.45; cursor: not-allowed; }
+
+  /* ── GOLONGAN PILLS ── */
+  .golongan-group { display: flex; gap: 8px; flex-wrap: wrap; }
+  .gol-pill { position: relative; }
+  .gol-pill input[type="radio"] { position: absolute; opacity: 0; width: 0; height: 0; }
+  .gol-pill label {
+    display: flex; align-items: center; justify-content: center;
+    width: 52px; height: 40px;
+    border: 1.5px solid var(--gray-border);
+    border-radius: var(--radius);
+    font-size: 14px; font-weight: 600; color: var(--gray-text);
+    cursor: pointer; transition: all 0.15s;
+    background: var(--input-bg); margin: 0;
+  }
+  .gol-pill input:checked + label { background: var(--blue); border-color: var(--blue); color: var(--white); }
+  .gol-pill label:hover { border-color: var(--blue); color: var(--blue); }
+
+  /* ── CHECKBOX ── */
+  .checkbox-item {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 13px 15px;
+    border: 1.5px solid var(--gray-border); border-radius: var(--radius);
+    cursor: pointer; transition: border-color 0.15s, background 0.15s;
+    background: var(--input-bg);
+  }
+  .checkbox-item:hover { border-color: var(--blue-border); background: var(--blue-light); }
+  .checkbox-item input[type="checkbox"] { width: 17px; height: 17px; accent-color: var(--blue); margin-top: 2px; flex-shrink: 0; cursor: pointer; }
+  .checkbox-item span { font-size: 13.5px; line-height: 1.6; color: var(--text); }
+  .checkbox-item:has(input:checked) { border-color: var(--blue); background: var(--blue-light); }
+
+  /* ── BUTTONS ── */
+  .btn-submit {
+    width: 100%; height: 48px;
+    background: var(--blue); color: var(--white);
+    border: none; border-radius: var(--radius);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 15px; font-weight: 700; cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+    display: flex; align-items: center; justify-content: center; gap: 9px;
+    letter-spacing: 0.2px;
+  }
+  .btn-submit:hover { background: var(--blue-dark); }
+  .btn-submit:active { transform: scale(0.99); }
+  .btn-submit svg { width: 17px; height: 17px; fill: none; stroke: white; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+  .btn-clear {
+    width: 100%; height: 38px;
+    background: transparent; color: var(--gray-text);
+    border: 1.5px solid var(--gray-border); border-radius: var(--radius);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 13px; font-weight: 500; cursor: pointer;
+    margin-top: 10px; transition: border-color 0.15s, color 0.15s;
+  }
+  .btn-clear:hover { border-color: #9CA3AF; color: var(--text); }
+
+  /* ── MISC ── */
+  .req-note { font-size: 12px; color: var(--gray-text); text-align: center; margin-bottom: 18px; }
+  .req-note span { color: var(--red); font-weight: 700; }
+
+  .success-box {
+    display: none; background: #F0FDF4;
+    border: 1.5px solid #86EFAC; border-radius: var(--radius);
+    padding: 14px 18px; margin-top: 14px;
+    align-items: center; gap: 12px;
+  }
+  .success-box.show { display: flex; }
+  .success-box svg { width: 22px; height: 22px; flex-shrink: 0; }
+  .success-box p { font-size: 13.5px; font-weight: 600; color: #166534; }
+
+  .field input.error, .field select.error, .field textarea.error {
+    border-color: var(--red);
+    box-shadow: 0 0 0 3px rgba(192,57,43,0.08);
+  }
+</style>
+</head>
+<body>
+
+<!-- LOGO HEADER -->
+<div class="logo-header">
+  <img src="logo-kemendikdasmen.png" alt="Logo Kemendikdasmen - Direktorat SMA"
+    onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+  <div class="logo-fallback">
+    <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="24" cy="24" r="23" fill="#1A5FB4"/>
+      <path d="M12 34V18l12-6 12 6v16" stroke="white" stroke-width="2" stroke-linejoin="round"/>
+      <rect x="18" y="24" width="12" height="10" rx="1.5" fill="white" opacity="0.9"/>
+      <path d="M20 18h8" stroke="#F5A623" stroke-width="2" stroke-linecap="round"/>
+      <circle cx="24" cy="14" r="2" fill="#F5A623"/>
+    </svg>
+    <div>
+      <strong>Kemendikdasmen</strong>
+      <span>Direktorat Sekolah Menengah Atas</span>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="page-title">
+    <h1>Biodata Kegiatan Tim Kerja<br>Pembelajaran dan Penilaian Tahun 2026</h1>
+    <p>Isi formulir dengan data yang benar. Data akan digunakan untuk keperluan administrasi kegiatan.</p>
+  </div>
+
+  <!-- A. INFO KEGIATAN -->
+  <div class="card">
+    <div class="card-accent"></div>
+    <div class="card-body">
+      <div class="section-header">
+        <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2zm-7 3a3 3 0 1 1 0 6 3 3 0 0 1 0-6zm6 12H6v-.5c0-2 4-3.1 6-3.1s6 1.1 6 3.1V18z"/></svg></div>
+        <h2>A. Informasi Kegiatan</h2>
+      </div>
+      <div class="field">
+        <label>Nama Kegiatan <span class="req">*</span></label>
+        <div class="hint">Pastikan memilih kegiatan yang sesuai dengan surat undangan!</div>
+        <select id="nama_kegiatan" onchange="onKegiatanChange()">
+          <option value="" disabled selected>-- Memuat daftar kegiatan... --</option>
+        </select>
+      </div>
+      <!-- Lokasi disimpan otomatis, tidak ditampilkan ke peserta -->
+      <input type="hidden" id="lokasi_hidden">
+    </div>
+  </div>
+
+  <!-- B. DATA PRIBADI -->
+  <div class="card">
+    <div class="card-accent"></div>
+    <div class="card-body">
+      <div class="section-header">
+        <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v2h20v-2c0-3.3-6.7-5-10-5z"/></svg></div>
+        <h2>B. Data Pribadi</h2>
+      </div>
+      <div class="field">
+        <label>Nama Lengkap <span class="req">*</span></label>
+        <div class="hint">Diisi beserta gelar, akan digunakan juga sebagai sertifikat (jika ada).</div>
+        <input type="text" id="nama" placeholder="Contoh: Dr. Budi Santoso, M.Pd.">
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>NIP <span class="req">*</span></label>
+          <div class="hint">Jika tidak ada, isi dengan tanda ( - )</div>
+          <input type="text" id="nip" placeholder="19XXXXXXXXXX">
+        </div>
+        <div class="field">
+          <label>NIK <span class="req">*</span></label>
+          <div class="hint">Awali dengan apostrof ( ' )</div>
+          <input type="text" id="nik" placeholder="'3XXXXXXXXXXXXXXX">
+        </div>
+      </div>
+      <div class="field">
+        <label>Pangkat / Golongan <span class="req">*</span></label>
+        <div class="hint">Jika tidak ada, pilih ( - )</div>
+        <div class="golongan-group">
+          <div class="gol-pill"><input type="radio" name="golongan" id="gol-I" value="I"><label for="gol-I">I</label></div>
+          <div class="gol-pill"><input type="radio" name="golongan" id="gol-II" value="II"><label for="gol-II">II</label></div>
+          <div class="gol-pill"><input type="radio" name="golongan" id="gol-III" value="III"><label for="gol-III">III</label></div>
+          <div class="gol-pill"><input type="radio" name="golongan" id="gol-IV" value="IV"><label for="gol-IV">IV</label></div>
+          <div class="gol-pill"><input type="radio" name="golongan" id="gol-none" value="-"><label for="gol-none" style="font-size:18px;font-weight:400">-</label></div>
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>Mata Pelajaran yang Diampu <span class="req">*</span></label>
+          <div class="hint">Untuk guru. Jika tidak ada, isi ( - )</div>
+          <input type="text" id="mapel" placeholder="Contoh: Matematika">
+        </div>
+        <div class="field">
+          <label>Jabatan <span class="req">*</span></label>
+          <div class="hint">Diisi untuk guru. Jika tidak ada, isi ( - )</div>
+          <input type="text" id="jabatan" placeholder="Contoh: Guru Madya">
+        </div>
+      </div>
+      <div class="field">
+        <label>Nomor Telepon (WhatsApp) <span class="req">*</span></label>
+        <input type="tel" id="wa" placeholder="Contoh: 081234567890" style="max-width:300px">
+      </div>
+    </div>
+  </div>
+
+  <!-- C. DATA INSTANSI -->
+  <div class="card">
+    <div class="card-accent"></div>
+    <div class="card-body">
+      <div class="section-header">
+        <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M12 3L2 9v2h20V9L12 3zm-7 8v7H3v2h18v-2h-2v-7h-2v7h-2v-7h-2v7h-2v-7H9v7H7v-7H5z"/></svg></div>
+        <h2>C. Data Instansi</h2>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>NPSN <span class="req">*</span></label>
+          <div class="hint">Jika tidak ada, isi ( - )</div>
+          <input type="text" id="npsn" placeholder="8 digit angka NPSN">
+        </div>
+        <div class="field">
+          <label>Instansi / Unit Kerja <span class="req">*</span></label>
+          <div class="hint">Isi nama instansi.</div>
+          <input type="text" id="instansi" placeholder="Nama sekolah / instansi">
+        </div>
+      </div>
+      <div class="field">
+        <label>Alamat Instansi / Unit Kerja <span class="req">*</span></label>
+        <textarea id="alamat" placeholder="Jl. ... No. ... Kecamatan ... Kabupaten/Kota ..."></textarea>
+      </div>
+      <div class="field">
+        <label>No. Telepon Instansi / Unit Kerja <span class="req">*</span></label>
+        <div class="hint">Jika tidak ada, isi ( - )</div>
+        <input type="tel" id="telp_instansi" placeholder="021XXXXXXX" style="max-width:260px">
+      </div>
+    </div>
+  </div>
+
+  <!-- D. WILAYAH -->
+  <div class="card">
+    <div class="card-accent"></div>
+    <div class="card-body">
+      <div class="section-header">
+        <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5z"/></svg></div>
+        <h2>D. Wilayah</h2>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>Provinsi <span class="req">*</span></label>
+          <select id="provinsi" onchange="updateKabkota()">
+            <option value="" disabled selected>-- Pilih provinsi --</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Kabupaten / Kota <span class="req">*</span></label>
+          <select id="kabkota" disabled>
+            <option value="" disabled selected>-- Pilih provinsi dulu --</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- E. PERNYATAAN -->
+  <div class="card">
+    <div class="card-accent"></div>
+    <div class="card-body">
+      <div class="section-header">
+        <div class="section-icon">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M9 11l3 3L22 4M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" stroke="var(--blue)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <h2>E. Pernyataan</h2>
+      </div>
+      <label class="checkbox-item">
+        <input type="checkbox" id="pernyataan">
+        <span>Dengan ini saya menyatakan data yang dimasukkan sudah benar, bersedia mengikuti kegiatan dimaksud secara penuh dan berpartisipasi secara aktif.</span>
+      </label>
+      <div style="margin-top:20px">
+        <button class="btn-submit" onclick="submitForm()">
+          <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+          Kirim
+        </button>
+        <button class="btn-clear" onclick="clearForm()">Hapus Formulir</button>
+      </div>
+      <div class="success-box" id="successBox">
+        <svg viewBox="0 0 22 22" fill="none">
+          <circle cx="11" cy="11" r="11" fill="#22C55E"/>
+          <polyline points="6,11 9,14 16,7" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <p>Formulir berhasil dikirim! Terima kasih atas partisipasi Anda.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const wilayah = {
+  "Aceh":["Kab. Aceh Barat","Kab. Aceh Barat Daya","Kab. Aceh Besar","Kab. Aceh Jaya","Kab. Aceh Selatan","Kab. Aceh Singkil","Kab. Aceh Tamiang","Kab. Aceh Tengah","Kab. Aceh Tenggara","Kab. Aceh Timur","Kab. Aceh Utara","Kab. Bener Meriah","Kab. Bireuen","Kab. Gayo Lues","Kab. Nagan Raya","Kab. Pidie","Kab. Pidie Jaya","Kab. Simeulue","Kota Banda Aceh","Kota Langsa","Kota Lhokseumawe","Kota Sabang","Kota Subulussalam"],
+  "Bali":["Kab. Badung","Kab. Bangli","Kab. Buleleng","Kab. Gianyar","Kab. Jembrana","Kab. Karang Asem","Kab. Klungkung","Kab. Tabanan","Kota Denpasar"],
+  "Banten":["Kab. Lebak","Kab. Pandeglang","Kab. Serang","Kab. Tangerang","Kota Cilegon","Kota Serang","Kota Tangerang","Kota Tangerang Selatan"],
+  "Bengkulu":["Kab. Bengkulu Selatan","Kab. Bengkulu Tengah","Kab. Bengkulu Utara","Kab. Kaur","Kab. Kepahiang","Kab. Lebong","Kab. Muko-muko","Kab. Rejang Lebong","Kab. Seluma","Kota Bengkulu"],
+  "D.I. Yogyakarta":["Kab. Bantul","Kab. Gunung Kidul","Kab. Kulon Progo","Kab. Sleman","Kota Yogyakarta"],
+  "D.K.I. Jakarta":["Kab. Kepulauan Seribu","Kota Jakarta Barat","Kota Jakarta Pusat","Kota Jakarta Selatan","Kota Jakarta Timur","Kota Jakarta Utara"],
+  "Gorontalo":["Kab. Boalemo","Kab. Bone Bolango","Kab. Gorontalo","Kab. Gorontalo Utara","Kab. Pohuwato","Kota Gorontalo"],
+  "Jambi":["Kab. Batang Hari","Kab. Bungo","Kab. Kerinci","Kab. Merangin","Kab. Muaro Jambi","Kab. Sarolangun","Kab. Tanjung Jabung Barat","Kab. Tanjung Jabung Timur","Kab. Tebo","Kota Jambi","Kota Sungai Penuh"],
+  "Jawa Barat":["Kab. Bandung","Kab. Bandung Barat","Kab. Bekasi","Kab. Bogor","Kab. Ciamis","Kab. Cianjur","Kab. Cirebon","Kab. Garut","Kab. Indramayu","Kab. Karawang","Kab. Kuningan","Kab. Majalengka","Kab. Pangandaran","Kab. Purwakarta","Kab. Subang","Kab. Sukabumi","Kab. Sumedang","Kab. Tasikmalaya","Kota Bandung","Kota Banjar","Kota Bekasi","Kota Bogor","Kota Cimahi","Kota Cirebon","Kota Depok","Kota Sukabumi","Kota Tasikmalaya"],
+  "Jawa Tengah":["Kab. Banjarnegara","Kab. Banyumas","Kab. Batang","Kab. Blora","Kab. Boyolali","Kab. Brebes","Kab. Cilacap","Kab. Demak","Kab. Grobogan","Kab. Jepara","Kab. Karanganyar","Kab. Kebumen","Kab. Kendal","Kab. Klaten","Kab. Kudus","Kab. Magelang","Kab. Pati","Kab. Pekalongan","Kab. Pemalang","Kab. Purbalingga","Kab. Purworejo","Kab. Rembang","Kab. Semarang","Kab. Sragen","Kab. Sukoharjo","Kab. Tegal","Kab. Temanggung","Kab. Wonogiri","Kab. Wonosobo","Kota Magelang","Kota Pekalongan","Kota Salatiga","Kota Semarang","Kota Surakarta","Kota Tegal"],
+  "Jawa Timur":["Kab. Bangkalan","Kab. Banyuwangi","Kab. Blitar","Kab. Bojonegoro","Kab. Bondowoso","Kab. Gresik","Kab. Jember","Kab. Jombang","Kab. Kediri","Kab. Lamongan","Kab. Lumajang","Kab. Madiun","Kab. Magetan","Kab. Malang","Kab. Mojokerto","Kab. Nganjuk","Kab. Ngawi","Kab. Pacitan","Kab. Pamekasan","Kab. Pasuruan","Kab. Ponorogo","Kab. Probolinggo","Kab. Sampang","Kab. Sidoarjo","Kab. Situbondo","Kab. Sumenep","Kab. Trenggalek","Kab. Tuban","Kab. Tulungagung","Kota Batu","Kota Blitar","Kota Kediri","Kota Madiun","Kota Malang","Kota Mojokerto","Kota Pasuruan","Kota Probolinggo","Kota Surabaya"],
+  "Kalimantan Barat":["Kab. Bengkayang","Kab. Kapuas Hulu","Kab. Kayong Utara","Kab. Ketapang","Kab. Kuburaya","Kab. Landak","Kab. Melawi","Kab. Mempawah","Kab. Sambas","Kab. Sanggau","Kab. Sekadau","Kab. Sintang","Kota Pontianak","Kota Singkawang"],
+  "Kalimantan Selatan":["Kab. Balangan","Kab. Banjar","Kab. Barito Kuala","Kab. Hulu Sungai Selatan","Kab. Hulu Sungai Tengah","Kab. Hulu Sungai Utara","Kab. Kotabaru","Kab. Tabalong","Kab. Tanah Bumbu","Kab. Tanah Laut","Kab. Tapin","Kota Banjarbaru","Kota Banjarmasin"],
+  "Kalimantan Tengah":["Kab. Barito Selatan","Kab. Barito Timur","Kab. Barito Utara","Kab. Gunung Mas","Kab. Kapuas","Kab. Katingan","Kab. Kotawaringin Barat","Kab. Kotawaringin Timur","Kab. Lamandau","Kab. Murung Raya","Kab. Pulang Pisau","Kab. Seruyan","Kab. Sukamara","Kota Palangka Raya"],
+  "Kalimantan Timur":["Kab. Berau","Kab. Kutai Barat","Kab. Kutai Kartanegara","Kab. Kutai Timur","Kab. Mahakam Ulu","Kab. Paser","Kab. Penajam Paser Utara","Kota Balikpapan","Kota Bontang","Kota Samarinda"],
+  "Kalimantan Utara":["Kab. Bulungan","Kab. Malinau","Kab. Nunukan","Kab. Tana Tidung","Kota Tarakan"],
+  "Kepulauan Bangka Belitung":["Kab. Bangka","Kab. Bangka Barat","Kab. Bangka Selatan","Kab. Bangka Tengah","Kab. Belitung","Kab. Belitung Timur","Kota Pangkalpinang"],
+  "Kepulauan Riau":["Kab. Bintan","Kab. Karimun","Kab. Kepulauan Anambas","Kab. Lingga","Kab. Natuna","Kota Batam","Kota Tanjungpinang"],
+  "Lampung":["Kab. Lampung Barat","Kab. Lampung Selatan","Kab. Lampung Tengah","Kab. Lampung Timur","Kab. Lampung Utara","Kab. Mesuji","Kab. Pesawaran","Kab. Pesisir Barat","Kab. Pringsewu","Kab. Tanggamus","Kab. Tulang Bawang","Kab. Tulang Bawang Barat","Kab. Way Kanan","Kota Bandar Lampung","Kota Metro"],
+  "Maluku":["Kab. Buru","Kab. Buru Selatan","Kab. Kepulauan Aru","Kab. Kepulauan Tanimbar","Kab. Maluku Barat Daya","Kab. Maluku Tengah","Kab. Maluku Tenggara","Kab. Seram Bagian Barat","Kab. Seram Bagian Timur","Kota Ambon","Kota Tual"],
+  "Maluku Utara":["Kab. Halmahera Barat","Kab. Halmahera Selatan","Kab. Halmahera Tengah","Kab. Halmahera Timur","Kab. Halmahera Utara","Kab. Kepulauan Morotai","Kab. Kepulauan Sula","Kab. Pulau Taliabu","Kota Ternate","Kota Tidore Kepulauan"],
+  "Nusa Tenggara Barat":["Kab. Bima","Kab. Dompu","Kab. Lombok Barat","Kab. Lombok Tengah","Kab. Lombok Timur","Kab. Lombok Utara","Kab. Sumbawa","Kab. Sumbawa Barat","Kota Bima","Kota Mataram"],
+  "Nusa Tenggara Timur":["Kab. Alor","Kab. Belu","Kab. Ende","Kab. Flores Timur","Kab. Kupang","Kab. Lembata","Kab. Malaka","Kab. Manggarai","Kab. Manggarai Barat","Kab. Manggarai Timur","Kab. Nagakeo","Kab. Ngada","Kab. Rote-Ndao","Kab. Sabu Raijua","Kab. Sikka","Kab. Sumba Barat","Kab. Sumba Barat Daya","Kab. Sumba Tengah","Kab. Sumba Timur","Kab. Timor Tengah Selatan","Kab. Timor Tengah Utara","Kota Kupang"],
+  "Papua":["Kab. Biak Numfor","Kab. Jayapura","Kab. Keerom","Kab. Kepulauan Yapen","Kab. Memberamo Raya","Kab. Sarmi","Kab. Supiori","Kab. Waropen","Kota Jayapura"],
+  "Papua Barat":["Kab. Fak-Fak","Kab. Kaimana","Kab. Manokwari","Kab. Manokwari Selatan","Kab. Pegunungan Arfak","Kab. Teluk Bintuni","Kab. Teluk Wondama"],
+  "Papua Barat Daya":["Kab. Maybrat","Kab. Raja Ampat","Kab. Sorong","Kab. Sorong Selatan","Kab. Tambrauw","Kota Sorong"],
+  "Papua Pegunungan":["Kab. Jayawijaya","Kab. Lanny Jaya","Kab. Membramo Tengah","Kab. Nduga","Kab. Pegunungan Bintang","Kab. Tolikara","Kab. Yahukimo","Kab. Yalimo"],
+  "Papua Selatan":["Kab. Asmat","Kab. Boven Digoel","Kab. Mappi","Kab. Merauke"],
+  "Papua Tengah":["Kab. Deiyai","Kab. Dogiyai","Kab. Intan Jaya","Kab. Mimika","Kab. Nabire","Kab. Paniai","Kab. Puncak","Kab. Puncak Jaya"],
+  "Riau":["Kab. Bengkalis","Kab. Indragiri Hilir","Kab. Indragiri Hulu","Kab. Kampar","Kab. Kepulauan Meranti","Kab. Kuantan Singingi","Kab. Pelalawan","Kab. Rokan Hilir","Kab. Rokan Hulu","Kab. Siak","Kota Dumai","Kota Pekanbaru"],
+  "Sulawesi Barat":["Kab. Majene","Kab. Mamasa","Kab. Mamuju","Kab. Mamuju Tengah","Kab. Pasangkayu","Kab. Polewali Mandar"],
+  "Sulawesi Selatan":["Kab. Bantaeng","Kab. Barru","Kab. Bone","Kab. Bulukumba","Kab. Enrekang","Kab. Gowa","Kab. Jeneponto","Kab. Kepulauan Selayar","Kab. Luwu","Kab. Luwu Timur","Kab. Luwu Utara","Kab. Maros","Kab. Pangkajene Kepulauan","Kab. Pinrang","Kab. Sidenreng Rappang","Kab. Sinjai","Kab. Soppeng","Kab. Takalar","Kab. Tana Toraja","Kab. Toraja Utara","Kab. Wajo","Kota Makassar","Kota Palopo","Kota Parepare"],
+  "Sulawesi Tengah":["Kab. Banggai","Kab. Banggai Kepulauan","Kab. Banggai Laut","Kab. Buol","Kab. Donggala","Kab. Morowali","Kab. Morowali Utara","Kab. Parigi Moutong","Kab. Poso","Kab. Sigi","Kab. Tojo Una-Una","Kab. Tolitoli","Kota Palu"],
+  "Sulawesi Tenggara":["Kab. Bombana","Kab. Buton","Kab. Buton Selatan","Kab. Buton Tengah","Kab. Buton Utara","Kab. Kolaka","Kab. Kolaka Timur","Kab. Kolaka Utara","Kab. Konawe","Kab. Konawe Kepulauan","Kab. Konawe Selatan","Kab. Konawe Utara","Kab. Muna","Kab. Muna Barat","Kab. Wakatobi","Kota Baubau","Kota Kendari"],
+  "Sulawesi Utara":["Kab. Bolaang Mongondow","Kab. Bolaang Mongondow Selatan","Kab. Bolaang Mongondow Timur","Kab. Bolaang Mongondow Utara","Kab. Kep. Sangihe","Kab. Kepulauan Siau Tagulandang Biaro","Kab. Kepulauan Talaud","Kab. Minahasa","Kab. Minahasa Selatan","Kab. Minahasa Tenggara","Kab. Minahasa Utara","Kota Bitung","Kota Kotamobagu","Kota Manado","Kota Tomohon"],
+  "Sumatera Barat":["Kab. Agam","Kab. Dharmasraya","Kab. Kepulauan Mentawai","Kab. Lima Puluh Koto","Kab. Padang Pariaman","Kab. Pasaman","Kab. Pasaman Barat","Kab. Pesisir Selatan","Kab. Sijunjung","Kab. Solok","Kab. Solok Selatan","Kab. Tanah Datar","Kota Bukittinggi","Kota Padang","Kota Padang Panjang","Kota Pariaman","Kota Payakumbuh","Kota Sawah Lunto","Kota Solok"],
+  "Sumatera Selatan":["Kab. Banyuasin","Kab. Empat Lawang","Kab. Lahat","Kab. Muara Enim","Kab. Musi Banyuasin","Kab. Musi Rawas","Kab. Musi Rawas Utara","Kab. Ogan Ilir","Kab. Ogan Komering Ilir","Kab. Ogan Komering Ulu","Kab. Ogan Komering Ulu Selatan","Kab. Ogan Komering Ulu Timur","Kab. Penukal Abab Lematang Ilir","Kota Lubuk Linggau","Kota Pagar Alam","Kota Palembang","Kota Prabumulih"],
+  "Sumatera Utara":["Kab. Asahan","Kab. Batubara","Kab. Dairi","Kab. Deli Serdang","Kab. Humbang Hasudutan","Kab. Karo","Kab. Labuhanbatu","Kab. Labuhanbatu Selatan","Kab. Labuhanbatu Utara","Kab. Langkat","Kab. Mandailing Natal","Kab. Nias","Kab. Nias Barat","Kab. Nias Selatan","Kab. Nias Utara","Kab. Padang Lawas","Kab. Padang Lawas Utara","Kab. Pakpak Bharat","Kab. Samosir","Kab. Serdang Bedagai","Kab. Simalungun","Kab. Tapanuli Selatan","Kab. Tapanuli Tengah","Kab. Tapanuli Utara","Kab. Toba","Kota Binjai","Kota Gunungsitoli","Kota Medan","Kota Padang Sidimpuan","Kota Pematangsiantar","Kota Sibolga","Kota Tanjung Balai","Kota Tebing Tinggi"]
+};
+
+// Populate provinsi
+(function(){
+  const sel = document.getElementById('provinsi');
+  Object.keys(wilayah).sort().forEach(p => {
+    const o = document.createElement('option');
+    o.value = p; o.textContent = 'Provinsi ' + p;
+    sel.appendChild(o);
+  });
+})();
+
+function updateKabkota() {
+  const prov = document.getElementById('provinsi').value;
+  const kabSel = document.getElementById('kabkota');
+  kabSel.innerHTML = '<option value="" disabled selected>-- Pilih kab/kota --</option>';
+  kabSel.disabled = false;
+  (wilayah[prov] || []).forEach(k => {
+    const o = document.createElement('option');
+    o.value = k; o.textContent = k;
+    kabSel.appendChild(o);
+  });
+  document.getElementById('provinsi').classList.remove('error');
+  kabSel.classList.remove('error');
+}
+
+// ─────────────────────────────────────────────────────
+//  ⬇️  GANTI URL INI SETELAH DEPLOY APPS SCRIPT
+// ─────────────────────────────────────────────────────
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzRpKYbEhktau5Q5MINiG0VkuMgxiw2CXgrztCbpFSfNnw0C8OCJK-hBFdq1RDwBmoIAg/exec';
+// ─────────────────────────────────────────────────────
+
+// Map nama_kegiatan → lokasi (dari fetch)
+let kegiatanMap = {};
+
+// Load kegiatan aktif saat halaman dibuka
+window.addEventListener('DOMContentLoaded', async () => {
+  const sel = document.getElementById('nama_kegiatan');
+  try {
+    const res = await fetch(`${SCRIPT_URL}?action=getKegiatan`);
+    const data = await res.json();
+    sel.innerHTML = '<option value="" disabled selected>-- Pilih nama kegiatan --</option>';
+    if (data.data && data.data.length > 0) {
+      data.data.forEach(item => {
+        kegiatanMap[item.nama_kegiatan] = item.lokasi;
+        const o = document.createElement('option');
+        o.value = item.nama_kegiatan;
+        o.textContent = item.nama_kegiatan;
+        sel.appendChild(o);
+      });
+    } else {
+      sel.innerHTML = '<option value="" disabled selected>-- Belum ada kegiatan tersedia --</option>';
+    }
+  } catch {
+    sel.innerHTML = '<option value="" disabled selected>-- Gagal memuat kegiatan --</option>';
+  }
+});
+
+function onKegiatanChange() {
+  const nama = document.getElementById('nama_kegiatan').value;
+  document.getElementById('lokasi_hidden').value = kegiatanMap[nama] || '';
+  document.getElementById('nama_kegiatan').classList.remove('error');
+}
+
+async function submitForm() {
+  const ids = ['nama','nip','nik','mapel','jabatan','wa','npsn','instansi','alamat','telp_instansi','provinsi','kabkota'];
+  let valid = true;
+
+  // Validasi nama kegiatan
+  const kegEl = document.getElementById('nama_kegiatan');
+  if (!kegEl.value) { kegEl.classList.add('error'); valid = false; }
+  else kegEl.classList.remove('error');
+
+  ids.forEach(id => {
+    const el = document.getElementById(id);
+    if (!el.value.trim()) { el.classList.add('error'); valid = false; }
+    else el.classList.remove('error');
+  });
+
+  if (!document.querySelector('input[name="golongan"]:checked')) valid = false;
+
+  const cb = document.getElementById('pernyataan');
+  if (!cb.checked) {
+    cb.closest('.checkbox-item').style.borderColor = '#C0392B';
+    valid = false;
+  } else cb.closest('.checkbox-item').style.borderColor = '';
+
+  if (!valid) {
+    const e = document.querySelector('.error');
+    if (e) e.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return;
+  }
+
+  // Disable tombol saat submit
+  const btnSubmit = document.querySelector('.btn-submit');
+  btnSubmit.disabled = true;
+  btnSubmit.innerHTML = `<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="white" stroke-width="2" fill="none" stroke-dasharray="31.4" stroke-dashoffset="10"/></svg> Mengirim...`;
+
+  const payload = {
+    action: 'submitBiodata',
+    data: {
+      nama_kegiatan: document.getElementById('nama_kegiatan').value,
+      lokasi: document.getElementById('lokasi_hidden').value,
+      nama: document.getElementById('nama').value,
+      nip: document.getElementById('nip').value,
+      nik: document.getElementById('nik').value,
+      golongan: document.querySelector('input[name="golongan"]:checked')?.value || '',
+      mapel: document.getElementById('mapel').value,
+      jabatan: document.getElementById('jabatan').value,
+      wa: document.getElementById('wa').value,
+      npsn: document.getElementById('npsn').value,
+      instansi: document.getElementById('instansi').value,
+      alamat: document.getElementById('alamat').value,
+      telp_instansi: document.getElementById('telp_instansi').value,
+      provinsi: document.getElementById('provinsi').value,
+      kabkota: document.getElementById('kabkota').value
+    }
+  };
+
+  try {
+    const res = await fetch(SCRIPT_URL, {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    });
+    const result = await res.json();
+    if (result.status === 'ok') {
+      document.getElementById('successBox').classList.add('show');
+      document.getElementById('successBox').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      btnSubmit.style.display = 'none';
+      document.querySelector('.btn-clear').style.display = 'none';
+    } else {
+      alert('Gagal mengirim data: ' + result.message);
+      btnSubmit.disabled = false;
+      btnSubmit.innerHTML = `<svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg> Kirim`;
+    }
+  } catch {
+    alert('Gagal terhubung ke server. Coba lagi.');
+    btnSubmit.disabled = false;
+    btnSubmit.innerHTML = `<svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg> Kirim`;
+  }
+}
+
+function clearForm() {
+  if (!confirm('Hapus semua isian formulir?')) return;
+  document.querySelectorAll('input[type=text],input[type=tel],textarea').forEach(el => el.value = '');
+  document.querySelectorAll('input[type=radio],input[type=checkbox]').forEach(el => el.checked = false);
+  document.getElementById('nama_kegiatan').selectedIndex = 0;
+  document.getElementById('lokasi_hidden').value = '';
+  document.getElementById('provinsi').selectedIndex = 0;
+  const kabSel = document.getElementById('kabkota');
+  kabSel.innerHTML = '<option value="" disabled selected>-- Pilih provinsi dulu --</option>';
+  kabSel.disabled = true;
+  document.querySelectorAll('.error').forEach(el => el.classList.remove('error'));
+  document.getElementById('successBox').classList.remove('show');
+  document.getElementById('pernyataan').closest('.checkbox-item').style.borderColor = '';
+  const btnSubmit = document.querySelector('.btn-submit');
+  btnSubmit.style.display = '';
+  btnSubmit.disabled = false;
+  document.querySelector('.btn-clear').style.display = '';
+}
+</script>
+</body>
+</html>

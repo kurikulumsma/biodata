@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin CMS – Biodata Kegiatan</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --blue: #1A5FB4; --blue-dark: #0D4A96; --blue-light: #EEF4FF;
+    --red: #C0392B; --red-light: #FEF2F2;
+    --green: #16A34A; --green-light: #F0FDF4;
+    --gray-bg: #F0F2F5; --gray-border: #D8DBE2; --gray-text: #6B7280;
+    --text: #1A1A2E; --white: #FFFFFF; --radius: 8px;
+  }
+  body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--gray-bg); color: var(--text); min-height: 100vh; }
+
+  /* LOGIN */
+  .login-wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; }
+  .login-card { background: var(--white); border-radius: 16px; border: 1px solid var(--gray-border); padding: 40px 36px; width: 100%; max-width: 380px; box-shadow: 0 4px 24px rgba(0,0,0,0.07); }
+  .login-card h1 { font-size: 20px; font-weight: 700; color: var(--blue); margin-bottom: 4px; }
+  .login-card p { font-size: 13px; color: var(--gray-text); margin-bottom: 28px; }
+  .login-card label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+  .login-card input { width: 100%; height: 42px; border: 1.5px solid var(--gray-border); border-radius: var(--radius); padding: 0 13px; font-family: inherit; font-size: 14px; outline: none; margin-bottom: 16px; }
+  .login-card input:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(26,95,180,0.1); }
+  .btn-login { width: 100%; height: 46px; background: var(--blue); color: white; border: none; border-radius: var(--radius); font-family: inherit; font-size: 15px; font-weight: 700; cursor: pointer; }
+  .btn-login:hover { background: var(--blue-dark); }
+  .login-err { font-size: 12.5px; color: var(--red); margin-top: -8px; margin-bottom: 12px; display: none; }
+  .login-err.show { display: block; }
+
+  /* DASHBOARD */
+  .dashboard { display: none; }
+  .topbar { background: var(--white); border-bottom: 1px solid var(--gray-border); padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; }
+  .topbar h1 { font-size: 16px; font-weight: 700; color: var(--blue); }
+  .btn-logout { font-size: 12.5px; color: var(--gray-text); background: none; border: 1px solid var(--gray-border); border-radius: 6px; padding: 6px 14px; cursor: pointer; font-family: inherit; }
+  .btn-logout:hover { border-color: var(--red); color: var(--red); }
+
+  .main { max-width: 720px; margin: 0 auto; padding: 28px 16px 64px; }
+
+  /* FORM TAMBAH */
+  .card { background: var(--white); border-radius: 12px; border: 1px solid var(--gray-border); overflow: hidden; margin-bottom: 20px; }
+  .card-accent { height: 3px; background: linear-gradient(90deg, var(--blue), #5B9BD5); }
+  .card-body { padding: 22px 24px; }
+  .card-body h2 { font-size: 15px; font-weight: 700; color: var(--blue); margin-bottom: 18px; }
+  .field { margin-bottom: 14px; }
+  .field label { display: block; font-size: 13.5px; font-weight: 600; margin-bottom: 6px; }
+  .field input, .field textarea { width: 100%; height: 42px; border: 1.5px solid var(--gray-border); border-radius: var(--radius); padding: 0 13px; font-family: inherit; font-size: 13.5px; outline: none; background: #F8FAFC; }
+  .field textarea { height: auto; padding: 11px 13px; min-height: 70px; resize: vertical; }
+  .field input:focus, .field textarea:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(26,95,180,0.1); background: white; }
+  .field input.error { border-color: var(--red); }
+  .btn-tambah { height: 44px; background: var(--blue); color: white; border: none; border-radius: var(--radius); font-family: inherit; font-size: 14px; font-weight: 700; cursor: pointer; padding: 0 28px; }
+  .btn-tambah:hover { background: var(--blue-dark); }
+  .btn-tambah:disabled { opacity: 0.6; cursor: not-allowed; }
+
+  /* TOAST */
+  .toast { position: fixed; bottom: 24px; right: 24px; background: #1e293b; color: white; padding: 12px 20px; border-radius: 10px; font-size: 13.5px; font-weight: 500; opacity: 0; transform: translateY(8px); transition: all 0.25s; pointer-events: none; z-index: 999; }
+  .toast.show { opacity: 1; transform: translateY(0); }
+  .toast.success { background: var(--green); }
+  .toast.error { background: var(--red); }
+
+  /* DAFTAR KEGIATAN */
+  .section-title { font-size: 15px; font-weight: 700; color: var(--blue); margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+  .badge-count { background: var(--blue-light); color: var(--blue); font-size: 12px; font-weight: 700; padding: 2px 9px; border-radius: 20px; }
+
+  .kegiatan-list { display: flex; flex-direction: column; gap: 10px; }
+  .kegiatan-item { background: var(--white); border: 1.5px solid var(--gray-border); border-radius: 10px; padding: 16px 18px; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; transition: border-color 0.15s; }
+  .kegiatan-item.nonaktif { opacity: 0.55; border-style: dashed; }
+  .kegiatan-item:hover { border-color: #b0bec5; }
+
+  .kegiatan-info { flex: 1; min-width: 0; }
+  .kegiatan-nama { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 4px; line-height: 1.4; }
+  .kegiatan-lokasi { font-size: 12.5px; color: var(--gray-text); }
+  .kegiatan-status { display: inline-flex; align-items: center; gap: 5px; font-size: 11.5px; font-weight: 600; padding: 3px 10px; border-radius: 20px; margin-top: 8px; }
+  .kegiatan-status.aktif { background: var(--green-light); color: var(--green); }
+  .kegiatan-status.nonaktif { background: #F3F4F6; color: var(--gray-text); }
+  .kegiatan-status::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: currentColor; display: inline-block; }
+
+  .kegiatan-actions { display: flex; gap: 8px; flex-shrink: 0; }
+  .btn-toggle { height: 34px; padding: 0 14px; border-radius: 7px; font-family: inherit; font-size: 12.5px; font-weight: 600; cursor: pointer; border: 1.5px solid; transition: all 0.15s; }
+  .btn-toggle.deactivate { border-color: #F59E0B; color: #B45309; background: #FFFBEB; }
+  .btn-toggle.deactivate:hover { background: #FEF3C7; }
+  .btn-toggle.activate { border-color: var(--green); color: var(--green); background: var(--green-light); }
+  .btn-toggle.activate:hover { background: #DCFCE7; }
+  .btn-hapus { height: 34px; padding: 0 14px; border-radius: 7px; font-family: inherit; font-size: 12.5px; font-weight: 600; cursor: pointer; border: 1.5px solid #FECACA; color: var(--red); background: var(--red-light); transition: all 0.15s; }
+  .btn-hapus:hover { background: #FEE2E2; }
+
+  .empty-state { text-align: center; padding: 40px 20px; color: var(--gray-text); font-size: 14px; }
+  .loading { text-align: center; padding: 24px; color: var(--gray-text); font-size: 13.5px; }
+
+  .script-url-info { background: var(--blue-light); border: 1.5px solid #C5D8F5; border-radius: 10px; padding: 14px 18px; margin-bottom: 20px; font-size: 13px; color: var(--blue); display: none; }
+  .script-url-info.show { display: block; }
+</style>
+</head>
+<body>
+
+<!-- SETUP URL NOTICE -->
+<div class="script-url-info" id="urlNotice">
+  ⚠️ <strong>Belum dikonfigurasi.</strong> Ganti nilai <code>SCRIPT_URL</code> di baris paling atas script dengan URL deployment Apps Script kamu.
+</div>
+
+<!-- LOGIN -->
+<div class="login-wrap" id="loginWrap">
+  <div class="login-card">
+    <h1>🔐 Admin Panel</h1>
+    <p>Manajemen Kegiatan – Biodata Kemendikdasmen</p>
+    <label>Username</label>
+    <input type="text" id="loginUser" placeholder="admin" autocomplete="off">
+    <label>Password</label>
+    <input type="password" id="loginPass" placeholder="••••••">
+    <div class="login-err" id="loginErr">Username atau password salah.</div>
+    <button class="btn-login" onclick="doLogin()">Masuk</button>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div class="dashboard" id="dashboard">
+  <div class="topbar">
+    <h1>⚙️ Admin CMS – Manajemen Kegiatan</h1>
+    <button class="btn-logout" onclick="doLogout()">Keluar</button>
+  </div>
+  <div class="main">
+
+    <!-- FORM TAMBAH KEGIATAN -->
+    <div class="card">
+      <div class="card-accent"></div>
+      <div class="card-body">
+        <h2>➕ Tambah Kegiatan Baru</h2>
+        <div class="field">
+          <label>Nama Kegiatan <span style="color:#C0392B">*</span></label>
+          <input type="text" id="inputNama" placeholder="Contoh: ToT Fasilitator Papan Interaktif Digital jenjang SMA">
+        </div>
+        <div class="field">
+          <label>Lokasi Kegiatan <span style="color:#C0392B">*</span></label>
+          <input type="text" id="inputLokasi" placeholder="Contoh: Hotel Grand Mercure, Jakarta, 15–18 April 2026">
+        </div>
+        <button class="btn-tambah" id="btnTambah" onclick="tambahKegiatan()">Simpan Kegiatan</button>
+      </div>
+    </div>
+
+    <!-- DAFTAR KEGIATAN -->
+    <div class="section-title">
+      Daftar Kegiatan
+      <span class="badge-count" id="badgeCount">0</span>
+    </div>
+    <div class="kegiatan-list" id="kegiatanList">
+      <div class="loading">Memuat data...</div>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ─────────────────────────────────────────────────────
+//  ⬇️  GANTI URL INI SETELAH DEPLOY APPS SCRIPT
+// ─────────────────────────────────────────────────────
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzRpKYbEhktau5Q5MINiG0VkuMgxiw2CXgrztCbpFSfNnw0C8OCJK-hBFdq1RDwBmoIAg/exec';
+// ─────────────────────────────────────────────────────
+
+let isLoggedIn = false;
+
+window.onload = () => {
+  if (SCRIPT_URL === 'GANTI_DENGAN_URL_APPS_SCRIPT_KAMU') {
+    document.getElementById('urlNotice').classList.add('show');
+  }
+  if (sessionStorage.getItem('adminLoggedIn') === 'true') {
+    showDashboard();
+  }
+};
+
+async function doLogin() {
+  const user = document.getElementById('loginUser').value.trim();
+  const pass = document.getElementById('loginPass').value.trim();
+  const errEl = document.getElementById('loginErr');
+  errEl.classList.remove('show');
+
+  try {
+    const res = await fetch(SCRIPT_URL, {
+      method: 'POST',
+      body: JSON.stringify({ action: 'login', username: user, password: pass })
+    });
+    const data = await res.json();
+    if (data.status === 'ok') {
+      sessionStorage.setItem('adminLoggedIn', 'true');
+      showDashboard();
+    } else {
+      errEl.classList.add('show');
+    }
+  } catch {
+    errEl.textContent = 'Gagal terhubung ke server. Cek URL Apps Script.';
+    errEl.classList.add('show');
+  }
+}
+
+function doLogout() {
+  sessionStorage.removeItem('adminLoggedIn');
+  document.getElementById('dashboard').style.display = 'none';
+  document.getElementById('loginWrap').style.display = 'flex';
+}
+
+function showDashboard() {
+  document.getElementById('loginWrap').style.display = 'none';
+  document.getElementById('dashboard').style.display = 'block';
+  loadKegiatan();
+}
+
+async function loadKegiatan() {
+  const list = document.getElementById('kegiatanList');
+  list.innerHTML = '<div class="loading">Memuat data...</div>';
+  try {
+    const res = await fetch(`${SCRIPT_URL}?action=getAllKegiatan`);
+    const data = await res.json();
+    renderKegiatan(data.data || []);
+  } catch {
+    list.innerHTML = '<div class="empty-state">Gagal memuat data. Cek koneksi atau URL Apps Script.</div>';
+  }
+}
+
+function renderKegiatan(items) {
+  const list = document.getElementById('kegiatanList');
+  document.getElementById('badgeCount').textContent = items.length;
+  if (!items.length) {
+    list.innerHTML = '<div class="empty-state">Belum ada kegiatan. Tambahkan di atas.</div>';
+    return;
+  }
+  list.innerHTML = items.map(item => `
+    <div class="kegiatan-item ${item.aktif ? '' : 'nonaktif'}" id="item-${item.id}">
+      <div class="kegiatan-info">
+        <div class="kegiatan-nama">${escHtml(item.nama_kegiatan)}</div>
+        <div class="kegiatan-lokasi">📍 ${escHtml(item.lokasi)}</div>
+        <div class="kegiatan-status ${item.aktif ? 'aktif' : 'nonaktif'}">${item.aktif ? 'Aktif' : 'Nonaktif'}</div>
+      </div>
+      <div class="kegiatan-actions">
+        ${item.aktif
+          ? `<button class="btn-toggle deactivate" onclick="toggleKegiatan('${item.id}', false)">Nonaktifkan</button>`
+          : `<button class="btn-toggle activate" onclick="toggleKegiatan('${item.id}', true)">Aktifkan</button>`
+        }
+        <button class="btn-hapus" onclick="hapusKegiatan('${item.id}', '${escHtml(item.nama_kegiatan)}')">Hapus</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+async function tambahKegiatan() {
+  const nama = document.getElementById('inputNama').value.trim();
+  const lokasi = document.getElementById('inputLokasi').value.trim();
+  if (!nama) { document.getElementById('inputNama').classList.add('error'); return; }
+  if (!lokasi) { document.getElementById('inputLokasi').classList.add('error'); return; }
+  document.getElementById('inputNama').classList.remove('error');
+  document.getElementById('inputLokasi').classList.remove('error');
+
+  const btn = document.getElementById('btnTambah');
+  btn.disabled = true; btn.textContent = 'Menyimpan...';
+  try {
+    const res = await fetch(SCRIPT_URL, {
+      method: 'POST',
+      body: JSON.stringify({ action: 'addKegiatan', nama_kegiatan: nama, lokasi: lokasi })
+    });
+    const data = await res.json();
+    if (data.status === 'ok') {
+      document.getElementById('inputNama').value = '';
+      document.getElementById('inputLokasi').value = '';
+      showToast('Kegiatan berhasil ditambahkan!', 'success');
+      loadKegiatan();
+    } else {
+      showToast('Gagal: ' + data.message, 'error');
+    }
+  } catch {
+    showToast('Gagal terhubung ke server.', 'error');
+  } finally {
+    btn.disabled = false; btn.textContent = 'Simpan Kegiatan';
+  }
+}
+
+async function toggleKegiatan(id, aktif) {
+  try {
+    const res = await fetch(SCRIPT_URL, {
+      method: 'POST',
+      body: JSON.stringify({ action: 'toggleKegiatan', id, aktif })
+    });
+    const data = await res.json();
+    if (data.status === 'ok') {
+      showToast(aktif ? 'Kegiatan diaktifkan.' : 'Kegiatan dinonaktifkan.', 'success');
+      loadKegiatan();
+    } else {
+      showToast('Gagal: ' + data.message, 'error');
+    }
+  } catch {
+    showToast('Gagal terhubung ke server.', 'error');
+  }
+}
+
+async function hapusKegiatan(id, nama) {
+  if (!confirm(`Hapus kegiatan "${nama}"?\n\nData responses yang sudah masuk TIDAK ikut terhapus.`)) return;
+  try {
+    const res = await fetch(SCRIPT_URL, {
+      method: 'POST',
+      body: JSON.stringify({ action: 'deleteKegiatan', id })
+    });
+    const data = await res.json();
+    if (data.status === 'ok') {
+      showToast('Kegiatan dihapus.', 'success');
+      loadKegiatan();
+    } else {
+      showToast('Gagal: ' + data.message, 'error');
+    }
+  } catch {
+    showToast('Gagal terhubung ke server.', 'error');
+  }
+}
+
+function showToast(msg, type = '') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = `toast show ${type}`;
+  setTimeout(() => t.className = 'toast', 3000);
+}
+
+function escHtml(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+document.getElementById('loginPass').addEventListener('keydown', e => {
+  if (e.key === 'Enter') doLogin();
+});
+</script>
+</body>
+</html>
