@@ -235,6 +235,81 @@
     border-color: var(--red);
     box-shadow: 0 0 0 3px rgba(192,57,43,0.08);
   }
+
+  /* ── NIK GATE (STEP 1) ── */
+  .nik-gate {
+    background: var(--white);
+    border-radius: 16px;
+    border: 1px solid var(--gray-border);
+    overflow: hidden;
+    margin-bottom: 28px;
+  }
+  .nik-gate-accent { height: 4px; background: linear-gradient(90deg, var(--blue) 0%, #5B9BD5 100%); }
+  .nik-gate-body { padding: 28px 26px 30px; }
+  .nik-gate-body h2 { font-size: 17px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+  .nik-gate-body p { font-size: 13px; color: var(--gray-text); margin-bottom: 22px; line-height: 1.5; }
+
+  .nik-input-row { display: flex; gap: 10px; }
+  .nik-input-row input {
+    flex: 1; height: 46px;
+    border: 1.5px solid var(--gray-border); border-radius: var(--radius);
+    padding: 0 14px; font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 14px; color: var(--text); background: var(--input-bg);
+    outline: none; transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .nik-input-row input:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(26,95,180,0.1); background: var(--white); }
+  .nik-input-row input.error { border-color: var(--red); box-shadow: 0 0 0 3px rgba(192,57,43,0.08); }
+
+  .btn-cek {
+    height: 46px; padding: 0 22px;
+    background: var(--blue); color: white; border: none; border-radius: var(--radius);
+    font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; font-weight: 700;
+    cursor: pointer; white-space: nowrap; transition: background 0.15s;
+    display: flex; align-items: center; gap: 8px; flex-shrink: 0;
+  }
+  .btn-cek:hover { background: var(--blue-dark); }
+  .btn-cek:disabled { opacity: 0.65; cursor: not-allowed; }
+
+  /* spinner inline */
+  .spin { display: inline-block; width: 15px; height: 15px; border: 2px solid rgba(255,255,255,0.4); border-top-color: white; border-radius: 50%; animation: spin 0.7s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* found / not-found banner */
+  .nik-result {
+    margin-top: 14px; padding: 13px 16px; border-radius: var(--radius);
+    font-size: 13px; font-weight: 600; display: none; align-items: center; gap: 10px;
+  }
+  .nik-result.show { display: flex; }
+  .nik-result.found { background: #F0FDF4; border: 1.5px solid #86EFAC; color: #166534; }
+  .nik-result.notfound { background: #FFFBEB; border: 1.5px solid #FCD34D; color: #92400E; }
+  .nik-result .result-icon { font-size: 18px; flex-shrink: 0; }
+
+  /* form section hidden/show */
+  .form-section { display: none; }
+  .form-section.show { display: block; }
+
+  /* kegiatan di step 1 */
+  .step1-kegiatan { margin-bottom: 18px; }
+  .step1-kegiatan label { display: block; font-size: 13.5px; font-weight: 600; margin-bottom: 6px; }
+  .step1-kegiatan .hint { font-size: 11.5px; color: var(--gray-text); margin-bottom: 5px; }
+  .step1-kegiatan select {
+    width: 100%; height: 44px;
+    border: 1.5px solid var(--gray-border); border-radius: var(--radius);
+    padding: 0 13px; font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 13.5px; color: var(--text); background: var(--input-bg);
+    outline: none; appearance: none; -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%236B7280'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 13px center;
+    padding-right: 34px; cursor: pointer; margin-bottom: 0;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .step1-kegiatan select:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(26,95,180,0.1); background: var(--white); }
+  .step1-kegiatan select.error { border-color: var(--red); }
+
+  /* NIK di form data pribadi jadi readonly setelah cek */
+  #nik[readonly] { background: #F1F5F9; color: #64748B; cursor: not-allowed; border-color: #CBD5E1; }
+  .nik-lock-note { font-size: 11.5px; color: var(--gray-text); margin-top: 4px; display: none; }
+  .nik-lock-note.show { display: block; }
 </style>
 </head>
 <body>
@@ -264,7 +339,7 @@
     <p>Isi formulir dengan data yang benar. Data akan digunakan untuk keperluan administrasi kegiatan.</p>
   </div>
 
-  <!-- A. INFO KEGIATAN -->
+  <!-- A. INFORMASI KEGIATAN -->
   <div class="card">
     <div class="card-accent"></div>
     <div class="card-body">
@@ -279,18 +354,46 @@
           <option value="" disabled selected>-- Memuat daftar kegiatan... --</option>
         </select>
       </div>
-      <!-- Lokasi disimpan otomatis, tidak ditampilkan ke peserta -->
       <input type="hidden" id="lokasi_hidden">
     </div>
   </div>
 
-  <!-- B. DATA PRIBADI -->
+  <!-- B. IDENTITAS PESERTA -->
   <div class="card">
     <div class="card-accent"></div>
     <div class="card-body">
       <div class="section-header">
         <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v2h20v-2c0-3.3-6.7-5-10-5z"/></svg></div>
-        <h2>B. Data Pribadi</h2>
+        <h2>B. Identitas Peserta</h2>
+      </div>
+      <div class="field">
+        <label>NIK <span class="req">*</span></label>
+        <div class="hint">Nomor Induk Kependudukan 16 digit (tanpa spasi)</div>
+        <div class="nik-input-row">
+          <input type="text" id="nikGateInput" placeholder="Contoh: 3XXXXXXXXXXXXXXX" maxlength="16" inputmode="numeric"
+            onkeydown="if(event.key==='Enter') cekNIK()">
+          <button class="btn-cek" id="btnCek" onclick="cekNIK()">
+            <span id="btnCekLabel">Cek Data</span>
+          </button>
+        </div>
+        <div class="nik-result" id="nikResult" style="margin-top:12px">
+          <span class="result-icon" id="nikResultIcon"></span>
+          <span id="nikResultText"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- C dst: muncul setelah NIK dicek -->
+  <div class="form-section" id="formSection">
+
+  <!-- C. DATA PRIBADI (dulu B) -->
+  <div class="card">
+    <div class="card-accent"></div>
+    <div class="card-body">
+      <div class="section-header">
+        <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v2h20v-2c0-3.3-6.7-5-10-5z"/></svg></div>
+        <h2>C. Data Pribadi</h2>
       </div>
       <div class="field">
         <label>Nama Lengkap <span class="req">*</span></label>
@@ -305,8 +408,8 @@
         </div>
         <div class="field">
           <label>NIK <span class="req">*</span></label>
-          <div class="hint">Awali dengan apostrof ( ' )</div>
-          <input type="text" id="nik" placeholder="'3XXXXXXXXXXXXXXX">
+          <div class="hint">Terisi otomatis dari input di atas</div>
+          <input type="text" id="nik" placeholder="3XXXXXXXXXXXXXXX" readonly>
         </div>
       </div>
       <div class="field">
@@ -339,13 +442,13 @@
     </div>
   </div>
 
-  <!-- C. DATA INSTANSI -->
+  <!-- D. DATA INSTANSI -->
   <div class="card">
     <div class="card-accent"></div>
     <div class="card-body">
       <div class="section-header">
         <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M12 3L2 9v2h20V9L12 3zm-7 8v7H3v2h18v-2h-2v-7h-2v7h-2v-7h-2v7h-2v-7H9v7H7v-7H5z"/></svg></div>
-        <h2>C. Data Instansi</h2>
+        <h2>D. Data Instansi</h2>
       </div>
       <div class="field-row">
         <div class="field">
@@ -371,13 +474,13 @@
     </div>
   </div>
 
-  <!-- D. WILAYAH -->
+  <!-- E. WILAYAH -->
   <div class="card">
     <div class="card-accent"></div>
     <div class="card-body">
       <div class="section-header">
         <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5z"/></svg></div>
-        <h2>D. Wilayah</h2>
+        <h2>E. Wilayah</h2>
       </div>
       <div class="field-row">
         <div class="field">
@@ -396,7 +499,7 @@
     </div>
   </div>
 
-  <!-- E. PERNYATAAN -->
+  <!-- F. PERNYATAAN -->
   <div class="card">
     <div class="card-accent"></div>
     <div class="card-body">
@@ -404,7 +507,7 @@
         <div class="section-icon">
           <svg viewBox="0 0 24 24" fill="none"><path d="M9 11l3 3L22 4M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" stroke="var(--blue)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </div>
-        <h2>E. Pernyataan</h2>
+        <h2>F. Pernyataan</h2>
       </div>
       <label class="checkbox-item">
         <input type="checkbox" id="pernyataan">
@@ -419,6 +522,7 @@
       </div>
     </div>
   </div>
+  </div><!-- /form-section -->
 </div>
 
 <!-- SUCCESS OVERLAY -->
@@ -577,6 +681,123 @@ function onKegiatanChange() {
   document.getElementById('nama_kegiatan').classList.remove('error');
 }
 
+// ── NIK GATE LOGIC ──────────────────────────────────────────────
+async function cekNIK() {
+  const nikVal = document.getElementById('nikGateInput').value.trim();
+  const kegEl  = document.getElementById('nama_kegiatan');
+  const nikEl  = document.getElementById('nikGateInput');
+  const resultEl = document.getElementById('nikResult');
+  const btn    = document.getElementById('btnCek');
+  const label  = document.getElementById('btnCekLabel');
+
+  // Validasi kegiatan dulu
+  if (!kegEl.value) {
+    kegEl.classList.add('error');
+    kegEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return;
+  }
+
+  // Validasi NIK
+  if (!nikVal || nikVal.length < 16) {
+    nikEl.classList.add('error');
+    nikEl.focus();
+    return;
+  }
+  nikEl.classList.remove('error');
+
+  // Loading state
+  btn.disabled = true;
+  label.innerHTML = '<span class="spin"></span>';
+
+  try {
+    const res = await fetch(SCRIPT_URL, {
+      method: 'POST',
+      body: JSON.stringify({ action: 'lookupNIK', nik: nikVal })
+    });
+    const result = await res.json();
+
+    if (result.status === 'found' && result.data) {
+      // Data ditemukan — prefill form
+      prefillForm(result.data);
+      showNikResult('found', `✅ Data ditemukan! Periksa dan koreksi jika ada perubahan.`);
+    } else {
+      // Peserta baru
+      clearFormFields();
+      // Isi NIK di form dari gate input
+      document.getElementById('nik').value = nikVal;
+      showNikResult('notfound', `⚠️ Peserta baru terdeteksi. Silakan isi formulir secara lengkap.`);
+    }
+  } catch(e) {
+    // Jika endpoint lookup tidak tersedia, tetap lanjutkan sebagai peserta baru
+    clearFormFields();
+    document.getElementById('nik').value = nikVal;
+    showNikResult('notfound', `⚠️ Tidak dapat memeriksa data. Silakan isi formulir secara lengkap.`);
+  } finally {
+    btn.disabled = false;
+    label.textContent = 'Cek Ulang';
+    // Tampilkan form section
+    document.getElementById('formSection').classList.add('show');
+    // Scroll ke form
+    setTimeout(() => {
+      document.getElementById('formSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 200);
+  }
+}
+
+function showNikResult(type, text) {
+  const el = document.getElementById('nikResult');
+  el.className = 'nik-result show ' + type;
+  el.querySelector('#nikResultText').textContent = text;
+  el.querySelector('#nikResultIcon').textContent = '';
+}
+
+function prefillForm(d) {
+  const setVal = (id, val) => {
+    const el = document.getElementById(id);
+    if (el && val !== undefined && val !== null) el.value = val;
+  };
+  setVal('nama', d.nama);
+  setVal('nip', d.nip);
+  setVal('nik', d.nik || document.getElementById('nikGateInput').value.trim());
+  setVal('mapel', d.mapel);
+  setVal('jabatan', d.jabatan);
+  setVal('wa', d.wa);
+  setVal('npsn', d.npsn);
+  setVal('instansi', d.instansi);
+  setVal('alamat', d.alamat);
+  setVal('telp_instansi', d.telp_instansi);
+
+  // Golongan
+  if (d.golongan) {
+    const radio = document.querySelector(`input[name="golongan"][value="${d.golongan}"]`);
+    if (radio) radio.checked = true;
+  }
+
+  // Provinsi & Kab/kota
+  if (d.provinsi) {
+    const provSel = document.getElementById('provinsi');
+    provSel.value = d.provinsi;
+    updateKabkota();
+    if (d.kabkota) {
+      setTimeout(() => { document.getElementById('kabkota').value = d.kabkota; }, 50);
+    }
+  }
+}
+
+function clearFormFields() {
+  document.querySelectorAll('#formSection input[type=text]:not([readonly]), #formSection input[type=tel], #formSection textarea').forEach(el => {
+    el.value = '';
+  });
+  document.querySelectorAll('#formSection input[type=radio], #formSection input[type=checkbox]').forEach(el => {
+    el.checked = false;
+  });
+  document.getElementById('provinsi').selectedIndex = 0;
+  const kabSel = document.getElementById('kabkota');
+  kabSel.innerHTML = '<option value="" disabled selected>-- Pilih provinsi dulu --</option>';
+  kabSel.disabled = true;
+}
+// ────────────────────────────────────────────────────────────────
+
 async function submitForm() {
   const ids = ['nama','nip','nik','mapel','jabatan','wa','npsn','instansi','alamat','telp_instansi','provinsi','kabkota'];
   let valid = true;
@@ -669,19 +890,21 @@ function tampilkanSukses(d) {
 
 function isiUlang() {
   document.getElementById('successOverlay').classList.remove('show');
-  document.querySelectorAll('input[type=text],input[type=tel],textarea').forEach(el => el.value = '');
-  document.querySelectorAll('input[type=radio],input[type=checkbox]').forEach(el => el.checked = false);
+  // Reset form fields
+  clearFormFields();
   document.getElementById('nama_kegiatan').selectedIndex = 0;
   document.getElementById('lokasi_hidden').value = '';
-  document.getElementById('provinsi').selectedIndex = 0;
-  const kabSel = document.getElementById('kabkota');
-  kabSel.innerHTML = '<option value="" disabled selected>-- Pilih provinsi dulu --</option>';
-  kabSel.disabled = true;
   document.querySelectorAll('.error').forEach(el => el.classList.remove('error'));
   document.getElementById('pernyataan').closest('.checkbox-item').style.borderColor = '';
   const btnSubmit = document.getElementById('btnSubmit');
   btnSubmit.disabled = false;
   btnSubmit.innerHTML = `<svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg> Kirim`;
+  // Reset NIK gate
+  document.getElementById('nikGateInput').value = '';
+  document.getElementById('nikResult').className = 'nik-result';
+  document.getElementById('btnCekLabel').textContent = 'Cek Data';
+  // Sembunyikan form section kembali
+  document.getElementById('formSection').classList.remove('show');
   window.scrollTo(0, 0);
 }
 
