@@ -153,43 +153,34 @@
 <div class="toast" id="toast"></div>
 
 <script>
-// ─────────────────────────────────────────────────────
-//  ⬇️  GANTI URL INI SETELAH DEPLOY APPS SCRIPT
-// ─────────────────────────────────────────────────────
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzRpKYbEhktau5Q5MINiG0VkuMgxiw2CXgrztCbpFSfNnw0C8OCJK-hBFdq1RDwBmoIAg/exec';
-// ─────────────────────────────────────────────────────
+const SUPABASE_URL = 'https://lusytejskqevwyyffeue.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx1c3l0ZWpza3Fldnd5eWZmZXVlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYxMzUyODksImV4cCI6MjA5MTcxMTI4OX0.LKCfdnlB8TQTeB7NuZ1DXwSkCI9DK3WlD4xk-jzUTPU';
+const ADMIN_USER = 'admin';
+const ADMIN_PASS = 'admin';
 
-let isLoggedIn = false;
+const sb = (path, opts = {}) => fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
+  headers: {
+    'apikey': SUPABASE_KEY,
+    'Authorization': `Bearer ${SUPABASE_KEY}`,
+    'Content-Type': 'application/json',
+    'Prefer': opts.prefer || 'return=representation',
+    ...(opts.headers || {})
+  },
+  ...opts
+});
 
 window.onload = () => {
-  if (SCRIPT_URL === 'GANTI_DENGAN_URL_APPS_SCRIPT_KAMU') {
-    document.getElementById('urlNotice').classList.add('show');
-  }
-  if (sessionStorage.getItem('adminLoggedIn') === 'true') {
-    showDashboard();
-  }
+  if (sessionStorage.getItem('adminLoggedIn') === 'true') showDashboard();
 };
 
-async function doLogin() {
+function doLogin() {
   const user = document.getElementById('loginUser').value.trim();
   const pass = document.getElementById('loginPass').value.trim();
   const errEl = document.getElementById('loginErr');
-  errEl.classList.remove('show');
-
-  try {
-    const res = await fetch(SCRIPT_URL, {
-      method: 'POST',
-      body: JSON.stringify({ action: 'login', username: user, password: pass })
-    });
-    const data = await res.json();
-    if (data.status === 'ok') {
-      sessionStorage.setItem('adminLoggedIn', 'true');
-      showDashboard();
-    } else {
-      errEl.classList.add('show');
-    }
-  } catch {
-    errEl.textContent = 'Gagal terhubung ke server. Cek URL Apps Script.';
+  if (user === ADMIN_USER && pass === ADMIN_PASS) {
+    sessionStorage.setItem('adminLoggedIn', 'true');
+    showDashboard();
+  } else {
     errEl.classList.add('show');
   }
 }
@@ -210,11 +201,11 @@ async function loadKegiatan() {
   const list = document.getElementById('kegiatanList');
   list.innerHTML = '<div class="loading">Memuat data...</div>';
   try {
-    const res = await fetch(`${SCRIPT_URL}?action=getAllKegiatan`);
+    const res = await sb('kegiatan?order=created_at.asc');
     const data = await res.json();
-    renderKegiatan(data.data || []);
+    renderKegiatan(data);
   } catch {
-    list.innerHTML = '<div class="empty-state">Gagal memuat data. Cek koneksi atau URL Apps Script.</div>';
+    list.innerHTML = '<div class="empty-state">Gagal memuat data.</div>';
   }
 }
 
@@ -226,7 +217,7 @@ function renderKegiatan(items) {
     return;
   }
   list.innerHTML = items.map(item => `
-    <div class="kegiatan-item ${item.aktif ? '' : 'nonaktif'}" id="item-${item.id}">
+    <div class="kegiatan-item ${item.aktif ? '' : 'nonaktif'}">
       <div class="kegiatan-info">
         <div class="kegiatan-nama">${escHtml(item.nama_kegiatan)}</div>
         <div class="kegiatan-lokasi">📍 ${escHtml(item.lokasi)}</div>
@@ -234,10 +225,10 @@ function renderKegiatan(items) {
       </div>
       <div class="kegiatan-actions">
         ${item.aktif
-          ? `<button class="btn-toggle deactivate" onclick="toggleKegiatan('${item.id}', false)">Nonaktifkan</button>`
-          : `<button class="btn-toggle activate" onclick="toggleKegiatan('${item.id}', true)">Aktifkan</button>`
+          ? `<button class="btn-toggle deactivate" onclick="toggleKegiatan(${item.id}, false)">Nonaktifkan</button>`
+          : `<button class="btn-toggle activate" onclick="toggleKegiatan(${item.id}, true)">Aktifkan</button>`
         }
-        <button class="btn-hapus" onclick="hapusKegiatan('${item.id}', '${escHtml(item.nama_kegiatan)}')">Hapus</button>
+        <button class="btn-hapus" onclick="hapusKegiatan(${item.id}, \`${escHtml(item.nama_kegiatan)}\`)">Hapus</button>
       </div>
     </div>
   `).join('');
@@ -254,21 +245,21 @@ async function tambahKegiatan() {
   const btn = document.getElementById('btnTambah');
   btn.disabled = true; btn.textContent = 'Menyimpan...';
   try {
-    const res = await fetch(SCRIPT_URL, {
+    const res = await sb('kegiatan', {
       method: 'POST',
-      body: JSON.stringify({ action: 'addKegiatan', nama_kegiatan: nama, lokasi: lokasi })
+      body: JSON.stringify({ nama_kegiatan: nama, lokasi, aktif: true })
     });
-    const data = await res.json();
-    if (data.status === 'ok') {
+    if (res.ok) {
       document.getElementById('inputNama').value = '';
       document.getElementById('inputLokasi').value = '';
       showToast('Kegiatan berhasil ditambahkan!', 'success');
       loadKegiatan();
     } else {
-      showToast('Gagal: ' + data.message, 'error');
+      const err = await res.json();
+      showToast('Gagal: ' + (err.message || 'Unknown error'), 'error');
     }
   } catch {
-    showToast('Gagal terhubung ke server.', 'error');
+    showToast('Gagal terhubung ke Supabase.', 'error');
   } finally {
     btn.disabled = false; btn.textContent = 'Simpan Kegiatan';
   }
@@ -276,38 +267,33 @@ async function tambahKegiatan() {
 
 async function toggleKegiatan(id, aktif) {
   try {
-    const res = await fetch(SCRIPT_URL, {
-      method: 'POST',
-      body: JSON.stringify({ action: 'toggleKegiatan', id, aktif })
+    const res = await sb(`kegiatan?id=eq.${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ aktif })
     });
-    const data = await res.json();
-    if (data.status === 'ok') {
+    if (res.ok) {
       showToast(aktif ? 'Kegiatan diaktifkan.' : 'Kegiatan dinonaktifkan.', 'success');
       loadKegiatan();
     } else {
-      showToast('Gagal: ' + data.message, 'error');
+      showToast('Gagal update status.', 'error');
     }
   } catch {
-    showToast('Gagal terhubung ke server.', 'error');
+    showToast('Gagal terhubung ke Supabase.', 'error');
   }
 }
 
 async function hapusKegiatan(id, nama) {
-  if (!confirm(`Hapus kegiatan "${nama}"?\n\nData responses yang sudah masuk TIDAK ikut terhapus.`)) return;
+  if (!confirm(`Hapus kegiatan:\n"${nama}"?\n\nData responses yang sudah masuk TIDAK ikut terhapus.`)) return;
   try {
-    const res = await fetch(SCRIPT_URL, {
-      method: 'POST',
-      body: JSON.stringify({ action: 'deleteKegiatan', id })
-    });
-    const data = await res.json();
-    if (data.status === 'ok') {
+    const res = await sb(`kegiatan?id=eq.${id}`, { method: 'DELETE', prefer: 'return=minimal' });
+    if (res.ok) {
       showToast('Kegiatan dihapus.', 'success');
       loadKegiatan();
     } else {
-      showToast('Gagal: ' + data.message, 'error');
+      showToast('Gagal hapus kegiatan.', 'error');
     }
   } catch {
-    showToast('Gagal terhubung ke server.', 'error');
+    showToast('Gagal terhubung ke Supabase.', 'error');
   }
 }
 
@@ -319,7 +305,7 @@ function showToast(msg, type = '') {
 }
 
 function escHtml(str) {
-  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
 
 document.getElementById('loginPass').addEventListener('keydown', e => {

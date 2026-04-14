@@ -187,15 +187,49 @@
   .req-note { font-size: 12px; color: var(--gray-text); text-align: center; margin-bottom: 18px; }
   .req-note span { color: var(--red); font-weight: 700; }
 
-  .success-box {
-    display: none; background: #F0FDF4;
-    border: 1.5px solid #86EFAC; border-radius: var(--radius);
-    padding: 14px 18px; margin-top: 14px;
-    align-items: center; gap: 12px;
+  /* ── SUCCESS OVERLAY ── */
+  .success-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: var(--gray-bg);
+    z-index: 999;
+    overflow-y: auto;
+    padding: 40px 16px 64px;
   }
-  .success-box.show { display: flex; }
-  .success-box svg { width: 22px; height: 22px; flex-shrink: 0; }
-  .success-box p { font-size: 13.5px; font-weight: 600; color: #166534; }
+  .success-overlay.show { display: block; }
+  .success-inner { max-width: 600px; margin: 0 auto; }
+  .success-header {
+    text-align: center; margin-bottom: 28px;
+  }
+  .success-icon {
+    width: 72px; height: 72px; background: #22C55E;
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 16px;
+  }
+  .success-icon svg { width: 36px; height: 36px; }
+  .success-header h2 { font-size: 20px; font-weight: 700; color: #166534; margin-bottom: 6px; }
+  .success-header p { font-size: 13.5px; color: var(--gray-text); }
+
+  .summary-card { background: var(--white); border-radius: 12px; border: 1px solid var(--gray-border); overflow: hidden; margin-bottom: 16px; }
+  .summary-card .card-accent { height: 3px; background: linear-gradient(90deg, #22C55E, #86EFAC); }
+  .summary-card .card-body { padding: 18px 22px; }
+  .summary-card h3 { font-size: 13px; font-weight: 700; color: var(--gray-text); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 14px; }
+  .summary-row { display: flex; gap: 10px; padding: 8px 0; border-bottom: 1px solid #F3F4F6; font-size: 13.5px; }
+  .summary-row:last-child { border-bottom: none; padding-bottom: 0; }
+  .summary-label { color: var(--gray-text); font-weight: 500; min-width: 140px; flex-shrink: 0; }
+  .summary-value { color: var(--text); font-weight: 600; word-break: break-word; }
+
+  .btn-ulang {
+    width: 100%; height: 48px;
+    background: var(--blue); color: var(--white);
+    border: none; border-radius: var(--radius);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 15px; font-weight: 700; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 9px;
+    margin-top: 4px;
+  }
+  .btn-ulang:hover { background: var(--blue-dark); }
+  .btn-ulang svg { width: 17px; height: 17px; stroke: white; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 
   .field input.error, .field select.error, .field textarea.error {
     border-color: var(--red);
@@ -377,20 +411,67 @@
         <span>Dengan ini saya menyatakan data yang dimasukkan sudah benar, bersedia mengikuti kegiatan dimaksud secara penuh dan berpartisipasi secara aktif.</span>
       </label>
       <div style="margin-top:20px">
-        <button class="btn-submit" onclick="submitForm()">
+        <button class="btn-submit" id="btnSubmit" onclick="submitForm()">
           <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
           Kirim
         </button>
         <button class="btn-clear" onclick="clearForm()">Hapus Formulir</button>
       </div>
-      <div class="success-box" id="successBox">
-        <svg viewBox="0 0 22 22" fill="none">
-          <circle cx="11" cy="11" r="11" fill="#22C55E"/>
-          <polyline points="6,11 9,14 16,7" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-        <p>Formulir berhasil dikirim! Terima kasih atas partisipasi Anda.</p>
+    </div>
+  </div>
+</div>
+
+<!-- SUCCESS OVERLAY -->
+<div class="success-overlay" id="successOverlay">
+  <div class="success-inner">
+    <div class="success-header">
+      <div class="success-icon">
+        <svg viewBox="0 0 24 24" fill="none"><polyline points="20,6 9,17 4,12" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <h2>Data Berhasil Dikirim!</h2>
+      <p>Terima kasih. Berikut ringkasan data yang telah Anda kirimkan.</p>
+    </div>
+
+    <div class="summary-card">
+      <div class="card-accent"></div>
+      <div class="card-body">
+        <h3>Informasi Kegiatan</h3>
+        <div class="summary-row"><span class="summary-label">Nama Kegiatan</span><span class="summary-value" id="sum_kegiatan">-</span></div>
+        <div class="summary-row"><span class="summary-label">Lokasi</span><span class="summary-value" id="sum_lokasi">-</span></div>
       </div>
     </div>
+
+    <div class="summary-card">
+      <div class="card-accent"></div>
+      <div class="card-body">
+        <h3>Data Pribadi</h3>
+        <div class="summary-row"><span class="summary-label">Nama Lengkap</span><span class="summary-value" id="sum_nama">-</span></div>
+        <div class="summary-row"><span class="summary-label">NIP</span><span class="summary-value" id="sum_nip">-</span></div>
+        <div class="summary-row"><span class="summary-label">NIK</span><span class="summary-value" id="sum_nik">-</span></div>
+        <div class="summary-row"><span class="summary-label">Pangkat/Golongan</span><span class="summary-value" id="sum_gol">-</span></div>
+        <div class="summary-row"><span class="summary-label">Mata Pelajaran</span><span class="summary-value" id="sum_mapel">-</span></div>
+        <div class="summary-row"><span class="summary-label">Jabatan</span><span class="summary-value" id="sum_jabatan">-</span></div>
+        <div class="summary-row"><span class="summary-label">No. WhatsApp</span><span class="summary-value" id="sum_wa">-</span></div>
+      </div>
+    </div>
+
+    <div class="summary-card">
+      <div class="card-accent"></div>
+      <div class="card-body">
+        <h3>Data Instansi</h3>
+        <div class="summary-row"><span class="summary-label">NPSN</span><span class="summary-value" id="sum_npsn">-</span></div>
+        <div class="summary-row"><span class="summary-label">Instansi</span><span class="summary-value" id="sum_instansi">-</span></div>
+        <div class="summary-row"><span class="summary-label">Alamat</span><span class="summary-value" id="sum_alamat">-</span></div>
+        <div class="summary-row"><span class="summary-label">Telp. Instansi</span><span class="summary-value" id="sum_telp">-</span></div>
+        <div class="summary-row"><span class="summary-label">Provinsi</span><span class="summary-value" id="sum_prov">-</span></div>
+        <div class="summary-row"><span class="summary-label">Kab/Kota</span><span class="summary-value" id="sum_kab">-</span></div>
+      </div>
+    </div>
+
+    <button class="btn-ulang" onclick="isiUlang()">
+      <svg viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 .49-3.5"></path></svg>
+      Isi Data Lain / Isi Ulang
+    </button>
   </div>
 </div>
 
@@ -460,24 +541,22 @@ function updateKabkota() {
   kabSel.classList.remove('error');
 }
 
-// ─────────────────────────────────────────────────────
-//  ⬇️  GANTI URL INI SETELAH DEPLOY APPS SCRIPT
-// ─────────────────────────────────────────────────────
+const SUPABASE_URL = 'https://lusytejskqevwyyffeue.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx1c3l0ZWpza3Fldnd5eWZmZXVlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYxMzUyODksImV4cCI6MjA5MTcxMTI4OX0.LKCfdnlB8TQTeB7NuZ1DXwSkCI9DK3WlD4xk-jzUTPU';
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzRpKYbEhktau5Q5MINiG0VkuMgxiw2CXgrztCbpFSfNnw0C8OCJK-hBFdq1RDwBmoIAg/exec';
-// ─────────────────────────────────────────────────────
 
-// Map nama_kegiatan → lokasi (dari fetch)
 let kegiatanMap = {};
 
-// Load kegiatan aktif saat halaman dibuka
 window.addEventListener('DOMContentLoaded', async () => {
   const sel = document.getElementById('nama_kegiatan');
   try {
-    const res = await fetch(`${SCRIPT_URL}?action=getKegiatan`);
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/kegiatan?aktif=eq.true&order=created_at.asc`, {
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+    });
     const data = await res.json();
     sel.innerHTML = '<option value="" disabled selected>-- Pilih nama kegiatan --</option>';
-    if (data.data && data.data.length > 0) {
-      data.data.forEach(item => {
+    if (data && data.length > 0) {
+      data.forEach(item => {
         kegiatanMap[item.nama_kegiatan] = item.lokasi;
         const o = document.createElement('option');
         o.value = item.nama_kegiatan;
@@ -502,7 +581,6 @@ async function submitForm() {
   const ids = ['nama','nip','nik','mapel','jabatan','wa','npsn','instansi','alamat','telp_instansi','provinsi','kabkota'];
   let valid = true;
 
-  // Validasi nama kegiatan
   const kegEl = document.getElementById('nama_kegiatan');
   if (!kegEl.value) { kegEl.classList.add('error'); valid = false; }
   else kegEl.classList.remove('error');
@@ -527,43 +605,36 @@ async function submitForm() {
     return;
   }
 
-  // Disable tombol saat submit
-  const btnSubmit = document.querySelector('.btn-submit');
+  const btnSubmit = document.getElementById('btnSubmit');
   btnSubmit.disabled = true;
-  btnSubmit.innerHTML = `<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="white" stroke-width="2" fill="none" stroke-dasharray="31.4" stroke-dashoffset="10"/></svg> Mengirim...`;
+  btnSubmit.innerHTML = `<svg viewBox="0 0 24 24" style="width:17px;height:17px;stroke:white;fill:none;stroke-width:2"><circle cx="12" cy="12" r="10" stroke-dasharray="31.4" stroke-dashoffset="10"/></svg> Mengirim...`;
 
-  const payload = {
-    action: 'submitBiodata',
-    data: {
-      nama_kegiatan: document.getElementById('nama_kegiatan').value,
-      lokasi: document.getElementById('lokasi_hidden').value,
-      nama: document.getElementById('nama').value,
-      nip: document.getElementById('nip').value,
-      nik: document.getElementById('nik').value,
-      golongan: document.querySelector('input[name="golongan"]:checked')?.value || '',
-      mapel: document.getElementById('mapel').value,
-      jabatan: document.getElementById('jabatan').value,
-      wa: document.getElementById('wa').value,
-      npsn: document.getElementById('npsn').value,
-      instansi: document.getElementById('instansi').value,
-      alamat: document.getElementById('alamat').value,
-      telp_instansi: document.getElementById('telp_instansi').value,
-      provinsi: document.getElementById('provinsi').value,
-      kabkota: document.getElementById('kabkota').value
-    }
+  const d = {
+    nama_kegiatan: document.getElementById('nama_kegiatan').value,
+    lokasi: document.getElementById('lokasi_hidden').value,
+    nama: document.getElementById('nama').value,
+    nip: document.getElementById('nip').value,
+    nik: document.getElementById('nik').value,
+    golongan: document.querySelector('input[name="golongan"]:checked')?.value || '',
+    mapel: document.getElementById('mapel').value,
+    jabatan: document.getElementById('jabatan').value,
+    wa: document.getElementById('wa').value,
+    npsn: document.getElementById('npsn').value,
+    instansi: document.getElementById('instansi').value,
+    alamat: document.getElementById('alamat').value,
+    telp_instansi: document.getElementById('telp_instansi').value,
+    provinsi: document.getElementById('provinsi').value,
+    kabkota: document.getElementById('kabkota').value
   };
 
   try {
     const res = await fetch(SCRIPT_URL, {
       method: 'POST',
-      body: JSON.stringify(payload)
+      body: JSON.stringify({ action: 'submitBiodata', data: d })
     });
     const result = await res.json();
     if (result.status === 'ok') {
-      document.getElementById('successBox').classList.add('show');
-      document.getElementById('successBox').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      btnSubmit.style.display = 'none';
-      document.querySelector('.btn-clear').style.display = 'none';
+      tampilkanSukses(d);
     } else {
       alert('Gagal mengirim data: ' + result.message);
       btnSubmit.disabled = false;
@@ -576,8 +647,28 @@ async function submitForm() {
   }
 }
 
-function clearForm() {
-  if (!confirm('Hapus semua isian formulir?')) return;
+function tampilkanSukses(d) {
+  document.getElementById('sum_kegiatan').textContent = d.nama_kegiatan;
+  document.getElementById('sum_lokasi').textContent = d.lokasi || '-';
+  document.getElementById('sum_nama').textContent = d.nama;
+  document.getElementById('sum_nip').textContent = d.nip;
+  document.getElementById('sum_nik').textContent = d.nik;
+  document.getElementById('sum_gol').textContent = d.golongan;
+  document.getElementById('sum_mapel').textContent = d.mapel;
+  document.getElementById('sum_jabatan').textContent = d.jabatan;
+  document.getElementById('sum_wa').textContent = d.wa;
+  document.getElementById('sum_npsn').textContent = d.npsn;
+  document.getElementById('sum_instansi').textContent = d.instansi;
+  document.getElementById('sum_alamat').textContent = d.alamat;
+  document.getElementById('sum_telp').textContent = d.telp_instansi;
+  document.getElementById('sum_prov').textContent = d.provinsi;
+  document.getElementById('sum_kab').textContent = d.kabkota;
+  document.getElementById('successOverlay').classList.add('show');
+  window.scrollTo(0, 0);
+}
+
+function isiUlang() {
+  document.getElementById('successOverlay').classList.remove('show');
   document.querySelectorAll('input[type=text],input[type=tel],textarea').forEach(el => el.value = '');
   document.querySelectorAll('input[type=radio],input[type=checkbox]').forEach(el => el.checked = false);
   document.getElementById('nama_kegiatan').selectedIndex = 0;
@@ -587,12 +678,16 @@ function clearForm() {
   kabSel.innerHTML = '<option value="" disabled selected>-- Pilih provinsi dulu --</option>';
   kabSel.disabled = true;
   document.querySelectorAll('.error').forEach(el => el.classList.remove('error'));
-  document.getElementById('successBox').classList.remove('show');
   document.getElementById('pernyataan').closest('.checkbox-item').style.borderColor = '';
-  const btnSubmit = document.querySelector('.btn-submit');
-  btnSubmit.style.display = '';
+  const btnSubmit = document.getElementById('btnSubmit');
   btnSubmit.disabled = false;
-  document.querySelector('.btn-clear').style.display = '';
+  btnSubmit.innerHTML = `<svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg> Kirim`;
+  window.scrollTo(0, 0);
+}
+
+function clearForm() {
+  if (!confirm('Hapus semua isian formulir?')) return;
+  isiUlang();
 }
 </script>
 </body>
