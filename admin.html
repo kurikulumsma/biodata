@@ -3,204 +3,471 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin CMS – Biodata Kegiatan</title>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<title>Admin Panel – Biodata Kegiatan</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  :root {
-    --blue: #1A5FB4; --blue-dark: #0D4A96; --blue-light: #EEF4FF;
-    --red: #C0392B; --red-light: #FEF2F2;
-    --green: #16A34A; --green-light: #F0FDF4;
-    --gray-bg: #F0F2F5; --gray-border: #D8DBE2; --gray-text: #6B7280;
-    --text: #1A1A2E; --white: #FFFFFF; --radius: 8px;
-  }
-  body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--gray-bg); color: var(--text); min-height: 100vh; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --blue: #1A5FB4; --blue-dark: #0D4A96; --blue-mid: #2563EB; --blue-light: #EEF4FF; --blue-faint: #F5F8FF;
+  --red: #C0392B; --red-light: #FEF2F2;
+  --green: #16A34A; --green-light: #F0FDF4;
+  --amber: #B45309; --amber-light: #FFFBEB;
+  --gray-bg: #F1F3F7; --gray-border: #E2E5ED; --gray-text: #6B7280; --gray-mid: #9CA3AF;
+  --text: #111827; --text-soft: #374151; --white: #FFFFFF;
+  --sidebar-w: 230px; --radius: 8px; --radius-lg: 12px;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.07); --shadow: 0 4px 16px rgba(0,0,0,0.08);
+}
+body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--gray-bg); color: var(--text); min-height: 100vh; font-size: 14px; }
 
-  /* LOGIN */
-  .login-wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; }
-  .login-card { background: var(--white); border-radius: 16px; border: 1px solid var(--gray-border); padding: 40px 36px; width: 100%; max-width: 380px; box-shadow: 0 4px 24px rgba(0,0,0,0.07); }
-  .login-card h1 { font-size: 20px; font-weight: 700; color: var(--blue); margin-bottom: 4px; }
-  .login-card p { font-size: 13px; color: var(--gray-text); margin-bottom: 28px; }
-  .login-card label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; }
-  .login-card input { width: 100%; height: 42px; border: 1.5px solid var(--gray-border); border-radius: var(--radius); padding: 0 13px; font-family: inherit; font-size: 14px; outline: none; margin-bottom: 16px; }
-  .login-card input:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(26,95,180,0.1); }
-  .btn-login { width: 100%; height: 46px; background: var(--blue); color: white; border: none; border-radius: var(--radius); font-family: inherit; font-size: 15px; font-weight: 700; cursor: pointer; }
-  .btn-login:hover { background: var(--blue-dark); }
-  .login-err { font-size: 12.5px; color: var(--red); margin-top: -8px; margin-bottom: 12px; display: none; }
-  .login-err.show { display: block; }
+/* ─── LOGIN ─── */
+.login-wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; background: var(--gray-bg); }
+.login-card { background: var(--white); border-radius: 18px; border: 1px solid var(--gray-border); padding: 44px 40px; width: 100%; max-width: 380px; box-shadow: var(--shadow); }
+.login-brand { display: flex; align-items: center; gap: 10px; margin-bottom: 28px; }
+.login-brand-icon { width: 38px; height: 38px; background: var(--blue); border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+.login-brand-icon svg { width: 20px; height: 20px; fill: white; }
+.login-brand-name { font-size: 17px; font-weight: 800; color: var(--text); }
+.login-brand-name span { color: var(--blue); }
+.login-title { font-size: 20px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+.login-sub { font-size: 13px; color: var(--gray-text); margin-bottom: 28px; }
+.login-card label { display: block; font-size: 12.5px; font-weight: 700; letter-spacing: 0.04em; color: var(--text-soft); text-transform: uppercase; margin-bottom: 6px; }
+.login-card input { width: 100%; height: 44px; border: 1.5px solid var(--gray-border); border-radius: var(--radius); padding: 0 14px; font-family: inherit; font-size: 14px; outline: none; background: #FAFBFC; margin-bottom: 16px; color: var(--text); transition: border-color 0.15s, box-shadow 0.15s; }
+.login-card input:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(26,95,180,0.1); background: white; }
+.btn-login { width: 100%; height: 46px; background: var(--blue); color: white; border: none; border-radius: var(--radius); font-family: inherit; font-size: 14px; font-weight: 700; cursor: pointer; transition: background 0.15s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+.btn-login:hover { background: var(--blue-dark); }
+.login-err { font-size: 12.5px; color: var(--red); background: var(--red-light); border: 1px solid #FECACA; border-radius: 6px; padding: 8px 12px; margin-top: -8px; margin-bottom: 14px; display: none; }
+.login-err.show { display: block; }
 
-  /* DASHBOARD */
-  .dashboard { display: none; }
-  .topbar { background: var(--white); border-bottom: 1px solid var(--gray-border); padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; }
-  .topbar h1 { font-size: 16px; font-weight: 700; color: var(--blue); }
-  .btn-logout { font-size: 12.5px; color: var(--gray-text); background: none; border: 1px solid var(--gray-border); border-radius: 6px; padding: 6px 14px; cursor: pointer; font-family: inherit; }
-  .btn-logout:hover { border-color: var(--red); color: var(--red); }
+/* ─── APP SHELL ─── */
+.app { display: none; min-height: 100vh; }
+.app.visible { display: flex; }
 
-  .main { max-width: 720px; margin: 0 auto; padding: 28px 16px 64px; }
+/* ─── SIDEBAR ─── */
+.sidebar { width: var(--sidebar-w); background: var(--white); border-right: 1px solid var(--gray-border); display: flex; flex-direction: column; min-height: 100vh; position: fixed; top: 0; left: 0; z-index: 100; }
+.sidebar-brand { padding: 20px 20px 16px; border-bottom: 1px solid var(--gray-border); display: flex; align-items: center; gap: 10px; }
+.sidebar-brand-icon { width: 34px; height: 34px; background: var(--blue); border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.sidebar-brand-icon svg { width: 18px; height: 18px; fill: white; }
+.sidebar-brand-name { font-size: 14px; font-weight: 800; color: var(--text); line-height: 1.2; }
+.sidebar-brand-name small { display: block; font-size: 11px; font-weight: 500; color: var(--gray-text); }
 
-  /* FORM TAMBAH */
-  .card { background: var(--white); border-radius: 12px; border: 1px solid var(--gray-border); overflow: hidden; margin-bottom: 20px; }
-  .card-accent { height: 3px; background: linear-gradient(90deg, var(--blue), #5B9BD5); }
-  .card-body { padding: 22px 24px; }
-  .card-body h2 { font-size: 15px; font-weight: 700; color: var(--blue); margin-bottom: 18px; }
-  .field { margin-bottom: 14px; }
-  .field label { display: block; font-size: 13.5px; font-weight: 600; margin-bottom: 6px; }
-  .field input, .field textarea { width: 100%; height: 42px; border: 1.5px solid var(--gray-border); border-radius: var(--radius); padding: 0 13px; font-family: inherit; font-size: 13.5px; outline: none; background: #F8FAFC; }
-  .field textarea { height: auto; padding: 11px 13px; min-height: 70px; resize: vertical; }
-  .field input:focus, .field textarea:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(26,95,180,0.1); background: white; }
-  .field input.error { border-color: var(--red); }
-  .btn-tambah { height: 44px; background: var(--blue); color: white; border: none; border-radius: var(--radius); font-family: inherit; font-size: 14px; font-weight: 700; cursor: pointer; padding: 0 28px; }
-  .btn-tambah:hover { background: var(--blue-dark); }
-  .btn-tambah:disabled { opacity: 0.6; cursor: not-allowed; }
+.sidebar-section { padding: 16px 12px 8px; }
+.sidebar-section-label { font-size: 10.5px; font-weight: 700; letter-spacing: 0.08em; color: var(--gray-mid); text-transform: uppercase; padding: 0 8px; margin-bottom: 6px; }
+.nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: var(--radius); cursor: pointer; font-size: 13.5px; font-weight: 600; color: var(--text-soft); transition: all 0.15s; margin-bottom: 2px; border: none; background: none; width: 100%; text-align: left; font-family: inherit; }
+.nav-item svg { width: 17px; height: 17px; flex-shrink: 0; opacity: 0.6; transition: opacity 0.15s; }
+.nav-item:hover { background: var(--blue-faint); color: var(--blue); }
+.nav-item:hover svg { opacity: 1; }
+.nav-item.active { background: var(--blue-light); color: var(--blue); }
+.nav-item.active svg { opacity: 1; }
 
-  /* TOAST */
-  .toast { position: fixed; bottom: 24px; right: 24px; background: #1e293b; color: white; padding: 12px 20px; border-radius: 10px; font-size: 13.5px; font-weight: 500; opacity: 0; transform: translateY(8px); transition: all 0.25s; pointer-events: none; z-index: 999; }
-  .toast.show { opacity: 1; transform: translateY(0); }
-  .toast.success { background: var(--green); }
-  .toast.error { background: var(--red); }
+.sidebar-footer { margin-top: auto; padding: 14px 12px; border-top: 1px solid var(--gray-border); }
+.user-card { display: flex; align-items: center; gap: 10px; padding: 10px 10px; border-radius: var(--radius); background: var(--gray-bg); }
+.user-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--blue-light); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.user-avatar svg { width: 16px; height: 16px; fill: var(--blue); }
+.user-info { flex: 1; min-width: 0; }
+.user-name { font-size: 12.5px; font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.user-role { font-size: 11px; color: var(--gray-text); font-weight: 500; }
+.btn-logout-icon { width: 28px; height: 28px; border: none; background: none; cursor: pointer; display: flex; align-items: center; justify-content: center; border-radius: 6px; transition: background 0.15s; flex-shrink: 0; }
+.btn-logout-icon:hover { background: #FEE2E2; }
+.btn-logout-icon svg { width: 15px; height: 15px; fill: var(--gray-text); }
+.btn-logout-icon:hover svg { fill: var(--red); }
 
-  /* DAFTAR KEGIATAN */
-  .section-title { font-size: 15px; font-weight: 700; color: var(--blue); margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
-  .badge-count { background: var(--blue-light); color: var(--blue); font-size: 12px; font-weight: 700; padding: 2px 9px; border-radius: 20px; }
+/* ─── MAIN CONTENT ─── */
+.content { margin-left: var(--sidebar-w); flex: 1; min-height: 100vh; display: flex; flex-direction: column; }
+.topbar { background: var(--white); border-bottom: 1px solid var(--gray-border); padding: 16px 28px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 50; }
+.topbar-title { font-size: 18px; font-weight: 800; color: var(--text); }
+.topbar-right { display: flex; align-items: center; gap: 12px; }
+.role-badge { font-size: 11.5px; font-weight: 700; padding: 4px 12px; border-radius: 20px; letter-spacing: 0.03em; }
+.role-badge.administrator { background: #EEF4FF; color: var(--blue); border: 1px solid #C5D8F5; }
+.role-badge.operator { background: var(--green-light); color: var(--green); border: 1px solid #BBF7D0; }
 
-  .kegiatan-list { display: flex; flex-direction: column; gap: 10px; }
-  .kegiatan-item { background: var(--white); border: 1.5px solid var(--gray-border); border-radius: 10px; padding: 16px 18px; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; transition: border-color 0.15s; }
-  .kegiatan-item.nonaktif { opacity: 0.55; border-style: dashed; }
-  .kegiatan-item:hover { border-color: #b0bec5; }
+.page { padding: 28px 28px 64px; }
 
-  .kegiatan-info { flex: 1; min-width: 0; }
-  .kegiatan-nama { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 4px; line-height: 1.4; }
-  .kegiatan-lokasi { font-size: 12.5px; color: var(--gray-text); }
-  .kegiatan-status { display: inline-flex; align-items: center; gap: 5px; font-size: 11.5px; font-weight: 600; padding: 3px 10px; border-radius: 20px; margin-top: 8px; }
-  .kegiatan-status.aktif { background: var(--green-light); color: var(--green); }
-  .kegiatan-status.nonaktif { background: #F3F4F6; color: var(--gray-text); }
-  .kegiatan-status::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: currentColor; display: inline-block; }
+/* ─── CARDS ─── */
+.card { background: var(--white); border-radius: var(--radius-lg); border: 1px solid var(--gray-border); overflow: hidden; margin-bottom: 20px; box-shadow: var(--shadow-sm); }
+.card-header { padding: 18px 22px; border-bottom: 1px solid var(--gray-border); display: flex; align-items: center; justify-content: space-between; }
+.card-header h2 { font-size: 14px; font-weight: 700; color: var(--text); }
+.card-body { padding: 22px 22px; }
 
-  .kegiatan-actions { display: flex; gap: 8px; flex-shrink: 0; }
-  .btn-toggle { height: 34px; padding: 0 14px; border-radius: 7px; font-family: inherit; font-size: 12.5px; font-weight: 600; cursor: pointer; border: 1.5px solid; transition: all 0.15s; }
-  .btn-toggle.deactivate { border-color: #F59E0B; color: #B45309; background: #FFFBEB; }
-  .btn-toggle.deactivate:hover { background: #FEF3C7; }
-  .btn-toggle.activate { border-color: var(--green); color: var(--green); background: var(--green-light); }
-  .btn-toggle.activate:hover { background: #DCFCE7; }
-  .btn-hapus { height: 34px; padding: 0 14px; border-radius: 7px; font-family: inherit; font-size: 12.5px; font-weight: 600; cursor: pointer; border: 1.5px solid #FECACA; color: var(--red); background: var(--red-light); transition: all 0.15s; }
-  .btn-hapus:hover { background: #FEE2E2; }
+/* ─── FORM ─── */
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.field { margin-bottom: 14px; }
+.field label { display: block; font-size: 12px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--text-soft); margin-bottom: 6px; }
+.field input, .field textarea, .field select { width: 100%; height: 42px; border: 1.5px solid var(--gray-border); border-radius: var(--radius); padding: 0 13px; font-family: inherit; font-size: 13.5px; outline: none; background: #FAFBFC; color: var(--text); transition: border-color 0.15s, box-shadow 0.15s; }
+.field textarea { height: auto; padding: 11px 13px; min-height: 70px; resize: vertical; }
+.field input:focus, .field textarea:focus, .field select:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(26,95,180,0.1); background: white; }
+.field input.error { border-color: var(--red); }
+.form-actions { display: flex; gap: 10px; padding-top: 4px; }
+.btn-primary { height: 40px; background: var(--blue); color: white; border: none; border-radius: var(--radius); font-family: inherit; font-size: 13.5px; font-weight: 700; cursor: pointer; padding: 0 22px; transition: background 0.15s; display: flex; align-items: center; gap: 7px; }
+.btn-primary:hover { background: var(--blue-dark); }
+.btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+.btn-primary svg { width: 15px; height: 15px; fill: white; }
+.btn-secondary { height: 40px; background: var(--white); color: var(--text-soft); border: 1.5px solid var(--gray-border); border-radius: var(--radius); font-family: inherit; font-size: 13.5px; font-weight: 600; cursor: pointer; padding: 0 18px; transition: all 0.15s; }
+.btn-secondary:hover { border-color: #9CA3AF; }
 
-  .empty-state { text-align: center; padding: 40px 20px; color: var(--gray-text); font-size: 14px; }
-  .loading { text-align: center; padding: 24px; color: var(--gray-text); font-size: 13.5px; }
+/* ─── KEGIATAN LIST ─── */
+.section-header { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+.section-header h3 { font-size: 14px; font-weight: 700; color: var(--text); }
+.badge-count { background: var(--blue-light); color: var(--blue); font-size: 11px; font-weight: 700; padding: 2px 9px; border-radius: 20px; }
+.kegiatan-list { display: flex; flex-direction: column; gap: 8px; }
+.kegiatan-item { background: var(--white); border: 1.5px solid var(--gray-border); border-radius: 10px; padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px; transition: border-color 0.15s; }
+.kegiatan-item.nonaktif { opacity: 0.55; border-style: dashed; }
+.kegiatan-item:hover { border-color: #b0bec5; }
+.kegiatan-info { flex: 1; min-width: 0; }
+.kegiatan-nama { font-size: 13.5px; font-weight: 700; color: var(--text); margin-bottom: 3px; }
+.kegiatan-lokasi { font-size: 12px; color: var(--gray-text); display: flex; align-items: center; gap: 5px; }
+.kegiatan-lokasi svg { width: 12px; height: 12px; fill: var(--gray-mid); flex-shrink: 0; }
+.kegiatan-status { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 20px; margin-top: 6px; }
+.kegiatan-status.aktif { background: var(--green-light); color: var(--green); }
+.kegiatan-status.nonaktif { background: #F3F4F6; color: var(--gray-text); }
+.kegiatan-status::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; display: inline-block; }
+.kegiatan-actions { display: flex; gap: 6px; flex-shrink: 0; }
+.btn-sm { height: 32px; padding: 0 12px; border-radius: 6px; font-family: inherit; font-size: 12px; font-weight: 600; cursor: pointer; border: 1.5px solid; transition: all 0.15s; display: flex; align-items: center; gap: 5px; white-space: nowrap; }
+.btn-sm svg { width: 13px; height: 13px; }
+.btn-sm.deactivate { border-color: #FCD34D; color: var(--amber); background: var(--amber-light); fill: var(--amber); }
+.btn-sm.deactivate:hover { background: #FEF3C7; }
+.btn-sm.deactivate svg { fill: var(--amber); }
+.btn-sm.activate { border-color: #86EFAC; color: var(--green); background: var(--green-light); }
+.btn-sm.activate:hover { background: #DCFCE7; }
+.btn-sm.activate svg { fill: var(--green); }
+.btn-sm.danger { border-color: #FECACA; color: var(--red); background: var(--red-light); }
+.btn-sm.danger:hover { background: #FEE2E2; }
+.btn-sm.danger svg { fill: var(--red); }
 
-  .script-url-info { background: var(--blue-light); border: 1.5px solid #C5D8F5; border-radius: 10px; padding: 14px 18px; margin-bottom: 20px; font-size: 13px; color: var(--blue); display: none; }
-  .script-url-info.show { display: block; }
+/* ─── TABLE PESERTA ─── */
+.filter-bar { display: flex; gap: 10px; margin-bottom: 16px; align-items: center; flex-wrap: wrap; }
+.filter-bar select { height: 38px; border: 1.5px solid var(--gray-border); border-radius: var(--radius); padding: 0 13px; font-family: inherit; font-size: 13px; background: var(--white); outline: none; min-width: 220px; color: var(--text); }
+.filter-bar select:focus { border-color: var(--blue); }
+.filter-bar .badge-count { font-size: 12px; padding: 4px 12px; }
 
-  /* TABS */
-  .tabs { display: flex; gap: 6px; margin-bottom: 18px; background: var(--white); border: 1px solid var(--gray-border); border-radius: 10px; padding: 5px; }
-  .tab-btn { flex: 1; height: 38px; border: none; border-radius: 7px; font-family: inherit; font-size: 13.5px; font-weight: 600; cursor: pointer; background: transparent; color: var(--gray-text); transition: all 0.15s; }
-  .tab-btn.active { background: var(--blue); color: white; }
-  .tab-btn:hover:not(.active) { background: var(--blue-light); color: var(--blue); }
-  .tab-panel { display: none; }
-  .tab-panel.active { display: block; }
+.table-wrap { overflow-x: auto; border-radius: var(--radius-lg); border: 1px solid var(--gray-border); box-shadow: var(--shadow-sm); }
+table { width: 100%; border-collapse: collapse; background: var(--white); font-size: 13px; }
+thead tr { background: #F8FAFC; border-bottom: 1.5px solid var(--gray-border); }
+thead th { padding: 11px 14px; text-align: left; font-size: 11.5px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--gray-text); white-space: nowrap; }
+thead th:first-child { padding-left: 18px; }
+tbody tr { border-bottom: 1px solid #F1F3F7; transition: background 0.1s; }
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: var(--blue-faint); }
+tbody td { padding: 11px 14px; color: var(--text-soft); vertical-align: middle; }
+tbody td:first-child { padding-left: 18px; font-weight: 600; color: var(--text); }
+.td-badge { display: inline-block; background: var(--blue-light); color: var(--blue); font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 20px; white-space: nowrap; }
+.td-empty { padding: 40px; text-align: center; color: var(--gray-text); font-size: 13.5px; }
+.td-loading { padding: 30px; text-align: center; color: var(--gray-text); font-size: 13.5px; }
+.icon-btn { width: 30px; height: 30px; border: none; background: none; cursor: pointer; border-radius: 6px; display: flex; align-items: center; justify-content: center; transition: background 0.15s; }
+.icon-btn:hover { background: #FEE2E2; }
+.icon-btn svg { width: 15px; height: 15px; fill: var(--gray-mid); }
+.icon-btn:hover svg { fill: var(--red); }
 
-  /* PESERTA */
-  .filter-bar { display: flex; gap: 10px; margin-bottom: 14px; align-items: center; flex-wrap: wrap; }
-  .filter-bar select { flex: 1; min-width: 180px; height: 38px; border: 1.5px solid var(--gray-border); border-radius: var(--radius); padding: 0 13px; font-family: inherit; font-size: 13px; background: var(--white); outline: none; }
-  .filter-bar select:focus { border-color: var(--blue); }
+/* ─── AKUN MANAGEMENT ─── */
+.akun-list { display: flex; flex-direction: column; gap: 8px; }
+.akun-item { background: var(--white); border: 1.5px solid var(--gray-border); border-radius: 10px; padding: 14px 16px; display: flex; align-items: center; gap: 14px; transition: border-color 0.15s; }
+.akun-item.nonaktif { opacity: 0.5; }
+.akun-item:hover { border-color: #b0bec5; }
+.akun-avatar { width: 38px; height: 38px; border-radius: 50%; background: var(--blue-light); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.akun-avatar svg { width: 18px; height: 18px; fill: var(--blue); }
+.akun-avatar.op { background: var(--green-light); }
+.akun-avatar.op svg { fill: var(--green); }
+.akun-info { flex: 1; min-width: 0; }
+.akun-nama { font-size: 13.5px; font-weight: 700; color: var(--text); }
+.akun-username { font-size: 12px; color: var(--gray-text); }
+.akun-role-badge { font-size: 11px; font-weight: 700; padding: 2px 9px; border-radius: 20px; }
+.akun-role-badge.administrator { background: var(--blue-light); color: var(--blue); }
+.akun-role-badge.operator { background: var(--green-light); color: var(--green); }
+.akun-actions { display: flex; gap: 6px; flex-shrink: 0; }
 
-  .peserta-list { display: flex; flex-direction: column; gap: 8px; }
-  .peserta-item { background: var(--white); border: 1.5px solid var(--gray-border); border-radius: 10px; padding: 14px 16px; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
-  .peserta-item:hover { border-color: #b0bec5; }
-  .peserta-info { flex: 1; min-width: 0; }
-  .peserta-nama { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 3px; }
-  .peserta-meta { font-size: 12px; color: var(--gray-text); line-height: 1.8; }
-  .peserta-kegiatan { display: inline-block; font-size: 11.5px; font-weight: 600; background: var(--blue-light); color: var(--blue); padding: 2px 9px; border-radius: 20px; margin-top: 5px; }
-  .btn-hapus-peserta { height: 34px; padding: 0 14px; border-radius: 7px; font-family: inherit; font-size: 12.5px; font-weight: 600; cursor: pointer; border: 1.5px solid #FECACA; color: var(--red); background: var(--red-light); transition: all 0.15s; white-space: nowrap; flex-shrink: 0; }
-  .btn-hapus-peserta:hover { background: #FEE2E2; }
+/* ─── MODAL ─── */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.35); z-index: 200; display: none; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(2px); }
+.modal-overlay.show { display: flex; }
+.modal { background: var(--white); border-radius: 16px; width: 100%; max-width: 440px; box-shadow: 0 20px 60px rgba(0,0,0,0.15); overflow: hidden; }
+.modal-header { padding: 20px 24px 16px; border-bottom: 1px solid var(--gray-border); display: flex; align-items: center; justify-content: space-between; }
+.modal-header h3 { font-size: 15px; font-weight: 700; color: var(--text); }
+.modal-close { width: 30px; height: 30px; border: none; background: none; cursor: pointer; border-radius: 6px; display: flex; align-items: center; justify-content: center; }
+.modal-close:hover { background: var(--gray-bg); }
+.modal-close svg { width: 16px; height: 16px; fill: var(--gray-text); }
+.modal-body { padding: 22px 24px; }
+.modal-footer { padding: 16px 24px 20px; display: flex; gap: 10px; justify-content: flex-end; }
+
+/* ─── CONFIRM DIALOG ─── */
+.confirm-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 300; display: none; align-items: center; justify-content: center; padding: 20px; }
+.confirm-overlay.show { display: flex; }
+.confirm-box { background: var(--white); border-radius: 14px; width: 100%; max-width: 380px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.2); }
+.confirm-box-header { padding: 22px 24px 14px; }
+.confirm-icon { width: 44px; height: 44px; border-radius: 12px; background: var(--red-light); display: flex; align-items: center; justify-content: center; margin-bottom: 14px; }
+.confirm-icon svg { width: 22px; height: 22px; fill: var(--red); }
+.confirm-title { font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+.confirm-msg { font-size: 13px; color: var(--gray-text); line-height: 1.6; }
+.confirm-footer { padding: 14px 24px 20px; display: flex; gap: 10px; justify-content: flex-end; }
+.btn-confirm-cancel { height: 38px; background: var(--white); color: var(--text-soft); border: 1.5px solid var(--gray-border); border-radius: var(--radius); font-family: inherit; font-size: 13.5px; font-weight: 600; cursor: pointer; padding: 0 18px; }
+.btn-confirm-cancel:hover { border-color: #9CA3AF; }
+.btn-confirm-ok { height: 38px; background: var(--red); color: white; border: none; border-radius: var(--radius); font-family: inherit; font-size: 13.5px; font-weight: 700; cursor: pointer; padding: 0 18px; }
+.btn-confirm-ok:hover { background: #A93226; }
+
+/* ─── TOAST ─── */
+.toast { position: fixed; bottom: 24px; right: 24px; background: #1e293b; color: white; padding: 12px 20px; border-radius: 10px; font-size: 13.5px; font-weight: 500; opacity: 0; transform: translateY(8px); transition: all 0.25s; pointer-events: none; z-index: 999; max-width: 320px; }
+.toast.show { opacity: 1; transform: translateY(0); }
+.toast.success { background: var(--green); }
+.toast.error { background: var(--red); }
+
+/* ─── STATES ─── */
+.empty-state { text-align: center; padding: 48px 20px; color: var(--gray-text); font-size: 14px; }
+.empty-state svg { width: 40px; height: 40px; fill: #E5E7EB; margin-bottom: 12px; display: block; margin-inline: auto; }
+.loading-state { text-align: center; padding: 32px; color: var(--gray-text); font-size: 13.5px; }
+
+/* ─── SECTION PAGES ─── */
+.section-page { display: none; }
+.section-page.active { display: block; }
+
+/* ─── PASSWORD HELPER ─── */
+.pass-hint { font-size: 11.5px; color: var(--gray-text); margin-top: 4px; }
+.input-wrap { position: relative; }
+.input-wrap input { padding-right: 42px; }
+.input-wrap .eye-btn { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; padding: 4px; }
+.input-wrap .eye-btn svg { width: 16px; height: 16px; fill: var(--gray-mid); }
 </style>
 </head>
 <body>
 
-<!-- SETUP URL NOTICE -->
-<div class="script-url-info" id="urlNotice">
-  ⚠️ <strong>Belum dikonfigurasi.</strong> Ganti nilai <code>SCRIPT_URL</code> di baris paling atas script dengan URL deployment Apps Script kamu.
-</div>
-
-<!-- LOGIN -->
+<!-- ─── LOGIN ─── -->
 <div class="login-wrap" id="loginWrap">
   <div class="login-card">
-    <h1>🔐 Admin Panel</h1>
-    <p>Manajemen Kegiatan – Biodata Kemendikdasmen</p>
+    <div class="login-brand">
+      <div class="login-brand-icon">
+        <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+      </div>
+      <div class="login-brand-name">Admin <span>Panel</span></div>
+    </div>
+    <div class="login-title">Selamat datang</div>
+    <div class="login-sub">Manajemen Kegiatan – Biodata Kemendikdasmen</div>
     <label>Username</label>
-    <input type="text" id="loginUser" placeholder="user" autocomplete="off">
+    <input type="text" id="loginUser" placeholder="Masukkan username" autocomplete="off">
     <label>Password</label>
-    <input type="password" id="loginPass" placeholder="••••••">
+    <input type="password" id="loginPass" placeholder="••••••••">
     <div class="login-err" id="loginErr">Username atau password salah.</div>
-    <button class="btn-login" onclick="doLogin()">Masuk</button>
+    <button class="btn-login" onclick="doLogin()" id="btnLogin">
+      <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:none;stroke:white;stroke-width:2;stroke-linecap:round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+      Masuk
+    </button>
   </div>
 </div>
 
-<!-- DASHBOARD -->
-<div class="dashboard" id="dashboard">
-  <div class="topbar">
-    <h1>⚙️ Admin CMS – Manajemen Kegiatan</h1>
-    <button class="btn-logout" onclick="doLogout()">Keluar</button>
-  </div>
-  <div class="main">
+<!-- ─── APP ─── -->
+<div class="app" id="app">
 
-    <!-- TABS -->
-    <div class="tabs">
-      <button class="tab-btn active" id="tabBtnKegiatan" onclick="switchTab('kegiatan')">⚙️ Kegiatan</button>
-      <button class="tab-btn" id="tabBtnPeserta" onclick="switchTab('peserta')">👥 Peserta</button>
+  <!-- SIDEBAR -->
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="sidebar-brand-icon">
+        <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+      </div>
+      <div class="sidebar-brand-name">
+        Admin Panel
+        <small>Biodata Kegiatan</small>
+      </div>
     </div>
 
-    <!-- TAB: KEGIATAN -->
-    <div class="tab-panel active" id="tab-kegiatan">
-      <div class="card">
-        <div class="card-accent"></div>
-        <div class="card-body">
-          <h2>➕ Tambah Kegiatan Baru</h2>
-          <div class="field">
-            <label>Nama Kegiatan <span style="color:#C0392B">*</span></label>
-            <input type="text" id="inputNama" placeholder="Contoh: Analisis Visitasi Pendampingan PID">
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Menu</div>
+
+      <!-- Kegiatan: hanya administrator -->
+      <button class="nav-item" id="navKegiatan" onclick="goTo('kegiatan')" style="display:none">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Kegiatan
+      </button>
+
+      <!-- Peserta: semua role -->
+      <button class="nav-item" id="navPeserta" onclick="goTo('peserta')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Peserta
+      </button>
+
+      <!-- Kelola Akun: hanya administrator -->
+      <button class="nav-item" id="navAkun" onclick="goTo('akun')" style="display:none">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        Kelola Akun
+      </button>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="user-card">
+        <div class="user-avatar">
+          <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </div>
+        <div class="user-info">
+          <div class="user-name" id="sidebarUserName">-</div>
+          <div class="user-role" id="sidebarUserRole">-</div>
+        </div>
+        <button class="btn-logout-icon" onclick="doLogout()" title="Keluar">
+          <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- MAIN CONTENT -->
+  <div class="content">
+    <div class="topbar">
+      <div class="topbar-title" id="topbarTitle">Dashboard</div>
+      <div class="topbar-right">
+        <span class="role-badge" id="roleBadge">-</span>
+      </div>
+    </div>
+
+    <div class="page">
+
+      <!-- ─── PAGE: KEGIATAN ─── -->
+      <div class="section-page" id="page-kegiatan">
+        <div class="card">
+          <div class="card-header">
+            <h2>Tambah Kegiatan Baru</h2>
           </div>
-          <div class="field">
-            <label>Lokasi Kegiatan <span style="color:#C0392B">*</span></label>
-            <input type="text" id="inputLokasi" placeholder="Contoh: Jakarta, 3 Mei 2026">
+          <div class="card-body">
+            <div class="form-row">
+              <div class="field">
+                <label>Nama Kegiatan <span style="color:var(--red)">*</span></label>
+                <input type="text" id="inputNama" placeholder="Contoh: Analisis Visitasi PID">
+              </div>
+              <div class="field">
+                <label>Lokasi Kegiatan <span style="color:var(--red)">*</span></label>
+                <input type="text" id="inputLokasi" placeholder="Contoh: Jakarta, 3 Mei 2026">
+              </div>
+            </div>
+            <div class="form-actions">
+              <button class="btn-primary" id="btnTambah" onclick="tambahKegiatan()">
+                <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Simpan Kegiatan
+              </button>
+            </div>
           </div>
-          <button class="btn-tambah" id="btnTambah" onclick="tambahKegiatan()">Simpan Kegiatan</button>
+        </div>
+
+        <div class="section-header">
+          <h3>Daftar Kegiatan</h3>
+          <span class="badge-count" id="badgeCount">0</span>
+        </div>
+        <div class="kegiatan-list" id="kegiatanList">
+          <div class="loading-state">Memuat data...</div>
         </div>
       </div>
 
-      <div class="section-title">
-        Daftar Kegiatan
-        <span class="badge-count" id="badgeCount">0</span>
+      <!-- ─── PAGE: PESERTA ─── -->
+      <div class="section-page" id="page-peserta">
+        <div class="filter-bar">
+          <select id="filterKegiatan" onchange="loadPeserta()">
+            <option value="">— Semua Kegiatan —</option>
+          </select>
+          <span class="badge-count" id="badgePeserta">0</span>
+        </div>
+        <div class="table-wrap">
+          <table id="pesertaTable">
+            <thead>
+              <tr>
+                <th>Nama</th>
+                <th>NIK</th>
+                <th>NIP</th>
+                <th>Golongan</th>
+                <th>Jabatan</th>
+                <th>Mapel</th>
+                <th>Instansi</th>
+                <th>NPSN</th>
+                <th>Alamat</th>
+                <th>Telp Instansi</th>
+                <th>Kab/Kota</th>
+                <th>Provinsi</th>
+                <th>WhatsApp</th>
+                <th>Kegiatan</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="pesertaTbody">
+              <tr><td colspan="15" class="td-loading">Memuat data...</td></tr>
+            </tbody>
+          </table>
+        </div>
       </div>
-      <div class="kegiatan-list" id="kegiatanList">
-        <div class="loading">Memuat data...</div>
-      </div>
-    </div>
 
-    <!-- TAB: PESERTA -->
-    <div class="tab-panel" id="tab-peserta">
-      <div class="filter-bar">
-        <select id="filterKegiatan" onchange="loadPeserta()">
-          <option value="">— Semua Kegiatan —</option>
-        </select>
-        <span class="badge-count" id="badgePeserta">0</span>
-      </div>
-      <div class="peserta-list" id="pesertaList">
-        <div class="loading">Memuat data...</div>
-      </div>
-    </div>
+      <!-- ─── PAGE: KELOLA AKUN ─── -->
+      <div class="section-page" id="page-akun">
+        <div class="card" style="margin-bottom:20px">
+          <div class="card-header">
+            <h2>Tambah Akun Baru</h2>
+          </div>
+          <div class="card-body">
+            <div class="form-row">
+              <div class="field">
+                <label>Nama Lengkap <span style="color:var(--red)">*</span></label>
+                <input type="text" id="akunNama" placeholder="Nama lengkap">
+              </div>
+              <div class="field">
+                <label>Username <span style="color:var(--red)">*</span></label>
+                <input type="text" id="akunUsername" placeholder="Unik, tanpa spasi" autocomplete="off">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="field">
+                <label>Password <span style="color:var(--red)">*</span></label>
+                <div class="input-wrap">
+                  <input type="password" id="akunPass" placeholder="Min. 6 karakter" autocomplete="new-password">
+                  <button class="eye-btn" type="button" onclick="togglePass('akunPass', this)">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                  </button>
+                </div>
+              </div>
+              <div class="field">
+                <label>Role <span style="color:var(--red)">*</span></label>
+                <select id="akunRole">
+                  <option value="operator">Operator</option>
+                  <option value="administrator">Administrator</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-actions">
+              <button class="btn-primary" id="btnTambahAkun" onclick="tambahAkun()">
+                <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Buat Akun
+              </button>
+            </div>
+          </div>
+        </div>
 
+        <div class="section-header">
+          <h3>Daftar Akun</h3>
+          <span class="badge-count" id="badgeAkun">0</span>
+        </div>
+        <div class="akun-list" id="akunList">
+          <div class="loading-state">Memuat data...</div>
+        </div>
+      </div>
+
+    </div><!-- /page -->
+  </div><!-- /content -->
+</div><!-- /app -->
+
+<!-- ─── CONFIRM DIALOG ─── -->
+<div class="confirm-overlay" id="confirmOverlay">
+  <div class="confirm-box">
+    <div class="confirm-box-header">
+      <div class="confirm-icon">
+        <svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      </div>
+      <div class="confirm-title" id="confirmTitle">Konfirmasi</div>
+      <div class="confirm-msg" id="confirmMsg"></div>
+    </div>
+    <div class="confirm-footer">
+      <button class="btn-confirm-cancel" onclick="confirmResolve(false)">Batal</button>
+      <button class="btn-confirm-ok" id="confirmOkBtn" onclick="confirmResolve(true)">Hapus</button>
+    </div>
   </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
+// ─── CONFIG ───
 const SUPABASE_URL = 'https://lusytejskqevwyyffeue.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx1c3l0ZWpza3Fldnd5eWZmZXVlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYxMzUyODksImV4cCI6MjA5MTcxMTI4OX0.LKCfdnlB8TQTeB7NuZ1DXwSkCI9DK3WlD4xk-jzUTPU';
-const ADMIN_USER = 'admin';
-const ADMIN_PASS = 'admin';
 
+// ─── STATE ───
+let currentUser = null; // { id, username, nama_lengkap, role }
+
+// ─── SUPABASE HELPER ───
 const sb = (path, opts = {}) => fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
   headers: {
     'apikey': SUPABASE_KEY,
@@ -212,43 +479,196 @@ const sb = (path, opts = {}) => fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
   ...opts
 });
 
+// ─── SHA-256 ───
+async function sha256(message) {
+  const msgBuffer = new TextEncoder().encode(message);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+// ─── LOGIN ───
 window.onload = () => {
-  if (sessionStorage.getItem('adminLoggedIn') === 'true') showDashboard();
+  const saved = sessionStorage.getItem('adminUser');
+  if (saved) {
+    try { currentUser = JSON.parse(saved); showApp(); } catch { sessionStorage.clear(); }
+  }
 };
 
-function doLogin() {
-  const user = document.getElementById('loginUser').value.trim();
+async function doLogin() {
+  const username = document.getElementById('loginUser').value.trim();
   const pass = document.getElementById('loginPass').value.trim();
   const errEl = document.getElementById('loginErr');
-  if (user === ADMIN_USER && pass === ADMIN_PASS) {
-    sessionStorage.setItem('adminLoggedIn', 'true');
-    showDashboard();
-  } else {
+  const btn = document.getElementById('btnLogin');
+  errEl.classList.remove('show');
+
+  if (!username || !pass) { errEl.textContent = 'Isi username dan password.'; errEl.classList.add('show'); return; }
+
+  btn.disabled = true;
+  btn.innerHTML = '<svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:none;stroke:white;stroke-width:2;stroke-linecap:round;animation:spin 1s linear infinite"><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"/><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"/><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"/></svg> Memeriksa...';
+
+  try {
+    const hash = await sha256(pass);
+    const res = await sb(`admin_users?username=eq.${encodeURIComponent(username)}&password_hash=eq.${hash}&aktif=eq.true&select=id,username,nama_lengkap,role`);
+    const data = await res.json();
+
+    if (data.length > 0) {
+      currentUser = data[0];
+      sessionStorage.setItem('adminUser', JSON.stringify(currentUser));
+      showApp();
+    } else {
+      errEl.textContent = 'Username atau password salah.';
+      errEl.classList.add('show');
+    }
+  } catch (e) {
+    errEl.textContent = 'Gagal terhubung ke server.';
     errEl.classList.add('show');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:none;stroke:white;stroke-width:2;stroke-linecap:round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg> Masuk';
   }
 }
 
 function doLogout() {
-  sessionStorage.removeItem('adminLoggedIn');
-  document.getElementById('dashboard').style.display = 'none';
+  sessionStorage.clear();
+  currentUser = null;
+  document.getElementById('app').classList.remove('visible');
   document.getElementById('loginWrap').style.display = 'flex';
+  document.getElementById('loginUser').value = '';
+  document.getElementById('loginPass').value = '';
 }
 
-function showDashboard() {
+function showApp() {
   document.getElementById('loginWrap').style.display = 'none';
-  document.getElementById('dashboard').style.display = 'block';
-  loadKegiatan();
-  populateFilterKegiatan();
+  document.getElementById('app').classList.add('visible');
+
+  // Update UI berdasarkan role
+  document.getElementById('sidebarUserName').textContent = currentUser.nama_lengkap || currentUser.username;
+  document.getElementById('sidebarUserRole').textContent = currentUser.role === 'administrator' ? 'Administrator' : 'Operator';
+  const rb = document.getElementById('roleBadge');
+  rb.textContent = currentUser.role === 'administrator' ? 'Administrator' : 'Operator';
+  rb.className = 'role-badge ' + currentUser.role;
+
+  if (currentUser.role === 'administrator') {
+    document.getElementById('navKegiatan').style.display = 'flex';
+    document.getElementById('navAkun').style.display = 'flex';
+    goTo('kegiatan');
+  } else {
+    goTo('peserta');
+  }
 }
 
-function switchTab(tab) {
-  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('tab-' + tab).classList.add('active');
-  document.getElementById('tabBtn' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('active');
-  if (tab === 'peserta') loadPeserta();
+// ─── NAVIGASI ───
+function goTo(page) {
+  document.querySelectorAll('.section-page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+
+  document.getElementById('page-' + page).classList.add('active');
+  const navEl = document.getElementById('nav' + page.charAt(0).toUpperCase() + page.slice(1));
+  if (navEl) navEl.classList.add('active');
+
+  const titles = { kegiatan: 'Kegiatan', peserta: 'Daftar Peserta', akun: 'Kelola Akun' };
+  document.getElementById('topbarTitle').textContent = titles[page] || page;
+
+  if (page === 'kegiatan') loadKegiatan();
+  if (page === 'peserta') { populateFilterKegiatan(); loadPeserta(); }
+  if (page === 'akun') loadAkun();
 }
 
+// ─── KEGIATAN (logika asli tidak diubah) ───
+async function loadKegiatan() {
+  const list = document.getElementById('kegiatanList');
+  list.innerHTML = '<div class="loading-state">Memuat data...</div>';
+  try {
+    const res = await sb('kegiatan?order=created_at.asc');
+    const data = await res.json();
+    renderKegiatan(data);
+  } catch {
+    list.innerHTML = '<div class="loading-state">Gagal memuat data.</div>';
+  }
+}
+
+function renderKegiatan(items) {
+  const list = document.getElementById('kegiatanList');
+  document.getElementById('badgeCount').textContent = items.length;
+  if (!items.length) {
+    list.innerHTML = '<div class="empty-state"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Belum ada kegiatan. Tambahkan di atas.</div>';
+    return;
+  }
+  list.innerHTML = items.map(item => `
+    <div class="kegiatan-item ${item.aktif ? '' : 'nonaktif'}">
+      <div class="kegiatan-info">
+        <div class="kegiatan-nama">${escHtml(item.nama_kegiatan)}</div>
+        <div class="kegiatan-lokasi">
+          <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          ${escHtml(item.lokasi)}
+        </div>
+        <div class="kegiatan-status ${item.aktif ? 'aktif' : 'nonaktif'}">${item.aktif ? 'Aktif' : 'Nonaktif'}</div>
+      </div>
+      <div class="kegiatan-actions">
+        ${item.aktif
+          ? `<button class="btn-sm deactivate" onclick="toggleKegiatan(${item.id}, false)">
+               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+               Nonaktifkan
+             </button>`
+          : `<button class="btn-sm activate" onclick="toggleKegiatan(${item.id}, true)">
+               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+               Aktifkan
+             </button>`
+        }
+        <button class="btn-sm danger" onclick="hapusKegiatan(${item.id}, \`${escHtml(item.nama_kegiatan)}\`)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+          Hapus
+        </button>
+      </div>
+    </div>
+  `).join('');
+}
+
+async function tambahKegiatan() {
+  const nama = document.getElementById('inputNama').value.trim();
+  const lokasi = document.getElementById('inputLokasi').value.trim();
+  if (!nama) { document.getElementById('inputNama').classList.add('error'); return; }
+  if (!lokasi) { document.getElementById('inputLokasi').classList.add('error'); return; }
+  document.getElementById('inputNama').classList.remove('error');
+  document.getElementById('inputLokasi').classList.remove('error');
+
+  const btn = document.getElementById('btnTambah');
+  btn.disabled = true; btn.innerHTML = '<svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Menyimpan...';
+  try {
+    const res = await sb('kegiatan', { method: 'POST', body: JSON.stringify({ nama_kegiatan: nama, lokasi, aktif: true }) });
+    if (res.ok) {
+      document.getElementById('inputNama').value = '';
+      document.getElementById('inputLokasi').value = '';
+      showToast('Kegiatan berhasil ditambahkan!', 'success');
+      loadKegiatan();
+    } else {
+      const err = await res.json();
+      showToast('Gagal: ' + (err.message || 'Unknown error'), 'error');
+    }
+  } catch { showToast('Gagal terhubung ke Supabase.', 'error'); }
+  finally { btn.disabled = false; btn.innerHTML = '<svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Simpan Kegiatan'; }
+}
+
+async function toggleKegiatan(id, aktif) {
+  try {
+    const res = await sb(`kegiatan?id=eq.${id}`, { method: 'PATCH', body: JSON.stringify({ aktif }) });
+    if (res.ok) { showToast(aktif ? 'Kegiatan diaktifkan.' : 'Kegiatan dinonaktifkan.', 'success'); loadKegiatan(); }
+    else showToast('Gagal update status.', 'error');
+  } catch { showToast('Gagal terhubung ke Supabase.', 'error'); }
+}
+
+async function hapusKegiatan(id, nama) {
+  const ok = await showConfirm('Hapus Kegiatan', `Hapus kegiatan "<strong>${escHtml(nama)}</strong>"? Data responses yang sudah masuk tidak ikut terhapus.`);
+  if (!ok) return;
+  try {
+    const res = await sb(`kegiatan?id=eq.${id}`, { method: 'DELETE', prefer: 'return=minimal' });
+    if (res.ok) { showToast('Kegiatan dihapus.', 'success'); loadKegiatan(); }
+    else showToast('Gagal hapus kegiatan.', 'error');
+  } catch { showToast('Gagal terhubung ke Supabase.', 'error'); }
+}
+
+// ─── PESERTA (logika asli tidak diubah, tampilan diubah ke tabel) ───
 async function populateFilterKegiatan() {
   const sel = document.getElementById('filterKegiatan');
   try {
@@ -265,8 +685,8 @@ async function populateFilterKegiatan() {
 }
 
 async function loadPeserta() {
-  const list = document.getElementById('pesertaList');
-  list.innerHTML = '<div class="loading">Memuat data...</div>';
+  const tbody = document.getElementById('pesertaTbody');
+  tbody.innerHTML = '<tr><td colspan="15" class="td-loading">Memuat data...</td></tr>';
   const filterVal = document.getElementById('filterKegiatan').value;
   let query = 'peserta?order=created_at.desc';
   if (filterVal) query += `&kegiatan_id=eq.${filterVal}`;
@@ -275,149 +695,168 @@ async function loadPeserta() {
     const data = await res.json();
     renderPeserta(data);
   } catch {
-    list.innerHTML = '<div class="empty-state">Gagal memuat data peserta.</div>';
+    tbody.innerHTML = '<tr><td colspan="15" class="td-loading">Gagal memuat data peserta.</td></tr>';
   }
 }
 
 function renderPeserta(items) {
-  const list = document.getElementById('pesertaList');
+  const tbody = document.getElementById('pesertaTbody');
   document.getElementById('badgePeserta').textContent = items.length;
   if (!items.length) {
-    list.innerHTML = '<div class="empty-state">Belum ada peserta terdaftar.</div>';
+    tbody.innerHTML = '<tr><td colspan="15" class="td-empty">Belum ada peserta terdaftar.</td></tr>';
     return;
   }
-  list.innerHTML = items.map(item => `
-    <div class="peserta-item">
-      <div class="peserta-info">
-        <div class="peserta-nama">${escHtml(item.nama || '-')}</div>
-        <div class="peserta-meta">
-          <span>🪪 NIK: ${escHtml(item.nik || '-')}</span>
-          <span>🔢 NIP: ${escHtml(item.nip || '-')}</span><br>
-          <span>🏫 ${escHtml(item.instansi || '-')}</span>
-          <span>📍 ${escHtml(item.kabkota || '')}${item.provinsi ? ', ' + escHtml(item.provinsi) : ''}</span><br>
-          <span>💼 ${escHtml(item.jabatan || '-')}</span>
-          <span>📱 ${escHtml(item.wa || '-')}</span>
-        </div>
-        <div class="peserta-kegiatan">📋 ${escHtml(item.nama_kegiatan || '-')}</div>
-      </div>
-      <button class="btn-hapus-peserta" onclick="hapusPeserta(${item.id}, \`${escHtml(item.nama || '')}\`)">Hapus</button>
-    </div>
+  const isAdmin = currentUser && currentUser.role === 'administrator';
+  tbody.innerHTML = items.map(item => `
+    <tr>
+      <td>${escHtml(item.nama || '-')}</td>
+      <td>${escHtml(item.nik || '-')}</td>
+      <td>${escHtml(item.nip || '-')}</td>
+      <td>${escHtml(item.golongan || '-')}</td>
+      <td>${escHtml(item.jabatan || '-')}</td>
+      <td>${escHtml(item.mapel || '-')}</td>
+      <td>${escHtml(item.instansi || '-')}</td>
+      <td>${escHtml(item.npsn || '-')}</td>
+      <td>${escHtml(item.alamat || '-')}</td>
+      <td>${escHtml(item.telp_instansi || '-')}</td>
+      <td>${escHtml(item.kabkota || '-')}</td>
+      <td>${escHtml(item.provinsi || '-')}</td>
+      <td>${escHtml(item.wa || '-')}</td>
+      <td><span class="td-badge">${escHtml(item.nama_kegiatan || '-')}</span></td>
+      <td>${isAdmin ? `<button class="icon-btn" onclick="hapusPeserta(${item.id}, \`${escHtml(item.nama || '')}\`)" title="Hapus peserta">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+      </button>` : ''}</td>
+    </tr>
   `).join('');
 }
 
 async function hapusPeserta(id, nama) {
-  if (!confirm(`Hapus data peserta:\n"${nama}"?\n\nTindakan ini tidak bisa dibatalkan.`)) return;
+  const ok = await showConfirm('Hapus Peserta', `Hapus data peserta "<strong>${escHtml(nama)}</strong>"? Tindakan ini tidak bisa dibatalkan.`);
+  if (!ok) return;
   try {
     const res = await sb(`peserta?id=eq.${id}`, { method: 'DELETE', prefer: 'return=minimal' });
-    if (res.ok) {
-      showToast('Data peserta dihapus.', 'success');
-      loadPeserta();
-    } else {
-      showToast('Gagal hapus peserta.', 'error');
-    }
-  } catch {
-    showToast('Gagal terhubung ke Supabase.', 'error');
-  }
+    if (res.ok) { showToast('Data peserta dihapus.', 'success'); loadPeserta(); }
+    else showToast('Gagal hapus peserta.', 'error');
+  } catch { showToast('Gagal terhubung ke Supabase.', 'error'); }
 }
 
-async function loadKegiatan() {
-  const list = document.getElementById('kegiatanList');
-  list.innerHTML = '<div class="loading">Memuat data...</div>';
+// ─── KELOLA AKUN ───
+async function loadAkun() {
+  const list = document.getElementById('akunList');
+  list.innerHTML = '<div class="loading-state">Memuat data...</div>';
   try {
-    const res = await sb('kegiatan?order=created_at.asc');
+    const res = await sb('admin_users?order=created_at.asc&select=id,username,nama_lengkap,role,aktif');
     const data = await res.json();
-    renderKegiatan(data);
+    renderAkun(data);
   } catch {
-    list.innerHTML = '<div class="empty-state">Gagal memuat data.</div>';
+    list.innerHTML = '<div class="loading-state">Gagal memuat data.</div>';
   }
 }
 
-function renderKegiatan(items) {
-  const list = document.getElementById('kegiatanList');
-  document.getElementById('badgeCount').textContent = items.length;
+function renderAkun(items) {
+  const list = document.getElementById('akunList');
+  document.getElementById('badgeAkun').textContent = items.length;
   if (!items.length) {
-    list.innerHTML = '<div class="empty-state">Belum ada kegiatan. Tambahkan di atas.</div>';
+    list.innerHTML = '<div class="empty-state">Belum ada akun.</div>';
     return;
   }
   list.innerHTML = items.map(item => `
-    <div class="kegiatan-item ${item.aktif ? '' : 'nonaktif'}">
-      <div class="kegiatan-info">
-        <div class="kegiatan-nama">${escHtml(item.nama_kegiatan)}</div>
-        <div class="kegiatan-lokasi">📍 ${escHtml(item.lokasi)}</div>
-        <div class="kegiatan-status ${item.aktif ? 'aktif' : 'nonaktif'}">${item.aktif ? 'Aktif' : 'Nonaktif'}</div>
+    <div class="akun-item ${item.aktif ? '' : 'nonaktif'}">
+      <div class="akun-avatar ${item.role === 'operator' ? 'op' : ''}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
       </div>
-      <div class="kegiatan-actions">
+      <div class="akun-info">
+        <div class="akun-nama">${escHtml(item.nama_lengkap || item.username)}</div>
+        <div class="akun-username">@${escHtml(item.username)}</div>
+      </div>
+      <span class="akun-role-badge ${item.role}">${item.role === 'administrator' ? 'Administrator' : 'Operator'}</span>
+      <div class="akun-actions">
         ${item.aktif
-          ? `<button class="btn-toggle deactivate" onclick="toggleKegiatan(${item.id}, false)">Nonaktifkan</button>`
-          : `<button class="btn-toggle activate" onclick="toggleKegiatan(${item.id}, true)">Aktifkan</button>`
+          ? `<button class="btn-sm deactivate" onclick="toggleAkun(${item.id}, false)">Nonaktifkan</button>`
+          : `<button class="btn-sm activate" onclick="toggleAkun(${item.id}, true)">Aktifkan</button>`
         }
-        <button class="btn-hapus" onclick="hapusKegiatan(${item.id}, \`${escHtml(item.nama_kegiatan)}\`)">Hapus</button>
+        ${item.id !== currentUser.id
+          ? `<button class="btn-sm danger" onclick="hapusAkun(${item.id}, \`${escHtml(item.username)}\`)">
+               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+               Hapus
+             </button>`
+          : `<span style="font-size:11.5px;color:var(--gray-text);padding:0 8px">(akun kamu)</span>`
+        }
       </div>
     </div>
   `).join('');
 }
 
-async function tambahKegiatan() {
-  const nama = document.getElementById('inputNama').value.trim();
-  const lokasi = document.getElementById('inputLokasi').value.trim();
-  if (!nama) { document.getElementById('inputNama').classList.add('error'); return; }
-  if (!lokasi) { document.getElementById('inputLokasi').classList.add('error'); return; }
-  document.getElementById('inputNama').classList.remove('error');
-  document.getElementById('inputLokasi').classList.remove('error');
+async function tambahAkun() {
+  const nama = document.getElementById('akunNama').value.trim();
+  const username = document.getElementById('akunUsername').value.trim();
+  const pass = document.getElementById('akunPass').value.trim();
+  const role = document.getElementById('akunRole').value;
 
-  const btn = document.getElementById('btnTambah');
-  btn.disabled = true; btn.textContent = 'Menyimpan...';
+  if (!nama || !username || !pass) { showToast('Isi semua field yang diperlukan.', 'error'); return; }
+  if (pass.length < 6) { showToast('Password minimal 6 karakter.', 'error'); return; }
+  if (/\s/.test(username)) { showToast('Username tidak boleh mengandung spasi.', 'error'); return; }
+
+  const btn = document.getElementById('btnTambahAkun');
+  btn.disabled = true;
   try {
-    const res = await sb('kegiatan', {
+    const hash = await sha256(pass);
+    const res = await sb('admin_users', {
       method: 'POST',
-      body: JSON.stringify({ nama_kegiatan: nama, lokasi, aktif: true })
+      body: JSON.stringify({ username, password_hash: hash, role, nama_lengkap: nama, aktif: true })
     });
     if (res.ok) {
-      document.getElementById('inputNama').value = '';
-      document.getElementById('inputLokasi').value = '';
-      showToast('Kegiatan berhasil ditambahkan!', 'success');
-      loadKegiatan();
+      document.getElementById('akunNama').value = '';
+      document.getElementById('akunUsername').value = '';
+      document.getElementById('akunPass').value = '';
+      document.getElementById('akunRole').value = 'operator';
+      showToast('Akun berhasil dibuat!', 'success');
+      loadAkun();
     } else {
       const err = await res.json();
-      showToast('Gagal: ' + (err.message || 'Unknown error'), 'error');
+      if (err.code === '23505') showToast('Username sudah digunakan.', 'error');
+      else showToast('Gagal: ' + (err.message || 'Unknown error'), 'error');
     }
-  } catch {
-    showToast('Gagal terhubung ke Supabase.', 'error');
-  } finally {
-    btn.disabled = false; btn.textContent = 'Simpan Kegiatan';
-  }
+  } catch { showToast('Gagal terhubung ke Supabase.', 'error'); }
+  finally { btn.disabled = false; }
 }
 
-async function toggleKegiatan(id, aktif) {
+async function toggleAkun(id, aktif) {
   try {
-    const res = await sb(`kegiatan?id=eq.${id}`, {
-      method: 'PATCH',
-      body: JSON.stringify({ aktif })
-    });
-    if (res.ok) {
-      showToast(aktif ? 'Kegiatan diaktifkan.' : 'Kegiatan dinonaktifkan.', 'success');
-      loadKegiatan();
-    } else {
-      showToast('Gagal update status.', 'error');
-    }
-  } catch {
-    showToast('Gagal terhubung ke Supabase.', 'error');
-  }
+    const res = await sb(`admin_users?id=eq.${id}`, { method: 'PATCH', body: JSON.stringify({ aktif }) });
+    if (res.ok) { showToast(aktif ? 'Akun diaktifkan.' : 'Akun dinonaktifkan.', 'success'); loadAkun(); }
+    else showToast('Gagal update akun.', 'error');
+  } catch { showToast('Gagal terhubung ke Supabase.', 'error'); }
 }
 
-async function hapusKegiatan(id, nama) {
-  if (!confirm(`Hapus kegiatan:\n"${nama}"?\n\nData responses yang sudah masuk TIDAK ikut terhapus.`)) return;
+async function hapusAkun(id, username) {
+  const ok = await showConfirm('Hapus Akun', `Hapus akun "<strong>${escHtml(username)}</strong>"? Tindakan ini tidak bisa dibatalkan.`);
+  if (!ok) return;
   try {
-    const res = await sb(`kegiatan?id=eq.${id}`, { method: 'DELETE', prefer: 'return=minimal' });
-    if (res.ok) {
-      showToast('Kegiatan dihapus.', 'success');
-      loadKegiatan();
-    } else {
-      showToast('Gagal hapus kegiatan.', 'error');
-    }
-  } catch {
-    showToast('Gagal terhubung ke Supabase.', 'error');
-  }
+    const res = await sb(`admin_users?id=eq.${id}`, { method: 'DELETE', prefer: 'return=minimal' });
+    if (res.ok) { showToast('Akun dihapus.', 'success'); loadAkun(); }
+    else showToast('Gagal hapus akun.', 'error');
+  } catch { showToast('Gagal terhubung ke Supabase.', 'error'); }
+}
+
+// ─── UTILITIES ───
+function togglePass(inputId, btn) {
+  const inp = document.getElementById(inputId);
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+}
+
+let confirmResolve = () => {};
+function showConfirm(title, msg, okLabel = 'Hapus') {
+  return new Promise(resolve => {
+    document.getElementById('confirmTitle').textContent = title;
+    document.getElementById('confirmMsg').innerHTML = msg;
+    document.getElementById('confirmOkBtn').textContent = okLabel;
+    document.getElementById('confirmOverlay').classList.add('show');
+    confirmResolve = (val) => {
+      document.getElementById('confirmOverlay').classList.remove('show');
+      resolve(val);
+    };
+  });
 }
 
 function showToast(msg, type = '') {
@@ -434,6 +873,11 @@ function escHtml(str) {
 document.getElementById('loginPass').addEventListener('keydown', e => {
   if (e.key === 'Enter') doLogin();
 });
+
+// CSS spin animation
+const style = document.createElement('style');
+style.textContent = '@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }';
+document.head.appendChild(style);
 </script>
 </body>
 </html>
