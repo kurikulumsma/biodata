@@ -650,6 +650,7 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzRpKYbEhktau5Q5MINiG0VkuMgxiw2CXgrztCbpFSfNnw0C8OCJK-hBFdq1RDwBmoIAg/exec';
 
 let kegiatanMap = {};
+let kegiatanIdMap = {};
 
 window.addEventListener('DOMContentLoaded', async () => {
   const sel = document.getElementById('nama_kegiatan');
@@ -662,6 +663,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     if (data && data.length > 0) {
       data.forEach(item => {
         kegiatanMap[item.nama_kegiatan] = item.lokasi;
+        kegiatanIdMap[item.nama_kegiatan] = item.id;
         const o = document.createElement('option');
         o.value = item.nama_kegiatan;
         o.textContent = item.nama_kegiatan;
@@ -710,25 +712,22 @@ async function cekNIK() {
   label.innerHTML = '<span class="spin"></span>';
 
   try {
-    const res = await fetch(SCRIPT_URL, {
-      method: 'POST',
-      body: JSON.stringify({ action: 'lookupNIK', nik: nikVal })
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/peserta?nik=eq.${encodeURIComponent(nikVal)}&order=created_at.desc&limit=1`, {
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
     });
-    const result = await res.json();
+    const data = await res.json();
 
-    if (result.status === 'found' && result.data) {
+    if (data && data.length > 0) {
       // Data ditemukan — prefill form
-      prefillForm(result.data);
+      prefillForm(data[0]);
       showNikResult('found', `✅ Data ditemukan! Periksa dan koreksi jika ada perubahan.`);
     } else {
       // Peserta baru
       clearFormFields();
-      // Isi NIK di form dari gate input
       document.getElementById('nik').value = nikVal;
       showNikResult('notfound', `⚠️ Peserta baru terdeteksi. Silakan isi formulir secara lengkap.`);
     }
   } catch(e) {
-    // Jika endpoint lookup tidak tersedia, tetap lanjutkan sebagai peserta baru
     clearFormFields();
     document.getElementById('nik').value = nikVal;
     showNikResult('notfound', `⚠️ Tidak dapat memeriksa data. Silakan isi formulir secara lengkap.`);
@@ -848,23 +847,47 @@ async function submitForm() {
     kabkota: document.getElementById('kabkota').value
   };
 
+  // Cari kegiatan_id dari kegiatanMap
+  const kegiatanId = kegiatanIdMap[d.nama_kegiatan] || null;
+
+  let supabaseOk = false;
+  try {
+    const sbRes = await fetch(`${SUPABASE_URL}/rest/v1/peserta`, {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify({ ...d, kegiatan_id: kegiatanId })
+    });
+    supabaseOk = sbRes.ok;
+  } catch { supabaseOk = false; }
+
+  // Kirim ke Google Sheet (tetap, untuk arsip)
   try {
     const res = await fetch(SCRIPT_URL, {
       method: 'POST',
       body: JSON.stringify({ action: 'submitBiodata', data: d })
     });
     const result = await res.json();
-    if (result.status === 'ok') {
+    if (result.status === 'ok' || supabaseOk) {
       tampilkanSukses(d);
     } else {
-      alert('Gagal mengirim data: ' + result.message);
+      alert('Gagal mengirim data: ' + (result.message || 'Unknown error'));
       btnSubmit.disabled = false;
       btnSubmit.innerHTML = `<svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg> Kirim`;
     }
   } catch {
-    alert('Gagal terhubung ke server. Coba lagi.');
-    btnSubmit.disabled = false;
-    btnSubmit.innerHTML = `<svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg> Kirim`;
+    // Kalau sheet gagal tapi Supabase berhasil, tetap sukses
+    if (supabaseOk) {
+      tampilkanSukses(d);
+    } else {
+      alert('Gagal terhubung ke server. Coba lagi.');
+      btnSubmit.disabled = false;
+      btnSubmit.innerHTML = `<svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg> Kirim`;
+    }
   }
 }
 
