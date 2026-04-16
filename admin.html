@@ -172,10 +172,8 @@ thead th {
 thead th:first-child .th-inner { padding-left: 18px; }
 .th-inner {
   display: flex; align-items: center; gap: 4px;
-  padding: 10px 12px; cursor: pointer;
-  transition: background 0.1s;
+  padding: 10px 12px;
 }
-.th-inner:hover { background: #EEF2F7; }
 .th-sort-icon { display: flex; flex-direction: column; gap: 1px; flex-shrink: 0; margin-left: 2px; opacity: 0.4; }
 .th-sort-icon svg { width: 8px; height: 8px; fill: currentColor; }
 thead th.sort-asc .th-sort-icon { opacity: 1; color: var(--blue); }
@@ -564,8 +562,6 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 // ─── STATE ───
 let currentUser = null;
 let allPeserta = [];
-let colFilters = {}; // { colKey: Set of selected values }
-let sortState = { col: null, dir: 'asc' };
 
 // ─── SUPABASE HELPER ───
 const sb = (path, opts = {}) => fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
@@ -588,7 +584,7 @@ async function sha256(message) {
 }
 
 // ─── DESIGN MODE ───
-const DESIGN_MODE = false;
+const DESIGN_MODE = true;
 
 window.onload = () => {
   if (DESIGN_MODE) {
@@ -806,8 +802,6 @@ async function loadPeserta() {
     const res = await sb(query);
     const data = await res.json();
     allPeserta = data;
-    colFilters = {};
-    sortState = { col: null, dir: 'asc' };
     renderTableHeader();
     applyTableFilters();
   } catch {
@@ -815,167 +809,32 @@ async function loadPeserta() {
   }
 }
 
-// ─── TABEL DENGAN KOLOM FILTER & SORT ───
+// ─── KOLOM TABEL ───
 const TABLE_COLS = [
-  { key: 'nama',         label: 'Nama' },
-  { key: 'nik',          label: 'NIK' },
+  { key: 'created_at',   label: 'Timestamp' },
+  { key: 'nama',         label: 'Nama Lengkap' },
   { key: 'nip',          label: 'NIP' },
-  { key: 'golongan',     label: 'Golongan' },
+  { key: 'golongan',     label: 'Pangkat/Golongan' },
+  { key: 'nik',          label: 'NIK' },
+  { key: 'mapel',        label: 'Mata Pelajaran yang Diampu' },
+  { key: 'instansi',     label: 'Instansi/Unit Kerja' },
   { key: 'jabatan',      label: 'Jabatan' },
-  { key: 'mapel',        label: 'Mapel' },
-  { key: 'instansi',     label: 'Instansi' },
-  { key: 'npsn',         label: 'NPSN' },
-  { key: 'alamat',       label: 'Alamat' },
-  { key: 'telp_instansi',label: 'Telp Instansi' },
-  { key: 'kabkota',      label: 'Kab/Kota' },
+  { key: 'wa',           label: 'Nomor Telepon (WhatsApp)' },
   { key: 'provinsi',     label: 'Provinsi' },
-  { key: 'wa',           label: 'WhatsApp' },
-  { key: 'nama_kegiatan',label: 'Kegiatan' },
-  { key: 'created_at',   label: 'Waktu Daftar' },
+  { key: 'kabkota',      label: 'Kabupaten/Kota' },
+  { key: 'alamat',       label: 'Alamat Instansi/Unit Kerja' },
+  { key: 'telp_instansi',label: 'No Telepon Instansi/Unit Kerja' },
 ];
 
 function renderTableHeader() {
   const tr = document.getElementById('pesertaTableHead');
-  const colCount = TABLE_COLS.length + 1;
-  tr.innerHTML = TABLE_COLS.map((col, i) => {
-    const sortClass = sortState.col === col.key ? (sortState.dir === 'asc' ? 'sort-asc' : 'sort-desc') : '';
-    const filterActive = colFilters[col.key] && colFilters[col.key].size > 0 ? 'active' : '';
-    return `
-      <th class="${sortClass}" id="th-${col.key}" style="position:relative">
-        <div class="th-inner" onclick="toggleSort('${col.key}')">
-          <span>${col.label}</span>
-          <span class="th-sort-icon">
-            <svg class="sort-up" viewBox="0 0 8 5"><path d="M4 0L8 5H0z"/></svg>
-            <svg class="sort-down" viewBox="0 0 8 5"><path d="M4 5L0 0h8z"/></svg>
-          </span>
-        </div>
-        <button class="th-filter-btn ${filterActive}" title="Filter kolom" onclick="toggleFilterPopup(event, '${col.key}')">
-          <svg viewBox="0 0 24 24"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
-        </button>
-        <div class="col-filter-popup" id="fp-${col.key}">
-          <input class="col-filter-search" placeholder="Cari..." oninput="renderFilterOptions('${col.key}', this.value)" id="fps-${col.key}">
-          <div class="col-filter-options" id="fpo-${col.key}"></div>
-          <div class="col-filter-actions">
-            <button class="col-filter-clear" onclick="clearColFilter('${col.key}')">Reset</button>
-            <button class="col-filter-apply" onclick="applyColFilter('${col.key}')">Terapkan</button>
-          </div>
-        </div>
-      </th>
-    `;
-  }).join('') + '<th style="width:44px"></th>';
-}
-
-let activePopup = null;
-function toggleFilterPopup(e, colKey) {
-  e.stopPropagation();
-  const popup = document.getElementById('fp-' + colKey);
-  if (activePopup && activePopup !== popup) {
-    activePopup.classList.remove('show');
-  }
-  if (popup.classList.contains('show')) {
-    popup.classList.remove('show');
-    activePopup = null;
-  } else {
-    popup.classList.add('show');
-    activePopup = popup;
-    document.getElementById('fps-' + colKey).value = '';
-    renderFilterOptions(colKey, '');
-  }
-}
-
-document.addEventListener('click', () => {
-  if (activePopup) { activePopup.classList.remove('show'); activePopup = null; }
-});
-
-function renderFilterOptions(colKey, search) {
-  const col = TABLE_COLS.find(c => c.key === colKey);
-  const values = [...new Set(allPeserta.map(r => {
-    let v = r[colKey] || '-';
-    if (colKey === 'created_at') v = formatTs(v);
-    return v;
-  }))].sort((a, b) => String(a).localeCompare(String(b)));
-
-  const selected = colFilters[colKey] || new Set();
-  const filtered = search ? values.filter(v => String(v).toLowerCase().includes(search.toLowerCase())) : values;
-  const container = document.getElementById('fpo-' + colKey);
-  if (!filtered.length) { container.innerHTML = '<div style="font-size:12px;color:var(--gray-text);padding:8px 4px">Tidak ada hasil</div>'; return; }
-  container.innerHTML = filtered.map(v => `
-    <label class="col-filter-option">
-      <input type="checkbox" value="${escHtml(String(v))}" ${selected.has(String(v)) ? 'checked' : ''} onchange="tempCheckChange('${colKey}', this)">
-      <span>${escHtml(String(v))}</span>
-    </label>
-  `).join('');
-}
-
-// temp state for checkboxes before apply
-let tempChecked = {};
-function tempCheckChange(colKey, cb) {
-  if (!tempChecked[colKey]) tempChecked[colKey] = new Set(colFilters[colKey] || []);
-  if (cb.checked) tempChecked[colKey].add(cb.value);
-  else tempChecked[colKey].delete(cb.value);
-}
-
-function applyColFilter(colKey) {
-  if (tempChecked[colKey] !== undefined) {
-    if (tempChecked[colKey].size === 0) delete colFilters[colKey];
-    else colFilters[colKey] = new Set(tempChecked[colKey]);
-    delete tempChecked[colKey];
-  } else {
-    // read current checkboxes
-    const checks = document.querySelectorAll(`#fpo-${colKey} input[type=checkbox]:checked`);
-    if (checks.length === 0) delete colFilters[colKey];
-    else colFilters[colKey] = new Set([...checks].map(c => c.value));
-  }
-  if (activePopup) { activePopup.classList.remove('show'); activePopup = null; }
-  renderTableHeader();
-  applyTableFilters();
-}
-
-function clearColFilter(colKey) {
-  delete colFilters[colKey];
-  delete tempChecked[colKey];
-  if (activePopup) { activePopup.classList.remove('show'); activePopup = null; }
-  renderTableHeader();
-  applyTableFilters();
-}
-
-function toggleSort(colKey) {
-  if (sortState.col === colKey) {
-    sortState.dir = sortState.dir === 'asc' ? 'desc' : 'asc';
-  } else {
-    sortState.col = colKey;
-    sortState.dir = 'asc';
-  }
-  renderTableHeader();
-  applyTableFilters();
+  tr.innerHTML = TABLE_COLS.map(col => `
+    <th><div class="th-inner"><span>${col.label}</span></div></th>
+  `).join('') + '<th style="width:44px"></th>';
 }
 
 function applyTableFilters() {
-  let items = [...allPeserta];
-
-  // Apply column filters
-  for (const [key, vals] of Object.entries(colFilters)) {
-    if (vals.size === 0) continue;
-    items = items.filter(row => {
-      let v = row[key] || '-';
-      if (key === 'created_at') v = formatTs(v);
-      return vals.has(String(v));
-    });
-  }
-
-  // Apply sort
-  if (sortState.col) {
-    items.sort((a, b) => {
-      let va = a[sortState.col] || '';
-      let vb = b[sortState.col] || '';
-      if (sortState.col === 'created_at') { va = new Date(va); vb = new Date(vb); }
-      else { va = String(va).toLowerCase(); vb = String(vb).toLowerCase(); }
-      if (va < vb) return sortState.dir === 'asc' ? -1 : 1;
-      if (va > vb) return sortState.dir === 'asc' ? 1 : -1;
-      return 0;
-    });
-  }
-
+  const items = [...allPeserta];
   document.getElementById('badgePeserta').textContent = items.length;
   renderPeserta(items);
 }
@@ -999,21 +858,19 @@ function renderPeserta(items) {
   const colCount = TABLE_COLS.length + 1;
   tbody.innerHTML = items.map(item => `
     <tr>
+      <td class="td-ts">${escHtml(formatTs(item.created_at))}</td>
       <td>${escHtml(item.nama || '-')}</td>
-      <td>${escHtml(item.nik || '-')}</td>
       <td>${escHtml(item.nip || '-')}</td>
       <td>${escHtml(item.golongan || '-')}</td>
-      <td>${escHtml(item.jabatan || '-')}</td>
+      <td>${escHtml(item.nik || '-')}</td>
       <td>${escHtml(item.mapel || '-')}</td>
       <td>${escHtml(item.instansi || '-')}</td>
-      <td>${escHtml(item.npsn || '-')}</td>
+      <td>${escHtml(item.jabatan || '-')}</td>
+      <td>${escHtml(item.wa || '-')}</td>
+      <td>${escHtml(item.provinsi || '-')}</td>
+      <td>${escHtml(item.kabkota || '-')}</td>
       <td>${escHtml(item.alamat || '-')}</td>
       <td>${escHtml(item.telp_instansi || '-')}</td>
-      <td>${escHtml(item.kabkota || '-')}</td>
-      <td>${escHtml(item.provinsi || '-')}</td>
-      <td>${escHtml(item.wa || '-')}</td>
-      <td><span class="td-badge">${escHtml(item.nama_kegiatan || '-')}</span></td>
-      <td class="td-ts">${escHtml(formatTs(item.created_at))}</td>
       <td>${isAdmin ? `<button class="icon-btn" onclick="hapusPeserta(${item.id}, \`${escHtml(item.nama || '')}\`)" title="Hapus peserta">
         <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
       </button>` : ''}</td>
