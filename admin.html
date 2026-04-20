@@ -22,7 +22,7 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--gray-bg);
 /* ─── LOGIN ─── */
 .login-wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; background: var(--gray-bg); }
 .login-card { background: var(--white); border-radius: 18px; border: 1px solid var(--gray-border); padding: 44px 40px; width: 100%; max-width: 380px; box-shadow: var(--shadow); }
-.login-brand { display: flex; align-items: center; gap: 10px; margin-bottom: 28px; }
+.login-brand { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 28px; }
 .login-brand-icon { width: 38px; height: 38px; background: var(--blue); border-radius: 10px; display: flex; align-items: center; justify-content: center; }
 .login-brand-icon svg { width: 20px; height: 20px; fill: none; stroke: white; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .login-brand-name { font-size: 17px; font-weight: 800; color: var(--text); }
@@ -52,7 +52,7 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--gray-bg);
   position: fixed; top: 0; left: 0; z-index: 100;
   transition: transform 0.25s cubic-bezier(0.4,0,0.2,1);
 }
-.sidebar-brand { padding: 20px 20px 16px; border-bottom: 1px solid var(--gray-border); display: flex; align-items: center; gap: 10px; }
+.sidebar-brand { padding: 14px 16px 12px; border-bottom: 1px solid var(--gray-border); display: flex; align-items: center; gap: 10px; }
 .sidebar-brand-icon { width: 34px; height: 34px; background: var(--blue); border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .sidebar-brand-icon svg { width: 18px; height: 18px; fill: none; stroke: white; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .sidebar-brand-name { font-size: 14px; font-weight: 800; color: var(--text); line-height: 1.2; flex: 1; min-width: 0; }
@@ -165,6 +165,10 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--gray-bg);
 .icon-btn-info:hover { background: var(--blue-light); }
 .icon-btn-info svg { width: 15px; height: 15px; stroke: var(--gray-mid); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .icon-btn-info:hover svg { stroke: var(--blue); }
+.icon-btn-print { width: 30px; height: 30px; border: none; background: none; cursor: pointer; border-radius: 6px; display: flex; align-items: center; justify-content: center; transition: background 0.15s; }
+.icon-btn-print:hover { background: #F0FDF4; }
+.icon-btn-print svg { width: 15px; height: 15px; stroke: var(--gray-mid); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.icon-btn-print:hover svg { stroke: var(--green); }
 .td-actions { display: flex; gap: 2px; align-items: center; }
 
 /* ─── MODAL DETAIL PESERTA ─── */
@@ -373,7 +377,7 @@ tbody td:first-child { padding-left: 18px; font-weight: 600; color: var(--text);
 <div class="login-wrap" id="loginWrap">
   <div class="login-card">
     <div class="login-brand">
-      <img src="logosma.png" alt="Logo SMA" style="height:38px;width:auto;object-fit:contain;">
+      <img src="logosma.png" alt="Logo SMA" style="height:52px;width:auto;object-fit:contain;">
     </div>
     <div class="login-title">Selamat datang</div>
     <div class="login-sub">Manajemen Kegiatan – Biodata Kemendikdasmen</div>
@@ -398,7 +402,7 @@ tbody td:first-child { padding-left: 18px; font-weight: 600; color: var(--text);
   <!-- SIDEBAR -->
   <nav class="sidebar" id="sidebar">
     <div class="sidebar-brand">
-      <img src="logosma.png" alt="Logo SMA" style="height:28px;width:auto;object-fit:contain;flex:1;min-width:0;">
+      <img src="logosma.png" alt="Logo SMA" style="height:36px;width:auto;object-fit:contain;flex:1;min-width:0;">
       <button class="sidebar-close-btn" onclick="closeSidebar()">
         <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
@@ -513,7 +517,7 @@ tbody td:first-child { padding-left: 18px; font-weight: 600; color: var(--text);
             <table>
               <thead>
                 <tr>
-                  <th><div class="th-inner">No</div></th>
+                  <th><div class="th-inner">Timestamp</div></th>
                   <th><div class="th-inner">Nama Lengkap</div></th>
                   <th><div class="th-inner">Instansi/Unit Kerja</div></th>
                   <th><div class="th-inner">Provinsi</div></th>
@@ -642,6 +646,37 @@ tbody td:first-child { padding-left: 18px; font-weight: 600; color: var(--text);
 
 <div class="toast" id="toast"></div>
 
+<!-- ─── MODAL RESET PASSWORD ─── -->
+<div class="modal-overlay" id="resetPassOverlay" onclick="if(event.target===this)closeResetPass()">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Reset Password</h3>
+      <button class="modal-close" onclick="closeResetPass()">
+        <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:13px;color:var(--gray-text);margin-bottom:18px;">Reset password untuk akun <strong id="resetPassUsername">-</strong></p>
+      <div class="field">
+        <label>Password Baru <span style="color:var(--red)">*</span></label>
+        <div class="input-wrap">
+          <input type="password" id="resetPassInput" placeholder="Min. 6 karakter" autocomplete="new-password">
+          <button class="eye-btn" type="button" onclick="togglePass('resetPassInput', this)">
+            <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeResetPass()">Batal</button>
+      <button class="btn-primary" id="btnDoResetPass" onclick="doResetPassword()">
+        <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        Simpan Password
+      </button>
+    </div>
+  </div>
+</div>
+
 <script>
 // ─── CONFIG ───
 const SUPABASE_URL = 'https://lusytejskqevwyyffeue.supabase.co';
@@ -672,7 +707,7 @@ async function sha256(message) {
 }
 
 // ─── DESIGN MODE ───
-const DESIGN_MODE = true;
+const DESIGN_MODE = false;
 
 window.onload = () => {
   if (DESIGN_MODE) {
@@ -736,8 +771,10 @@ function showApp() {
   if (currentUser.role === 'administrator') {
     document.getElementById('navKegiatan').style.display = 'flex';
     document.getElementById('navAkun').style.display = 'flex';
+    document.querySelector('#page-kegiatan .card').style.display = '';
     goTo('kegiatan');
   } else {
+    document.querySelector('#page-kegiatan .card').style.display = 'none';
     goTo('peserta');
   }
 }
@@ -774,7 +811,7 @@ async function loadKegiatan() {
   const list = document.getElementById('kegiatanList');
   list.innerHTML = '<div class="loading-state">Memuat data...</div>';
   try {
-    const res = await sb('kegiatan?order=created_at.desc');
+    const res = await sb('kegiatan?order=created_at.desc&select=id,nama_kegiatan,lokasi,aktif');
     const data = await res.json();
     renderKegiatan(data);
   } catch {
@@ -909,6 +946,7 @@ async function lihatPesertaKegiatan(kegiatanId, namaKegiatan, lokasi) {
   _detailKegiatanId = kegiatanId;
   _detailKegiatanNama = namaKegiatan;
   _detailKegiatanLokasi = lokasi;
+  _detailKegiatanTglBuka = '';
   // Sembunyikan list kegiatan, tampilkan panel detail
   document.getElementById('kegiatanList').style.display = 'none';
   document.querySelector('.section-header').style.display = 'none';
@@ -919,7 +957,7 @@ async function lihatPesertaKegiatan(kegiatanId, namaKegiatan, lokasi) {
   document.getElementById('badgeDetailPeserta').textContent = '0';
   document.getElementById('topbarTitle').textContent = 'Peserta: ' + namaKegiatan;
   try {
-    const res = await sb(`kegiatan_peserta?kegiatan_id=eq.${kegiatanId}&select=peserta(id,nama,nip,golongan,nik,mapel,instansi,jabatan,wa,provinsi,kabkota,alamat,telp_instansi)&order=created_at.asc`);
+    const res = await sb(`kegiatan_peserta?kegiatan_id=eq.${kegiatanId}&select=created_at,peserta(id,nama,nip,golongan,nik,mapel,instansi,jabatan,wa,provinsi,kabkota,alamat,telp_instansi)&order=created_at.asc`);
     const data = await res.json();
     const tbody = document.getElementById('detailPesertaTbody');
     document.getElementById('badgeDetailPeserta').textContent = data.length;
@@ -932,7 +970,7 @@ async function lihatPesertaKegiatan(kegiatanId, namaKegiatan, lokasi) {
       const safeId = p.id || '';
       const pJson = escHtml(JSON.stringify(p));
       return `<tr>
-        <td style="color:var(--gray-mid);font-size:12px;text-align:center;width:40px">${i + 1}</td>
+        <td class="td-ts">${escHtml(formatTs(row.created_at))}</td>
         <td style="font-weight:600;color:var(--text)">${escHtml(p.nama || '-')}</td>
         <td>${escHtml(p.instansi || '-')}</td>
         <td>${escHtml(p.provinsi || '-')}</td>
@@ -942,7 +980,10 @@ async function lihatPesertaKegiatan(kegiatanId, namaKegiatan, lokasi) {
             <button class="icon-btn-info" title="Informasi selengkapnya" onclick='showDetailPeserta(${JSON.stringify(p)})'>
               <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
             </button>
-            <button class="icon-btn" title="Hapus peserta" onclick="hapusPesertaKegiatan(${safeId}, \`${escHtml(p.nama || '')}\`)">
+            <button class="icon-btn-print" title="Cetak / Download PDF biodata" onclick='cetakBiodata(${JSON.stringify(p)})'>
+              <svg viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+            </button>
+            <button class="icon-btn" title="Hapus dari kegiatan" onclick="hapusPesertaKegiatan(${safeId}, \`${escHtml(p.nama || '')}\`)">
               <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
             </button>
           </div>
@@ -954,16 +995,216 @@ async function lihatPesertaKegiatan(kegiatanId, namaKegiatan, lokasi) {
   }
 }
 
-let _detailKegiatanId = null, _detailKegiatanNama = '', _detailKegiatanLokasi = '';
+let _detailKegiatanId = null, _detailKegiatanNama = '', _detailKegiatanLokasi = '', _detailKegiatanTglBuka = '';
 
 async function hapusPesertaKegiatan(pesertaId, nama) {
-  const ok = await showConfirm('Hapus Peserta', `Hapus data peserta "<strong>${escHtml(nama)}</strong>"? Tindakan ini tidak bisa dibatalkan.`);
+  const ok = await showConfirm('Hapus dari Kegiatan', `Hapus "<strong>${escHtml(nama)}</strong>" dari kegiatan ini? Data peserta di database tidak akan ikut terhapus.`);
   if (!ok) return;
   try {
-    const res = await sb(`peserta?id=eq.${pesertaId}`, { method: 'DELETE', prefer: 'return=minimal' });
-    if (res.ok) { showToast('Data peserta dihapus.', 'success'); lihatPesertaKegiatan(_detailKegiatanId, _detailKegiatanNama, _detailKegiatanLokasi); }
-    else showToast('Gagal hapus peserta.', 'error');
+    const res = await sb(`kegiatan_peserta?kegiatan_id=eq.${_detailKegiatanId}&peserta_id=eq.${pesertaId}`, { method: 'DELETE', prefer: 'return=minimal' });
+    if (res.ok) { showToast('Peserta dihapus dari kegiatan.', 'success'); lihatPesertaKegiatan(_detailKegiatanId, _detailKegiatanNama, _detailKegiatanLokasi); }
+    else showToast('Gagal hapus peserta dari kegiatan.', 'error');
   } catch { showToast('Gagal terhubung ke Supabase.', 'error'); }
+}
+
+function cetakBiodata(p) {
+  const namaKegiatan = _detailKegiatanNama || '';
+  const lokasi = _detailKegiatanLokasi || '';
+
+  // Nama kegiatan murni + ambil tanggal awal dari format "[23-26 April 2026] Nama Kegiatan"
+  let namaKegiatanMurni = namaKegiatan;
+  let tglPembukaan = '';
+  const BULAN_LIST = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+  const bulanRe = BULAN_LIST.join('|');
+  // Strip prefix [tgl] dari nama kegiatan jika ada
+  const matchBracket = namaKegiatan.match(/^\[([^\]]+)\]\s*(.*)/);
+  if (matchBracket) {
+    namaKegiatanMurni = matchBracket[2];
+    const range = matchBracket[1];
+    // Format sama bulan: "3-5 Maret 2026" → ambil "3 Maret 2026" (angka SEBELUM tanda -)
+    const mSama = range.match(new RegExp('^(\\d{1,2})[-\u2013]\\d{1,2}\\s+(' + bulanRe + ')\\s+(\\d{4})'));
+    // Format beda bulan: "3 Maret 2026 - 1 April 2026" → ambil "3 Maret 2026"
+    const mBeda = range.match(new RegExp('^(\\d{1,2})\\s+(' + bulanRe + ')\\s+(\\d{4})'));
+    if (mSama) tglPembukaan = mSama[1] + ' ' + mSama[2] + ' ' + mSama[3];
+    else if (mBeda) tglPembukaan = mBeda[1] + ' ' + mBeda[2] + ' ' + mBeda[3];
+  }
+
+  const lokasiTanggal = lokasi && tglPembukaan
+    ? `${lokasi}, ${tglPembukaan}`
+    : (lokasi || tglPembukaan || '-');
+
+  const f = v => v || '-';
+
+  const html = `<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Biodata ${f(p.nama)} - ${f(namaKegiatanMurni)}</title>
+<style>
+  @page { size: A4 portrait; margin: 0.5in; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 12pt;
+    color: #000;
+    background: #fff;
+    line-height: 1.5;
+  }
+  .kop {
+    width: 100%;
+    margin-bottom: 14pt;
+  }
+  .kop img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+  .judul {
+    text-align: center;
+    font-size: 14pt;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    line-height: 1.5;
+  }
+  .sub-judul {
+    text-align: center;
+    font-size: 14pt;
+    font-weight: bold;
+    text-transform: uppercase;
+    margin-bottom: 16pt;
+    line-height: 1.5;
+  }
+  table.biodata {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  table.biodata td {
+    padding: 3pt 0;
+    vertical-align: top;
+    font-size: 12pt;
+    line-height: 1.8;
+  }
+  table.biodata td.label {
+    width: 42%;
+    padding-right: 8pt;
+  }
+  table.biodata td.sep {
+    width: 4%;
+    text-align: center;
+  }
+  table.biodata td.value {
+    width: 54%;
+  }
+  .ttd-section {
+    margin-top: 32pt;
+    display: flex;
+    justify-content: flex-end;
+  }
+  .ttd-box {
+    text-align: center;
+    width: 200pt;
+    line-height: 1.5;
+  }
+  .ttd-lokasi-tgl {
+    font-size: 12pt;
+    margin-bottom: 60pt;
+  }
+  .ttd-nama {
+    font-size: 12pt;
+    font-weight: bold;
+    display: inline-block;
+    min-width: 180pt;
+  }
+</style>
+</head>
+<body>
+  <div class="kop">
+    <img src="kopsurat.png" alt="Kop Surat">
+  </div>
+
+  <div class="judul">BIODATA PESERTA</div>
+  <div class="sub-judul">${f(namaKegiatanMurni)}</div>
+
+  <table class="biodata">
+    <tr>
+      <td class="label">Nama</td>
+      <td class="sep">:</td>
+      <td class="value">${f(p.nama)}</td>
+    </tr>
+    <tr>
+      <td class="label">NIP</td>
+      <td class="sep">:</td>
+      <td class="value">${f(p.nip)}</td>
+    </tr>
+    <tr>
+      <td class="label">Pangkat/Golongan</td>
+      <td class="sep">:</td>
+      <td class="value">${f(p.golongan)}</td>
+    </tr>
+    <tr>
+      <td class="label">Jabatan</td>
+      <td class="sep">:</td>
+      <td class="value">${f(p.jabatan)}</td>
+    </tr>
+    <tr>
+      <td class="label">No. HP (WA)</td>
+      <td class="sep">:</td>
+      <td class="value">${f(p.wa)}</td>
+    </tr>
+    <tr>
+      <td class="label">NPWP/NIK</td>
+      <td class="sep">:</td>
+      <td class="value">${f(p.nik)}</td>
+    </tr>
+    <tr>
+      <td class="label">Instansi</td>
+      <td class="sep">:</td>
+      <td class="value">${f(p.instansi)}</td>
+    </tr>
+    <tr>
+      <td class="label">Alamat</td>
+      <td class="sep">:</td>
+      <td class="value">${f(p.alamat)}</td>
+    </tr>
+    <tr>
+      <td class="label">Telepon</td>
+      <td class="sep">:</td>
+      <td class="value">${f(p.telp_instansi)}</td>
+    </tr>
+    <tr>
+      <td class="label">Kabupaten/Kota</td>
+      <td class="sep">:</td>
+      <td class="value">${f(p.kabkota)}</td>
+    </tr>
+    <tr>
+      <td class="label">Provinsi</td>
+      <td class="sep">:</td>
+      <td class="value">${f(p.provinsi)}</td>
+    </tr>
+  </table>
+
+  <div class="ttd-section">
+    <div class="ttd-box">
+      <div class="ttd-lokasi-tgl">${f(lokasiTanggal)}</div>
+      <div class="ttd-nama">${f(p.nama)}</div>
+    </div>
+  </div>
+</body>
+</html>`;
+
+  const iframe = document.createElement('iframe');
+  iframe.style.cssText = 'position:fixed;width:0;height:0;border:none;opacity:0;pointer-events:none;';
+  document.body.appendChild(iframe);
+  const doc = iframe.contentWindow.document;
+  doc.open();
+  doc.write(html);
+  doc.close();
+  iframe.contentWindow.focus();
+  setTimeout(() => {
+    iframe.contentWindow.print();
+    setTimeout(() => document.body.removeChild(iframe), 1000);
+  }, 400);
 }
 
 function showDetailPeserta(p) {
@@ -1121,6 +1362,10 @@ function renderAkun(items) {
           ? `<button class="btn-sm deactivate" onclick="toggleAkun(${item.id}, false)">Nonaktifkan</button>`
           : `<button class="btn-sm activate" onclick="toggleAkun(${item.id}, true)">Aktifkan</button>`
         }
+        <button class="btn-sm" onclick="resetPassword(${item.id}, \`${escHtml(item.username)}\`)" style="border-color:#C5D8F5;color:var(--blue);background:var(--blue-light);">
+          <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          Reset Password
+        </button>
         ${item.id !== currentUser.id
           ? `<button class="btn-sm danger" onclick="hapusAkun(${item.id}, \`${escHtml(item.username)}\`)">
                <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
@@ -1181,6 +1426,32 @@ async function hapusAkun(id, username) {
     if (res.ok) { showToast('Akun dihapus.', 'success'); loadAkun(); }
     else showToast('Gagal hapus akun.', 'error');
   } catch { showToast('Gagal terhubung ke Supabase.', 'error'); }
+}
+
+let _resetPassTargetId = null;
+function resetPassword(id, username) {
+  _resetPassTargetId = id;
+  document.getElementById('resetPassUsername').textContent = '@' + username;
+  document.getElementById('resetPassInput').value = '';
+  document.getElementById('resetPassOverlay').classList.add('show');
+}
+function closeResetPass() {
+  document.getElementById('resetPassOverlay').classList.remove('show');
+  _resetPassTargetId = null;
+}
+async function doResetPassword() {
+  const newPass = document.getElementById('resetPassInput').value.trim();
+  if (!newPass) { showToast('Masukkan password baru.', 'error'); return; }
+  if (newPass.length < 6) { showToast('Password minimal 6 karakter.', 'error'); return; }
+  const btn = document.getElementById('btnDoResetPass');
+  btn.disabled = true;
+  try {
+    const hash = await sha256(newPass);
+    const res = await sb(`admin_users?id=eq.${_resetPassTargetId}`, { method: 'PATCH', body: JSON.stringify({ password_hash: hash }) });
+    if (res.ok) { showToast('Password berhasil direset.', 'success'); closeResetPass(); }
+    else showToast('Gagal reset password.', 'error');
+  } catch { showToast('Gagal terhubung ke Supabase.', 'error'); }
+  finally { btn.disabled = false; }
 }
 
 // ─── UTILITIES ───
