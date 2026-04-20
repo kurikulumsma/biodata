@@ -169,6 +169,11 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--gray-bg);
 .icon-btn-print:hover { background: #F0FDF4; }
 .icon-btn-print svg { width: 15px; height: 15px; stroke: var(--gray-mid); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .icon-btn-print:hover svg { stroke: var(--green); }
+.icon-btn-download { width: 30px; height: 30px; border: none; background: none; cursor: pointer; border-radius: 6px; display: flex; align-items: center; justify-content: center; transition: background 0.15s; }
+.icon-btn-download:hover { background: #EEF4FF; }
+.icon-btn-download svg { width: 15px; height: 15px; stroke: var(--gray-mid); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.icon-btn-download:hover svg { stroke: var(--blue); }
+.badge-printed { font-size: 10px; font-weight: 700; color: var(--green); background: var(--green-light); border: 1px solid #BBF7D0; padding: 1px 6px; border-radius: 20px; white-space: nowrap; }
 .td-actions { display: flex; gap: 2px; align-items: center; }
 
 /* ─── MODAL DETAIL PESERTA ─── */
@@ -185,6 +190,9 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--gray-bg);
 .detail-row:last-child { border-bottom: none; }
 .detail-label { width: 180px; flex-shrink: 0; font-size: 11.5px; font-weight: 700; color: var(--gray-text); text-transform: uppercase; letter-spacing: 0.03em; padding-top: 1px; }
 .detail-value { flex: 1; color: var(--text); font-weight: 500; line-height: 1.5; word-break: break-word; }
+.detail-value-input { flex: 1; border: 1.5px solid var(--gray-border); border-radius: 6px; padding: 3px 8px; font-family: inherit; font-size: 13px; font-weight: 500; color: var(--text); background: #FAFBFC; transition: border-color 0.15s; }
+.detail-value-input:focus { border-color: var(--blue); outline: none; background: white; }
+.modal-detail-footer { padding: 14px 22px 18px; border-top: 1px solid var(--gray-border); display: flex; gap: 10px; justify-content: flex-end; flex-shrink: 0; }
 
 /* ─── PESERTA PAGE ─── */
 .peserta-page-header {
@@ -522,7 +530,7 @@ tbody td:first-child { padding-left: 18px; font-weight: 600; color: var(--text);
                   <th><div class="th-inner">Instansi/Unit Kerja</div></th>
                   <th><div class="th-inner">Provinsi</div></th>
                   <th><div class="th-inner">Kabupaten/Kota</div></th>
-                  <th style="width:80px"></th>
+                  <th style="width:130px"></th>
                 </tr>
               </thead>
               <tbody id="detailPesertaTbody">
@@ -623,6 +631,13 @@ tbody td:first-child { padding-left: 18px; font-weight: 600; color: var(--text);
       </button>
     </div>
     <div class="modal-detail-body" id="modalDetailBody"></div>
+    <div class="modal-detail-footer">
+      <button class="btn-secondary" onclick="closeDetailPeserta()">Tutup</button>
+      <button class="btn-primary" id="btnSimpanDetail" onclick="simpanDetailPeserta()">
+        <svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        Simpan Perubahan
+      </button>
+    </div>
   </div>
 </div>
 
@@ -774,8 +789,10 @@ function showApp() {
     document.querySelector('#page-kegiatan .card').style.display = '';
     goTo('kegiatan');
   } else {
+    // Operator: tampilkan nav kegiatan (read-only), sembunyikan form tambah
+    document.getElementById('navKegiatan').style.display = 'flex';
     document.querySelector('#page-kegiatan .card').style.display = 'none';
-    goTo('peserta');
+    goTo('kegiatan');
   }
 }
 
@@ -846,6 +863,7 @@ function renderKegiatan(items) {
           <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
           Lihat Peserta
         </button>
+        ${currentUser && currentUser.role === 'administrator' ? `
         ${item.aktif
           ? `<button class="btn-sm deactivate" onclick="toggleKegiatan(${item.id}, false)">
                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
@@ -859,7 +877,7 @@ function renderKegiatan(items) {
         <button class="btn-sm danger" onclick="hapusKegiatan(${item.id}, \`${escHtml(item.nama_kegiatan)}\`)">
           <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
           Hapus
-        </button>
+        </button>` : ''}
       </div>
     </div>
   `).join('');
@@ -969,6 +987,8 @@ async function lihatPesertaKegiatan(kegiatanId, namaKegiatan, lokasi) {
       const p = row.peserta || {};
       const safeId = p.id || '';
       const pJson = escHtml(JSON.stringify(p));
+      const printedKey = `printed_${_detailKegiatanId}_${safeId}`;
+      const isPrinted = localStorage.getItem(printedKey) === '1';
       return `<tr>
         <td class="td-ts">${escHtml(formatTs(row.created_at))}</td>
         <td style="font-weight:600;color:var(--text)">${escHtml(p.nama || '-')}</td>
@@ -977,12 +997,16 @@ async function lihatPesertaKegiatan(kegiatanId, namaKegiatan, lokasi) {
         <td>${escHtml(p.kabkota || '-')}</td>
         <td>
           <div class="td-actions">
-            <button class="icon-btn-info" title="Informasi selengkapnya" onclick='showDetailPeserta(${JSON.stringify(p)})'>
+            <button class="icon-btn-info" title="Informasi &amp; edit data" onclick='showDetailPeserta(${JSON.stringify(p)})'>
               <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
             </button>
-            <button class="icon-btn-print" title="Cetak / Download PDF biodata" onclick='cetakBiodata(${JSON.stringify(p)})'>
+            <button class="icon-btn-download" title="Unduh PDF biodata" onclick='unduhBiodata(${JSON.stringify(p)})'>
+              <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            </button>
+            <button class="icon-btn-print" id="printBtn_${safeId}" title="Cetak biodata" onclick='cetakBiodata(${JSON.stringify(p)}, "${safeId}")'>
               <svg viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
             </button>
+            ${isPrinted ? `<span class="badge-printed" id="printedBadge_${safeId}">✓ Dicetak</span>` : `<span class="badge-printed" id="printedBadge_${safeId}" style="display:none">✓ Dicetak</span>`}
             <button class="icon-btn" title="Hapus dari kegiatan" onclick="hapusPesertaKegiatan(${safeId}, \`${escHtml(p.nama || '')}\`)">
               <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
             </button>
@@ -1007,7 +1031,7 @@ async function hapusPesertaKegiatan(pesertaId, nama) {
   } catch { showToast('Gagal terhubung ke Supabase.', 'error'); }
 }
 
-function cetakBiodata(p) {
+function cetakBiodata(p, pesertaId) {
   const namaKegiatan = _detailKegiatanNama || '';
   const lokasi = _detailKegiatanLokasi || '';
 
@@ -1203,11 +1227,111 @@ function cetakBiodata(p) {
   iframe.contentWindow.focus();
   setTimeout(() => {
     iframe.contentWindow.print();
+    // Tandai sudah dicetak
+    if (pesertaId && _detailKegiatanId) {
+      const printedKey = `printed_${_detailKegiatanId}_${pesertaId}`;
+      localStorage.setItem(printedKey, '1');
+      const badge = document.getElementById('printedBadge_' + pesertaId);
+      if (badge) badge.style.display = '';
+    }
     setTimeout(() => document.body.removeChild(iframe), 1000);
   }, 400);
 }
 
+function unduhBiodata(p) {
+  const namaKegiatan = _detailKegiatanNama || '';
+  const lokasi = _detailKegiatanLokasi || '';
+
+  let namaKegiatanMurni = namaKegiatan;
+  let tglPembukaan = '';
+  const BULAN_LIST = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+  const bulanRe = BULAN_LIST.join('|');
+  const matchBracket = namaKegiatan.match(/^\[([^\]]+)\]\s*(.*)/);
+  if (matchBracket) {
+    namaKegiatanMurni = matchBracket[2];
+    const range = matchBracket[1];
+    const mSama = range.match(new RegExp('^(\\d{1,2})[-\u2013]\\d{1,2}\\s+(' + bulanRe + ')\\s+(\\d{4})'));
+    const mBeda = range.match(new RegExp('^(\\d{1,2})\\s+(' + bulanRe + ')\\s+(\\d{4})'));
+    if (mSama) tglPembukaan = mSama[1] + ' ' + mSama[2] + ' ' + mSama[3];
+    else if (mBeda) tglPembukaan = mBeda[1] + ' ' + mBeda[2] + ' ' + mBeda[3];
+  }
+
+  const lokasiTanggal = lokasi && tglPembukaan ? `${lokasi}, ${tglPembukaan}` : (lokasi || tglPembukaan || '-');
+  const f = v => v || '-';
+
+  // Nama file: nama peserta lowercase, spasi jadi underscore, sanitasi
+  const namaFile = (p.nama || 'biodata').replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_\-]/g, '') + '.pdf';
+
+  const html = `<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Biodata ${f(p.nama)}</title>
+<style>
+  @page { size: A4 portrait; margin: 0.5in; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Times New Roman', Times, serif; font-size: 12pt; color: #000; background: #fff; line-height: 1.5; }
+  .kop { width: 100%; margin-bottom: 14pt; }
+  .kop img { width: 100%; height: auto; display: block; }
+  .judul { text-align: center; font-size: 14pt; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; line-height: 1.5; }
+  .sub-judul { text-align: center; font-size: 14pt; font-weight: bold; text-transform: uppercase; margin-bottom: 16pt; line-height: 1.5; }
+  table.biodata { width: 100%; border-collapse: collapse; }
+  table.biodata td { padding: 3pt 0; vertical-align: top; font-size: 12pt; line-height: 1.8; }
+  table.biodata td.label { width: 42%; padding-right: 8pt; }
+  table.biodata td.sep { width: 4%; text-align: center; }
+  table.biodata td.value { width: 54%; }
+  .ttd-section { margin-top: 32pt; display: flex; justify-content: flex-end; }
+  .ttd-box { text-align: center; width: 200pt; line-height: 1.5; }
+  .ttd-lokasi-tgl { font-size: 12pt; margin-bottom: 60pt; }
+  .ttd-nama { font-size: 12pt; font-weight: bold; display: inline-block; min-width: 180pt; }
+</style>
+</head>
+<body>
+  <div class="kop"><img src="kopsurat.png" alt="Kop Surat"></div>
+  <div class="judul">BIODATA PESERTA</div>
+  <div class="sub-judul">${f(namaKegiatanMurni)}</div>
+  <table class="biodata">
+    <tr><td class="label">Nama</td><td class="sep">:</td><td class="value">${f(p.nama)}</td></tr>
+    <tr><td class="label">NIP</td><td class="sep">:</td><td class="value">${f(p.nip)}</td></tr>
+    <tr><td class="label">Pangkat/Golongan</td><td class="sep">:</td><td class="value">${f(p.golongan)}</td></tr>
+    <tr><td class="label">Jabatan</td><td class="sep">:</td><td class="value">${f(p.jabatan)}</td></tr>
+    <tr><td class="label">No. HP (WA)</td><td class="sep">:</td><td class="value">${f(p.wa)}</td></tr>
+    <tr><td class="label">NPWP/NIK</td><td class="sep">:</td><td class="value">${f(p.nik)}</td></tr>
+    <tr><td class="label">Instansi</td><td class="sep">:</td><td class="value">${f(p.instansi)}</td></tr>
+    <tr><td class="label">Alamat</td><td class="sep">:</td><td class="value">${f(p.alamat)}</td></tr>
+    <tr><td class="label">Telepon</td><td class="sep">:</td><td class="value">${f(p.telp_instansi)}</td></tr>
+    <tr><td class="label">Kabupaten/Kota</td><td class="sep">:</td><td class="value">${f(p.kabkota)}</td></tr>
+    <tr><td class="label">Provinsi</td><td class="sep">:</td><td class="value">${f(p.provinsi)}</td></tr>
+  </table>
+  <div class="ttd-section">
+    <div class="ttd-box">
+      <div class="ttd-lokasi-tgl">${f(lokasiTanggal)}</div>
+      <div class="ttd-nama">${f(p.nama)}</div>
+    </div>
+  </div>
+  <script>
+    window.onload = function() {
+      window.print();
+      window.onafterprint = function() { window.close(); };
+    };
+  <\/script>
+</body>
+</html>`;
+
+  const blob = new Blob([html], { type: 'application/pdf' });
+  // Buka di tab baru dengan nama file yang tepat via URL object
+  const printWin = window.open('', '_blank');
+  if (!printWin) { showToast('Popup diblokir browser. Izinkan popup lalu coba lagi.', 'error'); return; }
+  printWin.document.open();
+  printWin.document.write(html.replace('<\\/script>', '</script>'));
+  printWin.document.close();
+  // Beri nama file dengan mengatur title
+  printWin.document.title = namaFile.replace('.pdf', '');
+  showToast('Halaman biodata dibuka. Pilih "Save as PDF" saat dialog cetak muncul.', 'success');
+}
+
 function showDetailPeserta(p) {
+  _editPesertaId = p.id || null;
   const LABELS = [
     ['nama','Nama Lengkap'],['nip','NIP'],['golongan','Pangkat/Golongan'],
     ['nik','NIK'],['mapel','Mata Pelajaran'],['instansi','Instansi/Unit Kerja'],
@@ -1217,11 +1341,37 @@ function showDetailPeserta(p) {
   const rows = LABELS.map(([k,l]) => `
     <div class="detail-row">
       <div class="detail-label">${l}</div>
-      <div class="detail-value">${escHtml(p[k] || '-')}</div>
+      <input class="detail-value-input" data-field="${k}" value="${escHtml(p[k] || '')}" placeholder="-">
     </div>`).join('');
   document.getElementById('modalDetailNama').textContent = p.nama || 'Detail Peserta';
   document.getElementById('modalDetailBody').innerHTML = rows;
   document.getElementById('modalDetailOverlay').classList.add('show');
+}
+
+async function simpanDetailPeserta() {
+  if (!_editPesertaId) { showToast('ID peserta tidak ditemukan.', 'error'); return; }
+  const inputs = document.querySelectorAll('#modalDetailBody .detail-value-input');
+  const payload = {};
+  inputs.forEach(inp => { payload[inp.dataset.field] = inp.value.trim(); });
+  const btn = document.getElementById('btnSimpanDetail');
+  btn.disabled = true;
+  try {
+    const res = await sb(`peserta?id=eq.${_editPesertaId}`, { method: 'PATCH', body: JSON.stringify(payload) });
+    if (res.ok) {
+      showToast('Data peserta berhasil diperbarui!', 'success');
+      closeDetailPeserta();
+      // Reload tabel yang sedang aktif
+      if (document.getElementById('detailPesertaPanel').classList.contains('active')) {
+        lihatPesertaKegiatan(_detailKegiatanId, _detailKegiatanNama, _detailKegiatanLokasi);
+      } else {
+        loadPeserta();
+      }
+    } else {
+      const err = await res.json();
+      showToast('Gagal simpan: ' + (err.message || 'Unknown error'), 'error');
+    }
+  } catch { showToast('Gagal terhubung ke Supabase.', 'error'); }
+  finally { btn.disabled = false; }
 }
 
 function closeDetailPeserta() {
