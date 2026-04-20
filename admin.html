@@ -128,10 +128,13 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--gray-bg);
 .kegiatan-item.nonaktif { opacity: 0.55; border-style: dashed; }
 .kegiatan-item:hover { border-color: #b0bec5; }
 .kegiatan-info { flex: 1; min-width: 0; }
-.kegiatan-nama { font-size: 13.5px; font-weight: 700; color: var(--text); margin-bottom: 3px; }
+.kegiatan-nama { font-size: 13.5px; font-weight: 700; color: var(--text); margin-bottom: 5px; }
+.kegiatan-meta { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
 .kegiatan-lokasi { font-size: 12px; color: var(--gray-text); display: flex; align-items: center; gap: 5px; }
 .kegiatan-lokasi svg { width: 12px; height: 12px; stroke: var(--gray-mid); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
-.kegiatan-status { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 20px; margin-top: 6px; }
+.kegiatan-tanggal { font-size: 12px; color: var(--gray-text); display: flex; align-items: center; gap: 5px; }
+.kegiatan-tanggal svg { width: 12px; height: 12px; stroke: var(--gray-mid); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
+.kegiatan-status { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 20px; flex-shrink: 0; }
 .kegiatan-status.aktif { background: var(--green-light); color: var(--green); }
 .kegiatan-status.nonaktif { background: #F3F4F6; color: var(--gray-text); }
 .kegiatan-status::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; display: inline-block; }
@@ -144,6 +147,40 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--gray-bg);
 .btn-sm.activate:hover { background: #DCFCE7; }
 .btn-sm.danger { border-color: #FECACA; color: var(--red); background: var(--red-light); }
 .btn-sm.danger:hover { background: #FEE2E2; }
+
+/* ─── TOOLTIP TABEL ─── */
+.td-truncate { max-width: 160px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: default; position: relative; }
+.td-truncate[title]:hover::after {
+  content: attr(title);
+  position: absolute; left: 0; top: calc(100% + 4px); z-index: 999;
+  background: #1e293b; color: white; font-size: 12px; line-height: 1.5;
+  padding: 6px 10px; border-radius: 6px; white-space: pre-wrap; word-break: break-word;
+  max-width: 320px; min-width: 120px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+  pointer-events: none;
+}
+
+/* ─── ICON BUTTONS TABEL PESERTA ─── */
+.icon-btn-info { width: 30px; height: 30px; border: none; background: none; cursor: pointer; border-radius: 6px; display: flex; align-items: center; justify-content: center; transition: background 0.15s; }
+.icon-btn-info:hover { background: var(--blue-light); }
+.icon-btn-info svg { width: 15px; height: 15px; stroke: var(--gray-mid); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.icon-btn-info:hover svg { stroke: var(--blue); }
+.td-actions { display: flex; gap: 2px; align-items: center; }
+
+/* ─── MODAL DETAIL PESERTA ─── */
+.modal-detail-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.35); z-index: 200; display: none; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(2px); }
+.modal-detail-overlay.show { display: flex; }
+.modal-detail { background: var(--white); border-radius: 16px; width: 100%; max-width: 520px; max-height: 85vh; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 20px 60px rgba(0,0,0,0.15); }
+.modal-detail-header { padding: 18px 22px 14px; border-bottom: 1px solid var(--gray-border); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+.modal-detail-header h3 { font-size: 14px; font-weight: 700; color: var(--text); }
+.modal-detail-close { width: 30px; height: 30px; border: none; background: none; cursor: pointer; border-radius: 6px; display: flex; align-items: center; justify-content: center; }
+.modal-detail-close:hover { background: var(--gray-bg); }
+.modal-detail-close svg { width: 16px; height: 16px; stroke: var(--gray-text); fill: none; stroke-width: 2; stroke-linecap: round; }
+.modal-detail-body { padding: 18px 22px; overflow-y: auto; }
+.detail-row { display: flex; gap: 10px; padding: 8px 0; border-bottom: 1px solid #F1F3F7; font-size: 13px; }
+.detail-row:last-child { border-bottom: none; }
+.detail-label { width: 180px; flex-shrink: 0; font-size: 11.5px; font-weight: 700; color: var(--gray-text); text-transform: uppercase; letter-spacing: 0.03em; padding-top: 1px; }
+.detail-value { flex: 1; color: var(--text); font-weight: 500; line-height: 1.5; word-break: break-word; }
 
 /* ─── PESERTA PAGE ─── */
 .peserta-page-header {
@@ -290,6 +327,16 @@ tbody td:first-child { padding-left: 18px; font-weight: 600; color: var(--text);
 .section-page { display: none; }
 .section-page.active { display: block; }
 
+/* ─── DETAIL PESERTA KEGIATAN ─── */
+.detail-peserta-panel { display: none; }
+.detail-peserta-panel.active { display: block; }
+.back-btn { display: inline-flex; align-items: center; gap: 7px; height: 36px; padding: 0 14px; background: var(--white); border: 1.5px solid var(--gray-border); border-radius: var(--radius); font-family: inherit; font-size: 13px; font-weight: 600; color: var(--text-soft); cursor: pointer; margin-bottom: 16px; transition: all 0.15s; }
+.back-btn:hover { border-color: #9CA3AF; color: var(--text); }
+.back-btn svg { width: 15px; height: 15px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.detail-kegiatan-title { font-size: 15px; font-weight: 800; color: var(--text); margin-bottom: 4px; }
+.detail-kegiatan-lokasi { font-size: 12.5px; color: var(--gray-text); display: flex; align-items: center; gap: 5px; margin-bottom: 16px; }
+.detail-kegiatan-lokasi svg { width: 12px; height: 12px; stroke: var(--gray-mid); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
 /* ─── PASSWORD HELPER ─── */
 .pass-hint { font-size: 11.5px; color: var(--gray-text); margin-top: 4px; }
 .input-wrap { position: relative; }
@@ -326,10 +373,7 @@ tbody td:first-child { padding-left: 18px; font-weight: 600; color: var(--text);
 <div class="login-wrap" id="loginWrap">
   <div class="login-card">
     <div class="login-brand">
-      <div class="login-brand-icon">
-        <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-      </div>
-      <div class="login-brand-name">Admin <span>Panel</span></div>
+      <img src="logosma.png" alt="Logo SMA" style="height:38px;width:auto;object-fit:contain;">
     </div>
     <div class="login-title">Selamat datang</div>
     <div class="login-sub">Manajemen Kegiatan – Biodata Kemendikdasmen</div>
@@ -354,13 +398,7 @@ tbody td:first-child { padding-left: 18px; font-weight: 600; color: var(--text);
   <!-- SIDEBAR -->
   <nav class="sidebar" id="sidebar">
     <div class="sidebar-brand">
-      <div class="sidebar-brand-icon">
-        <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-      </div>
-      <div class="sidebar-brand-name">
-        Admin Panel
-        <small>Biodata Kegiatan</small>
-      </div>
+      <img src="logosma.png" alt="Logo SMA" style="height:28px;width:auto;object-fit:contain;flex:1;min-width:0;">
       <button class="sidebar-close-btn" onclick="closeSidebar()">
         <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
@@ -376,7 +414,7 @@ tbody td:first-child { padding-left: 18px; font-weight: 600; color: var(--text);
 
       <button class="nav-item" id="navPeserta" onclick="goTo('peserta')">
         <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-        Peserta
+        Database Peserta
       </button>
 
       <button class="nav-item" id="navAkun" onclick="goTo('akun')" style="display:none">
@@ -427,11 +465,21 @@ tbody td:first-child { padding-left: 18px; font-weight: 600; color: var(--text);
             <div class="form-row">
               <div class="field">
                 <label>Nama Kegiatan <span style="color:var(--red)">*</span></label>
-                <input type="text" id="inputNama" placeholder="Contoh: Analisis Visitasi PID">
+                <input type="text" id="inputNama" placeholder="Contoh: Kurasi Konten MPI">
               </div>
               <div class="field">
                 <label>Lokasi Kegiatan <span style="color:var(--red)">*</span></label>
-                <input type="text" id="inputLokasi" placeholder="Contoh: Jakarta, 3 Mei 2026">
+                <input type="text" id="inputLokasi" placeholder="Contoh: Jakarta">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="field">
+                <label>Tanggal Pembukaan <span style="color:var(--red)">*</span></label>
+                <input type="date" id="inputTglBuka">
+              </div>
+              <div class="field">
+                <label>Tanggal Penutupan <span style="color:var(--red)">*</span></label>
+                <input type="date" id="inputTglTutup">
               </div>
             </div>
             <div class="form-actions">
@@ -450,15 +498,42 @@ tbody td:first-child { padding-left: 18px; font-weight: 600; color: var(--text);
         <div class="kegiatan-list" id="kegiatanList">
           <div class="loading-state">Memuat data...</div>
         </div>
+
+        <!-- Panel detail peserta per kegiatan -->
+        <div class="detail-peserta-panel" id="detailPesertaPanel">
+          <button class="back-btn" onclick="tutupDetailPeserta()">
+            <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+            Kembali ke Daftar Kegiatan
+          </button>
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+            <h3 style="font-size:14px;font-weight:700;color:var(--text);">Peserta Terdaftar</h3>
+            <span class="badge-count" id="badgeDetailPeserta">0</span>
+          </div>
+          <div class="table-outer">
+            <table>
+              <thead>
+                <tr>
+                  <th><div class="th-inner">No</div></th>
+                  <th><div class="th-inner">Nama Lengkap</div></th>
+                  <th><div class="th-inner">Instansi/Unit Kerja</div></th>
+                  <th><div class="th-inner">Provinsi</div></th>
+                  <th><div class="th-inner">Kabupaten/Kota</div></th>
+                  <th style="width:80px"></th>
+                </tr>
+              </thead>
+              <tbody id="detailPesertaTbody">
+                <tr><td colspan="6" class="td-loading">Memuat data...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
 
       <!-- ─── PAGE: PESERTA ─── -->
       <div class="section-page" id="page-peserta">
         <!-- Header tetap (tidak ikut scroll horizontal) -->
         <div class="filter-bar">
-          <select id="filterKegiatan" onchange="loadPeserta()">
-            <option value="">— Semua Kegiatan —</option>
-          </select>
+          <input type="text" id="searchPeserta" placeholder="Cari nama peserta..." oninput="applyTableFilters()" style="height:38px;border:1.5px solid var(--gray-border);border-radius:var(--radius);padding:0 13px;font-family:inherit;font-size:13px;background:var(--white);min-width:260px;color:var(--text);transition:border-color 0.15s;outline:none;" onfocus="this.style.borderColor='var(--blue)'" onblur="this.style.borderColor='var(--gray-border)'">
           <span class="badge-count" id="badgePeserta">0</span>
         </div>
 
@@ -533,6 +608,19 @@ tbody td:first-child { padding-left: 18px; font-weight: 600; color: var(--text);
     </div><!-- /page -->
   </div><!-- /content -->
 </div><!-- /app -->
+
+<!-- ─── MODAL DETAIL PESERTA ─── -->
+<div class="modal-detail-overlay" id="modalDetailOverlay" onclick="if(event.target===this)closeDetailPeserta()">
+  <div class="modal-detail">
+    <div class="modal-detail-header">
+      <h3 id="modalDetailNama">Detail Peserta</h3>
+      <button class="modal-detail-close" onclick="closeDetailPeserta()">
+        <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-detail-body" id="modalDetailBody"></div>
+  </div>
+</div>
 
 <!-- ─── CONFIRM DIALOG ─── -->
 <div class="confirm-overlay" id="confirmOverlay">
@@ -673,10 +761,10 @@ function goTo(page) {
   document.getElementById('page-' + page).classList.add('active');
   const navEl = document.getElementById('nav' + page.charAt(0).toUpperCase() + page.slice(1));
   if (navEl) navEl.classList.add('active');
-  const titles = { kegiatan: 'Kegiatan', peserta: 'Daftar Peserta', akun: 'Kelola Akun' };
+  const titles = { kegiatan: 'Kegiatan', peserta: 'Database Peserta', akun: 'Kelola Akun' };
   document.getElementById('topbarTitle').textContent = titles[page] || page;
   if (page === 'kegiatan') loadKegiatan();
-  if (page === 'peserta') { populateFilterKegiatan(); loadPeserta(); }
+  if (page === 'peserta') loadPeserta();
   if (page === 'akun') loadAkun();
   closeSidebar();
 }
@@ -686,7 +774,7 @@ async function loadKegiatan() {
   const list = document.getElementById('kegiatanList');
   list.innerHTML = '<div class="loading-state">Memuat data...</div>';
   try {
-    const res = await sb('kegiatan?order=created_at.asc');
+    const res = await sb('kegiatan?order=created_at.desc');
     const data = await res.json();
     renderKegiatan(data);
   } catch {
@@ -708,13 +796,19 @@ function renderKegiatan(items) {
     <div class="kegiatan-item ${item.aktif ? '' : 'nonaktif'}">
       <div class="kegiatan-info">
         <div class="kegiatan-nama">${escHtml(item.nama_kegiatan)}</div>
-        <div class="kegiatan-lokasi">
-          <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-          ${escHtml(item.lokasi)}
+        <div class="kegiatan-meta">
+          <div class="kegiatan-lokasi">
+            <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            ${escHtml(item.lokasi)}
+          </div>
+          <div class="kegiatan-status ${item.aktif ? 'aktif' : 'nonaktif'}">${item.aktif ? 'Aktif' : 'Nonaktif'}</div>
         </div>
-        <div class="kegiatan-status ${item.aktif ? 'aktif' : 'nonaktif'}">${item.aktif ? 'Aktif' : 'Nonaktif'}</div>
       </div>
       <div class="kegiatan-actions">
+        <button class="btn-sm" onclick="lihatPesertaKegiatan(${item.id}, \`${escHtml(item.nama_kegiatan)}\`, \`${escHtml(item.lokasi)}\`)" style="border-color:#C5D8F5;color:var(--blue);background:var(--blue-light);">
+          <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          Lihat Peserta
+        </button>
         ${item.aktif
           ? `<button class="btn-sm deactivate" onclick="toggleKegiatan(${item.id}, false)">
                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
@@ -737,17 +831,37 @@ function renderKegiatan(items) {
 async function tambahKegiatan() {
   const nama = document.getElementById('inputNama').value.trim();
   const lokasi = document.getElementById('inputLokasi').value.trim();
-  if (!nama) { document.getElementById('inputNama').classList.add('error'); return; }
-  if (!lokasi) { document.getElementById('inputLokasi').classList.add('error'); return; }
-  document.getElementById('inputNama').classList.remove('error');
-  document.getElementById('inputLokasi').classList.remove('error');
+  const tglBuka = document.getElementById('inputTglBuka').value;
+  const tglTutup = document.getElementById('inputTglTutup').value;
+  let valid = true;
+  ['inputNama','inputLokasi','inputTglBuka','inputTglTutup'].forEach(id => document.getElementById(id).classList.remove('error'));
+  if (!nama) { document.getElementById('inputNama').classList.add('error'); valid = false; }
+  if (!lokasi) { document.getElementById('inputLokasi').classList.add('error'); valid = false; }
+  if (!tglBuka) { document.getElementById('inputTglBuka').classList.add('error'); valid = false; }
+  if (!tglTutup) { document.getElementById('inputTglTutup').classList.add('error'); valid = false; }
+  if (!valid) return;
+
+  // Format tanggal: kalau bulan+tahun sama → "23-26 April 2026", kalau beda bulan → "23 April - 2 Mei 2026"
+  const BULAN = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+  const buka = new Date(tglBuka + 'T00:00:00');
+  const tutup = new Date(tglTutup + 'T00:00:00');
+  let rangeStr;
+  if (buka.getMonth() === tutup.getMonth() && buka.getFullYear() === tutup.getFullYear()) {
+    rangeStr = `${buka.getDate()}-${tutup.getDate()} ${BULAN[buka.getMonth()]} ${buka.getFullYear()}`;
+  } else {
+    rangeStr = `${buka.getDate()} ${BULAN[buka.getMonth()]} ${buka.getFullYear()} - ${tutup.getDate()} ${BULAN[tutup.getMonth()]} ${tutup.getFullYear()}`;
+  }
+  const namaFinal = `[${rangeStr}] ${nama}`;
+
   const btn = document.getElementById('btnTambah');
   btn.disabled = true; btn.innerHTML = '<svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Menyimpan...';
   try {
-    const res = await sb('kegiatan', { method: 'POST', body: JSON.stringify({ nama_kegiatan: nama, lokasi, aktif: true }) });
+    const res = await sb('kegiatan', { method: 'POST', body: JSON.stringify({ nama_kegiatan: namaFinal, lokasi, aktif: true }) });
     if (res.ok) {
       document.getElementById('inputNama').value = '';
       document.getElementById('inputLokasi').value = '';
+      document.getElementById('inputTglBuka').value = '';
+      document.getElementById('inputTglTutup').value = '';
       showToast('Kegiatan berhasil ditambahkan!', 'success');
       loadKegiatan();
     } else {
@@ -777,29 +891,11 @@ async function hapusKegiatan(id, nama) {
 }
 
 // ─── PESERTA ───
-async function populateFilterKegiatan() {
-  const sel = document.getElementById('filterKegiatan');
-  try {
-    const res = await sb('kegiatan?order=created_at.asc');
-    const data = await res.json();
-    sel.innerHTML = '<option value="">— Semua Kegiatan —</option>';
-    data.forEach(item => {
-      const o = document.createElement('option');
-      o.value = item.id;
-      o.textContent = item.nama_kegiatan;
-      sel.appendChild(o);
-    });
-  } catch {}
-}
-
 async function loadPeserta() {
   const tbody = document.getElementById('pesertaTbody');
   tbody.innerHTML = '<tr><td colspan="16" class="td-loading">Memuat data...</td></tr>';
-  const filterVal = document.getElementById('filterKegiatan').value;
-  let query = 'peserta?order=created_at.desc';
-  if (filterVal) query += `&kegiatan_id=eq.${filterVal}`;
   try {
-    const res = await sb(query);
+    const res = await sb('peserta?order=created_at.desc');
     const data = await res.json();
     allPeserta = data;
     renderTableHeader();
@@ -807,6 +903,96 @@ async function loadPeserta() {
   } catch {
     tbody.innerHTML = '<tr><td colspan="16" class="td-loading">Gagal memuat data peserta.</td></tr>';
   }
+}
+
+async function lihatPesertaKegiatan(kegiatanId, namaKegiatan, lokasi) {
+  _detailKegiatanId = kegiatanId;
+  _detailKegiatanNama = namaKegiatan;
+  _detailKegiatanLokasi = lokasi;
+  // Sembunyikan list kegiatan, tampilkan panel detail
+  document.getElementById('kegiatanList').style.display = 'none';
+  document.querySelector('.section-header').style.display = 'none';
+  document.querySelector('#page-kegiatan .card').style.display = 'none';
+  const panel = document.getElementById('detailPesertaPanel');
+  panel.classList.add('active');
+  document.getElementById('detailPesertaTbody').innerHTML = '<tr><td colspan="6" class="td-loading">Memuat data...</td></tr>';
+  document.getElementById('badgeDetailPeserta').textContent = '0';
+  document.getElementById('topbarTitle').textContent = 'Peserta: ' + namaKegiatan;
+  try {
+    const res = await sb(`kegiatan_peserta?kegiatan_id=eq.${kegiatanId}&select=peserta(id,nama,nip,golongan,nik,mapel,instansi,jabatan,wa,provinsi,kabkota,alamat,telp_instansi)&order=created_at.asc`);
+    const data = await res.json();
+    const tbody = document.getElementById('detailPesertaTbody');
+    document.getElementById('badgeDetailPeserta').textContent = data.length;
+    if (!data.length) {
+      tbody.innerHTML = '<tr><td colspan="6" class="td-empty">Belum ada peserta terdaftar di kegiatan ini.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = data.map((row, i) => {
+      const p = row.peserta || {};
+      const safeId = p.id || '';
+      const pJson = escHtml(JSON.stringify(p));
+      return `<tr>
+        <td style="color:var(--gray-mid);font-size:12px;text-align:center;width:40px">${i + 1}</td>
+        <td style="font-weight:600;color:var(--text)">${escHtml(p.nama || '-')}</td>
+        <td>${escHtml(p.instansi || '-')}</td>
+        <td>${escHtml(p.provinsi || '-')}</td>
+        <td>${escHtml(p.kabkota || '-')}</td>
+        <td>
+          <div class="td-actions">
+            <button class="icon-btn-info" title="Informasi selengkapnya" onclick='showDetailPeserta(${JSON.stringify(p)})'>
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            </button>
+            <button class="icon-btn" title="Hapus peserta" onclick="hapusPesertaKegiatan(${safeId}, \`${escHtml(p.nama || '')}\`)">
+              <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+            </button>
+          </div>
+        </td>
+      </tr>`;
+    }).join('');
+  } catch {
+    document.getElementById('detailPesertaTbody').innerHTML = '<tr><td colspan="6" class="td-loading">Gagal memuat data.</td></tr>';
+  }
+}
+
+let _detailKegiatanId = null, _detailKegiatanNama = '', _detailKegiatanLokasi = '';
+
+async function hapusPesertaKegiatan(pesertaId, nama) {
+  const ok = await showConfirm('Hapus Peserta', `Hapus data peserta "<strong>${escHtml(nama)}</strong>"? Tindakan ini tidak bisa dibatalkan.`);
+  if (!ok) return;
+  try {
+    const res = await sb(`peserta?id=eq.${pesertaId}`, { method: 'DELETE', prefer: 'return=minimal' });
+    if (res.ok) { showToast('Data peserta dihapus.', 'success'); lihatPesertaKegiatan(_detailKegiatanId, _detailKegiatanNama, _detailKegiatanLokasi); }
+    else showToast('Gagal hapus peserta.', 'error');
+  } catch { showToast('Gagal terhubung ke Supabase.', 'error'); }
+}
+
+function showDetailPeserta(p) {
+  const LABELS = [
+    ['nama','Nama Lengkap'],['nip','NIP'],['golongan','Pangkat/Golongan'],
+    ['nik','NIK'],['mapel','Mata Pelajaran'],['instansi','Instansi/Unit Kerja'],
+    ['jabatan','Jabatan'],['wa','No. WhatsApp'],['provinsi','Provinsi'],
+    ['kabkota','Kabupaten/Kota'],['alamat','Alamat Instansi'],['telp_instansi','Telepon Instansi']
+  ];
+  const rows = LABELS.map(([k,l]) => `
+    <div class="detail-row">
+      <div class="detail-label">${l}</div>
+      <div class="detail-value">${escHtml(p[k] || '-')}</div>
+    </div>`).join('');
+  document.getElementById('modalDetailNama').textContent = p.nama || 'Detail Peserta';
+  document.getElementById('modalDetailBody').innerHTML = rows;
+  document.getElementById('modalDetailOverlay').classList.add('show');
+}
+
+function closeDetailPeserta() {
+  document.getElementById('modalDetailOverlay').classList.remove('show');
+}
+
+function tutupDetailPeserta() {
+  document.getElementById('detailPesertaPanel').classList.remove('active');
+  document.getElementById('kegiatanList').style.display = '';
+  document.querySelector('.section-header').style.display = '';
+  document.querySelector('#page-kegiatan .card').style.display = '';
+  document.getElementById('topbarTitle').textContent = 'Kegiatan';
 }
 
 // ─── KOLOM TABEL ───
@@ -834,7 +1020,8 @@ function renderTableHeader() {
 }
 
 function applyTableFilters() {
-  const items = [...allPeserta];
+  const q = (document.getElementById('searchPeserta')?.value || '').trim().toLowerCase();
+  const items = q ? allPeserta.filter(p => (p.nama || '').toLowerCase().includes(q)) : [...allPeserta];
   document.getElementById('badgePeserta').textContent = items.length;
   renderPeserta(items);
 }
@@ -855,7 +1042,11 @@ function renderPeserta(items) {
     return;
   }
   const isAdmin = currentUser && currentUser.role === 'administrator';
-  const colCount = TABLE_COLS.length + 1;
+  const MAX = { instansi: 180, jabatan: 140, mapel: 140, alamat: 180, telp_instansi: 120 };
+  function tdTrunc(val, maxW) {
+    const v = val || '-';
+    return `<td class="td-truncate" style="max-width:${maxW}px" title="${escHtml(v)}">${escHtml(v)}</td>`;
+  }
   tbody.innerHTML = items.map(item => `
     <tr>
       <td class="td-ts">${escHtml(formatTs(item.created_at))}</td>
@@ -863,17 +1054,24 @@ function renderPeserta(items) {
       <td>${escHtml(item.nip || '-')}</td>
       <td>${escHtml(item.golongan || '-')}</td>
       <td>${escHtml(item.nik || '-')}</td>
-      <td>${escHtml(item.mapel || '-')}</td>
-      <td>${escHtml(item.instansi || '-')}</td>
-      <td>${escHtml(item.jabatan || '-')}</td>
+      ${tdTrunc(item.mapel, 140)}
+      ${tdTrunc(item.instansi, 180)}
+      ${tdTrunc(item.jabatan, 140)}
       <td>${escHtml(item.wa || '-')}</td>
       <td>${escHtml(item.provinsi || '-')}</td>
       <td>${escHtml(item.kabkota || '-')}</td>
-      <td>${escHtml(item.alamat || '-')}</td>
-      <td>${escHtml(item.telp_instansi || '-')}</td>
-      <td>${isAdmin ? `<button class="icon-btn" onclick="hapusPeserta(${item.id}, \`${escHtml(item.nama || '')}\`)" title="Hapus peserta">
-        <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
-      </button>` : ''}</td>
+      ${tdTrunc(item.alamat, 180)}
+      ${tdTrunc(item.telp_instansi, 120)}
+      <td>
+        <div class="td-actions">
+          <button class="icon-btn-info" title="Informasi selengkapnya" onclick='showDetailPeserta(${JSON.stringify(item)})'>
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          </button>
+          ${isAdmin ? `<button class="icon-btn" onclick="hapusPeserta(${item.id}, \`${escHtml(item.nama || '')}\`)" title="Hapus peserta">
+            <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+          </button>` : ''}
+        </div>
+      </td>
     </tr>
   `).join('');
 }
