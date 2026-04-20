@@ -850,19 +850,42 @@ async function submitForm() {
   // Cari kegiatan_id dari kegiatanMap
   const kegiatanId = kegiatanIdMap[d.nama_kegiatan] || null;
 
+  // Hapus nama_kegiatan & lokasi dari payload peserta (tidak ada di tabel)
+  const pesertaPayload = { ...d };
+  delete pesertaPayload.nama_kegiatan;
+  delete pesertaPayload.lokasi;
+
   let supabaseOk = false;
   try {
-    const sbRes = await fetch(`${SUPABASE_URL}/rest/v1/peserta`, {
+    // Step 1: Upsert peserta by NIK
+    const upsertRes = await fetch(`${SUPABASE_URL}/rest/v1/peserta?on_conflict=nik`, {
       method: 'POST',
       headers: {
         'apikey': SUPABASE_KEY,
         'Authorization': `Bearer ${SUPABASE_KEY}`,
         'Content-Type': 'application/json',
-        'Prefer': 'return=minimal'
+        'Prefer': 'return=representation,resolution=merge-duplicates'
       },
-      body: JSON.stringify({ ...d, kegiatan_id: kegiatanId })
+      body: JSON.stringify(pesertaPayload)
     });
-    supabaseOk = sbRes.ok;
+    if (!upsertRes.ok) throw new Error('upsert peserta gagal');
+    const upsertData = await upsertRes.json();
+    const pesertaId = upsertData[0]?.id;
+
+    // Step 2: Insert relasi kegiatan_peserta (ignore kalau sudah ada)
+    if (pesertaId && kegiatanId) {
+      await fetch(`${SUPABASE_URL}/rest/v1/kegiatan_peserta`, {
+        method: 'POST',
+        headers: {
+          'apikey': SUPABASE_KEY,
+          'Authorization': `Bearer ${SUPABASE_KEY}`,
+          'Content-Type': 'application/json',
+          'Prefer': 'return=minimal,resolution=ignore-duplicates'
+        },
+        body: JSON.stringify({ kegiatan_id: kegiatanId, peserta_id: pesertaId })
+      });
+    }
+    supabaseOk = true;
   } catch { supabaseOk = false; }
 
   // Kirim ke Google Sheet (tetap, untuk arsip)
