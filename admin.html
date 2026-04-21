@@ -497,7 +497,7 @@ tbody td:first-child { padding-left: 18px; font-weight: 600; color: var(--text);
       </div>
       <div class="topbar-right">
         <span class="role-badge" id="roleBadge">-</span>
-        <button class="btn-logout-mobile" id="btnLogoutMobile" onclick="doLogout()" title="Keluar" style="display:none">
+        <button class="btn-logout-mobile" id="btnLogoutMobile" onclick="doLogout()" title="Keluar">
           <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
           Keluar
         </button>
@@ -662,21 +662,17 @@ tbody td:first-child { padding-left: 18px; font-weight: 600; color: var(--text);
 </div><!-- /app -->
 
 <!-- ─── MODAL DETAIL PESERTA ─── -->
-<div class="modal-detail-overlay" id="modalDetailOverlay" onclick="if(event.target===this)closeDetailPeserta()">
+<div class="modal-detail-overlay" id="modalDetailOverlay" onclick="if(event.target===this)tutupDetailPesertaModal()">
   <div class="modal-detail">
     <div class="modal-detail-header">
       <h3 id="modalDetailNama">Detail Peserta</h3>
-      <button class="modal-detail-close" onclick="closeDetailPeserta()">
+      <button class="modal-detail-close" onclick="tutupDetailPesertaModal()">
         <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
     </div>
     <div class="modal-detail-body" id="modalDetailBody"></div>
     <div class="modal-detail-footer" id="modalDetailFooter" style="padding:14px 22px 18px;border-top:1px solid var(--gray-border);display:flex;gap:10px;justify-content:flex-end;">
-      <button class="btn-secondary" onclick="closeDetailPeserta()">Tutup</button>
-      <button class="btn-primary" id="btnSimpanEdit" onclick="simpanEditPeserta()">
-        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-        Simpan Perubahan
-      </button>
+      <button class="btn-secondary" onclick="tutupDetailPesertaModal()">Tutup</button>
     </div>
   </div>
 </div>
@@ -1050,8 +1046,8 @@ async function lihatPesertaKegiatan(kegiatanId, namaKegiatan, lokasi) {
         <td>${escHtml(p.kabkota || '-')}</td>
         <td>
           <div class="td-actions">
-            <button class="icon-btn-info" title="Edit data peserta" onclick='showDetailPeserta(${JSON.stringify(p)})'>
-              <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            <button class="icon-btn-info" title="Lihat detail peserta" onclick='showDetailPeserta(${JSON.stringify(p)})'>
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
             </button>
             <button class="icon-btn-print" title="Cetak / Download PDF biodata" onclick='cetakBiodata(${JSON.stringify(p)}, this)'>
               <svg viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
@@ -1312,6 +1308,10 @@ async function cetakBiodata(p, btnEl) {
 
 let _editPesertaId = null;
 
+function tutupDetailPesertaModal() {
+  document.getElementById('modalDetailOverlay').classList.remove('show');
+}
+
 function showDetailPeserta(p) {
   _editPesertaId = p.id || null;
   const LABELS = [
@@ -1323,7 +1323,7 @@ function showDetailPeserta(p) {
   const rows = LABELS.map(([k,l]) => `
     <div class="detail-row">
       <div class="detail-label">${l}</div>
-      <div class="detail-value"><input type="text" id="edit_${k}" value="${escHtml(p[k] || '')}"></div>
+      <div class="detail-value">${escHtml(p[k] || '-')}</div>
     </div>`).join('');
   document.getElementById('modalDetailNama').textContent = p.nama || 'Detail Peserta';
   document.getElementById('modalDetailBody').innerHTML = rows;
@@ -1331,7 +1331,7 @@ function showDetailPeserta(p) {
 }
 
 async function simpanEditPeserta() {
-  if (!_editPesertaId) { closeDetailPeserta(); return; }
+  if (!_editPesertaId) { tutupDetailPesertaModal(); return; }
   const KEYS = ['nama','nip','golongan','nik','mapel','instansi','jabatan','wa','provinsi','kabkota','alamat','telp_instansi'];
   const payload = {};
   KEYS.forEach(k => {
@@ -1354,7 +1354,7 @@ async function simpanEditPeserta() {
     });
     if (res.ok) {
       showToast('Data peserta berhasil disimpan.', 'success');
-      closeDetailPeserta();
+      tutupDetailPesertaModal();
       if (document.getElementById('page-peserta').classList.contains('active')) loadPeserta();
       if (document.getElementById('detailPesertaPanel').classList.contains('active')) lihatPesertaKegiatan(_detailKegiatanId, _detailKegiatanNama, _detailKegiatanLokasi);
     } else {
@@ -1478,8 +1478,8 @@ function renderPeserta(items) {
       ${tdTrunc(item.telp_instansi, 120)}
       <td>
         <div class="td-actions">
-          <button class="icon-btn-info" title="Edit data peserta" onclick='showDetailPeserta(${JSON.stringify(item)})'>
-            <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          <button class="icon-btn-info" title="Lihat detail peserta" onclick='showDetailPeserta(${JSON.stringify(item)})'>
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
           </button>
           <button class="icon-btn-riwayat" title="Riwayat kegiatan peserta" onclick='showRiwayatKegiatan(${item.id}, \`${escHtml(item.nama || '')}\`)'>
             <svg viewBox="0 0 24 24"><path d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/><polyline points="12 6 12 12 16 14"/></svg>
