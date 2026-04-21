@@ -179,6 +179,7 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--gray-bg);
 .icon-btn-print svg { width: 15px; height: 15px; stroke: var(--gray-mid); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .icon-btn-print:hover svg { stroke: var(--green); }
 .td-actions { display: flex; gap: 2px; align-items: center; }
+.badge-printed { font-size: 10.5px; font-weight: 700; padding: 2px 7px; border-radius: 20px; background: var(--green-light); color: var(--green); border: 1px solid #BBF7D0; white-space: nowrap; margin-left: 2px; }
 .icon-btn-riwayat { width: 30px; height: 30px; border: none; background: none; cursor: pointer; border-radius: 6px; display: flex; align-items: center; justify-content: center; transition: background 0.15s; }
 .icon-btn-riwayat:hover { background: var(--amber-light); }
 .icon-btn-riwayat svg { width: 15px; height: 15px; stroke: var(--gray-mid); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
@@ -384,6 +385,11 @@ tbody td:first-child { padding-left: 18px; font-weight: 600; color: var(--text);
 .input-wrap .eye-btn { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; padding: 4px; }
 .input-wrap .eye-btn svg { width: 16px; height: 16px; stroke: var(--gray-mid); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 
+/* ─── LOGOUT MOBILE ─── */
+.btn-logout-mobile { display: none; height: 34px; padding: 0 12px; background: none; border: 1.5px solid var(--gray-border); border-radius: var(--radius); font-family: inherit; font-size: 12.5px; font-weight: 700; color: var(--text-soft); cursor: pointer; align-items: center; gap: 6px; transition: all 0.15s; white-space: nowrap; }
+.btn-logout-mobile:hover { background: #FEE2E2; border-color: #FECACA; color: var(--red); }
+.btn-logout-mobile svg { stroke: currentColor; }
+
 /* ─── RESPONSIVE ─── */
 @media (max-width: 768px) {
   .sidebar { transform: translateX(-100%); }
@@ -400,6 +406,7 @@ tbody td:first-child { padding-left: 18px; font-weight: 600; color: var(--text);
   .akun-item { }
   .card-body { padding: 16px; }
   .toast { bottom: 16px; right: 16px; left: 16px; max-width: none; text-align: center; }
+  .btn-logout-mobile { display: flex; }
 }
 @media (max-width: 480px) {
   .login-card { padding: 32px 24px; }
@@ -490,6 +497,10 @@ tbody td:first-child { padding-left: 18px; font-weight: 600; color: var(--text);
       </div>
       <div class="topbar-right">
         <span class="role-badge" id="roleBadge">-</span>
+        <button class="btn-logout-mobile" id="btnLogoutMobile" onclick="doLogout()" title="Keluar" style="display:none">
+          <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          Keluar
+        </button>
       </div>
     </div>
 
@@ -890,7 +901,7 @@ function renderKegiatan(items) {
     return;
   }
   list.innerHTML = items.map(item => {
-    const jumlahPeserta = Array.isArray(item.kegiatan_peserta) ? item.kegiatan_peserta.length : (item.kegiatan_peserta?.[0]?.count ?? 0);
+    const jumlahPeserta = item.kegiatan_peserta?.[0]?.count ?? 0;
     return `
     <div class="kegiatan-item ${item.aktif ? '' : 'nonaktif'}">
       <div class="kegiatan-info">
@@ -1069,7 +1080,7 @@ async function hapusPesertaKegiatan(pesertaId, nama) {
   } catch { showToast('Gagal terhubung ke Supabase.', 'error'); }
 }
 
-function cetakBiodata(p, btnEl) {
+async function cetakBiodata(p, btnEl) {
   // tampilkan badge sudah dicetak
   if (btnEl) {
     const tdActions = btnEl.closest('.td-actions');
@@ -1265,18 +1276,38 @@ function cetakBiodata(p, btnEl) {
 </body>
 </html>`;
 
+  // Preload kop surat sebagai absolute URL agar tidak gagal di iframe
+  const baseUrl = window.location.href.replace(/[^/]*$/, '');
+
+  async function getKopBase64() {
+    try {
+      const r = await fetch(baseUrl + 'kopsurat.png');
+      if (!r.ok) return null;
+      const blob = await r.blob();
+      return await new Promise(res => {
+        const fr = new FileReader();
+        fr.onload = () => res(fr.result);
+        fr.readAsDataURL(blob);
+      });
+    } catch { return null; }
+  }
+
+  const kopDataUrl = await getKopBase64();
+  const kopSrc = kopDataUrl || (baseUrl + 'kopsurat.png');
+  const htmlFinal = html.replace('<img src="kopsurat.png" alt="Kop Surat">', `<img src="${kopSrc}" alt="Kop Surat">`);
+
   const iframe = document.createElement('iframe');
   iframe.style.cssText = 'position:fixed;width:0;height:0;border:none;opacity:0;pointer-events:none;';
   document.body.appendChild(iframe);
   const doc = iframe.contentWindow.document;
   doc.open();
-  doc.write(html);
+  doc.write(htmlFinal);
   doc.close();
   iframe.contentWindow.focus();
   setTimeout(() => {
     iframe.contentWindow.print();
     setTimeout(() => document.body.removeChild(iframe), 1000);
-  }, 400);
+  }, 600);
 }
 
 let _editPesertaId = null;
@@ -1318,9 +1349,15 @@ async function simpanEditPeserta() {
       if (document.getElementById('page-peserta').classList.contains('active')) loadPeserta();
       if (document.getElementById('detailPesertaPanel').classList.contains('active')) lihatPesertaKegiatan(_detailKegiatanId, _detailKegiatanNama, _detailKegiatanLokasi);
     } else {
-      showToast('Gagal menyimpan perubahan.', 'error');
+      let errMsg = 'Gagal menyimpan perubahan.';
+      try { const errJson = await res.json(); if (errJson.message) errMsg = 'Gagal: ' + errJson.message; } catch(e) {}
+      showToast(errMsg, 'error');
+      // Modal tetap terbuka agar user bisa coba lagi
     }
-  } catch { showToast('Gagal terhubung ke Supabase.', 'error'); }
+  } catch(e) {
+    showToast('Gagal terhubung ke Supabase. Coba lagi.', 'error');
+    // Modal tetap terbuka agar user bisa tutup manual
+  }
   finally { btn.disabled = false; }
 }
 
