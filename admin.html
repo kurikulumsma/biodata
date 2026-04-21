@@ -1341,22 +1341,29 @@ async function simpanEditPeserta() {
   const btn = document.getElementById('btnSimpanEdit');
   btn.disabled = true;
   try {
-    const res = await sb(`peserta?id=eq.${_editPesertaId}`, { method: 'PATCH', body: JSON.stringify(payload) });
+    // Pakai fetch langsung dengan return=minimal agar tidak ada body parsing issue
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/peserta?id=eq.${_editPesertaId}`, {
+      method: 'PATCH',
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify(payload)
+    });
     if (res.ok) {
       showToast('Data peserta berhasil disimpan.', 'success');
       closeDetailPeserta();
-      // refresh tabel yang sedang aktif
       if (document.getElementById('page-peserta').classList.contains('active')) loadPeserta();
       if (document.getElementById('detailPesertaPanel').classList.contains('active')) lihatPesertaKegiatan(_detailKegiatanId, _detailKegiatanNama, _detailKegiatanLokasi);
     } else {
-      let errMsg = 'Gagal menyimpan perubahan.';
+      let errMsg = 'Gagal menyimpan perubahan. (HTTP ' + res.status + ')';
       try { const errJson = await res.json(); if (errJson.message) errMsg = 'Gagal: ' + errJson.message; } catch(e) {}
       showToast(errMsg, 'error');
-      // Modal tetap terbuka agar user bisa coba lagi
     }
   } catch(e) {
     showToast('Gagal terhubung ke Supabase. Coba lagi.', 'error');
-    // Modal tetap terbuka agar user bisa tutup manual
   }
   finally { btn.disabled = false; }
 }
