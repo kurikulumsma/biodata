@@ -385,6 +385,20 @@ tbody td:first-child { padding-left: 18px; font-weight: 600; color: var(--text);
 .input-wrap .eye-btn { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; padding: 4px; }
 .input-wrap .eye-btn svg { width: 16px; height: 16px; stroke: var(--gray-mid); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 
+/* ─── SEARCH BAR KEGIATAN ─── */
+.kegiatan-search-bar { margin-bottom: 14px; }
+.kegiatan-search-bar input { height: 38px; border: 1.5px solid var(--gray-border); border-radius: var(--radius); padding: 0 13px 0 36px; font-family: inherit; font-size: 13px; background: var(--white); color: var(--text); transition: border-color 0.15s; outline: none; width: 100%; max-width: 320px; }
+.kegiatan-search-bar input:focus { border-color: var(--blue); }
+.kegiatan-search-wrap { position: relative; display: inline-block; }
+.kegiatan-search-wrap svg { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; stroke: var(--gray-mid); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; pointer-events: none; }
+
+/* ─── SEARCH BAR DETAIL PESERTA ─── */
+.detail-peserta-search-bar { margin-bottom: 12px; }
+.detail-peserta-search-bar input { height: 38px; border: 1.5px solid var(--gray-border); border-radius: var(--radius); padding: 0 13px 0 36px; font-family: inherit; font-size: 13px; background: var(--white); color: var(--text); transition: border-color 0.15s; outline: none; width: 100%; max-width: 320px; }
+.detail-peserta-search-bar input:focus { border-color: var(--blue); }
+.detail-peserta-search-wrap { position: relative; display: inline-block; }
+.detail-peserta-search-wrap svg { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; stroke: var(--gray-mid); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; pointer-events: none; }
+
 /* ─── LOGOUT MOBILE ─── */
 .btn-logout-mobile { display: none; height: 34px; padding: 0 12px; background: none; border: 1.5px solid var(--gray-border); border-radius: var(--radius); font-family: inherit; font-size: 12.5px; font-weight: 700; color: var(--text-soft); cursor: pointer; align-items: center; gap: 6px; transition: all 0.15s; white-space: nowrap; }
 .btn-logout-mobile:hover { background: #FEE2E2; border-color: #FECACA; color: var(--red); }
@@ -547,6 +561,12 @@ tbody td:first-child { padding-left: 18px; font-weight: 600; color: var(--text);
           <h3>Daftar Kegiatan</h3>
           <span class="badge-count" id="badgeCount">0</span>
         </div>
+        <div class="kegiatan-search-bar">
+          <div class="kegiatan-search-wrap">
+            <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" id="searchKegiatan" placeholder="Cari nama kegiatan..." oninput="filterKegiatan()" autocomplete="off">
+          </div>
+        </div>
         <div class="kegiatan-list" id="kegiatanList">
           <div class="loading-state">Memuat data...</div>
         </div>
@@ -560,6 +580,12 @@ tbody td:first-child { padding-left: 18px; font-weight: 600; color: var(--text);
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
             <h3 style="font-size:14px;font-weight:700;color:var(--text);">Peserta Terdaftar</h3>
             <span class="badge-count" id="badgeDetailPeserta">0</span>
+          </div>
+          <div class="detail-peserta-search-bar">
+            <div class="detail-peserta-search-wrap">
+              <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <input type="text" id="searchDetailPeserta" placeholder="Cari nama peserta..." oninput="filterDetailPeserta()" autocomplete="off">
+            </div>
           </div>
           <div class="table-outer">
             <table>
@@ -751,6 +777,8 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 // ─── STATE ───
 let currentUser = null;
 let allPeserta = [];
+let allKegiatan = [];
+let allDetailPeserta = [];
 
 // ─── SUPABASE HELPER ───
 const sb = (path, opts = {}) => fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
@@ -880,6 +908,9 @@ async function loadKegiatan() {
   try {
     const res = await sb('kegiatan?order=created_at.desc&select=id,nama_kegiatan,lokasi,aktif,kegiatan_peserta(count)');
     const data = await res.json();
+    allKegiatan = data;
+    const searchEl = document.getElementById('searchKegiatan');
+    if (searchEl) searchEl.value = '';
     renderKegiatan(data);
   } catch {
     list.innerHTML = '<div class="loading-state">Gagal memuat data.</div>';
@@ -931,6 +962,12 @@ function renderKegiatan(items) {
       </div>
     </div>
   `}).join('');
+}
+
+function filterKegiatan() {
+  const q = (document.getElementById('searchKegiatan').value || '').trim().toLowerCase();
+  const filtered = q ? allKegiatan.filter(k => k.nama_kegiatan.toLowerCase().includes(q)) : allKegiatan;
+  renderKegiatan(filtered);
 }
 
 async function tambahKegiatan() {
@@ -1019,6 +1056,7 @@ async function lihatPesertaKegiatan(kegiatanId, namaKegiatan, lokasi) {
   // Sembunyikan list kegiatan, tampilkan panel detail
   document.getElementById('kegiatanList').style.display = 'none';
   document.querySelector('.section-header').style.display = 'none';
+  document.querySelector('.kegiatan-search-bar').style.display = 'none';
   document.querySelector('#page-kegiatan .card').style.display = 'none'; // sembunyikan form sementara saja saat lihat peserta
   const panel = document.getElementById('detailPesertaPanel');
   panel.classList.add('active');
@@ -1030,14 +1068,28 @@ async function lihatPesertaKegiatan(kegiatanId, namaKegiatan, lokasi) {
     const data = await res.json();
     const tbody = document.getElementById('detailPesertaTbody');
     document.getElementById('badgeDetailPeserta').textContent = data.length;
+    const searchEl = document.getElementById('searchDetailPeserta');
+    if (searchEl) searchEl.value = '';
+    allDetailPeserta = data;
     if (!data.length) {
       tbody.innerHTML = '<tr><td colspan="6" class="td-empty">Belum ada peserta terdaftar di kegiatan ini.</td></tr>';
       return;
     }
-    tbody.innerHTML = data.map((row, i) => {
+    renderDetailPeserta(data);
+  } catch {
+    document.getElementById('detailPesertaTbody').innerHTML = '<tr><td colspan="6" class="td-loading">Gagal memuat data.</td></tr>';
+  }
+}
+
+function renderDetailPeserta(rows) {
+  const tbody = document.getElementById('detailPesertaTbody');
+  if (!rows.length) {
+    tbody.innerHTML = '<tr><td colspan="6" class="td-empty">Tidak ada peserta yang cocok.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = rows.map((row) => {
       const p = row.peserta || {};
       const safeId = p.id || '';
-      const pJson = escHtml(JSON.stringify(p));
       return `<tr>
         <td class="td-ts">${escHtml(formatTs(row.created_at))}</td>
         <td style="font-weight:600;color:var(--text)">${escHtml(p.nama || '-')}</td>
@@ -1058,10 +1110,13 @@ async function lihatPesertaKegiatan(kegiatanId, namaKegiatan, lokasi) {
           </div>
         </td>
       </tr>`;
-    }).join('');
-  } catch {
-    document.getElementById('detailPesertaTbody').innerHTML = '<tr><td colspan="6" class="td-loading">Gagal memuat data.</td></tr>';
-  }
+  }).join('');
+}
+
+function filterDetailPeserta() {
+  const q = (document.getElementById('searchDetailPeserta').value || '').trim().toLowerCase();
+  const filtered = q ? allDetailPeserta.filter(row => (row.peserta?.nama || '').toLowerCase().includes(q)) : allDetailPeserta;
+  renderDetailPeserta(filtered);
 }
 
 let _detailKegiatanId = null, _detailKegiatanNama = '', _detailKegiatanLokasi = '', _detailKegiatanTglBuka = '';
@@ -1404,6 +1459,7 @@ function tutupDetailPeserta() {
   document.getElementById('detailPesertaPanel').classList.remove('active');
   document.getElementById('kegiatanList').style.display = '';
   document.querySelector('.section-header').style.display = '';
+  document.querySelector('.kegiatan-search-bar').style.display = '';
   // Tampilkan form tambah kegiatan untuk semua role (operator & admin keduanya boleh)
   document.querySelector('#page-kegiatan .card').style.display = '';
   document.getElementById('topbarTitle').textContent = 'Kegiatan';
