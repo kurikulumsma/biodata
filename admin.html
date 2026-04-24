@@ -17,7 +17,7 @@
   --sidebar-w: 230px; --radius: 8px; --radius-lg: 12px;
   --shadow-sm: 0 1px 3px rgba(0,0,0,0.07); --shadow: 0 4px 16px rgba(0,0,0,0.08);
 }
-body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--gray-bg); color: var(--text); min-height: 100vh; font-size: 14px; }
+body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--gray-bg); color: var(--text); min-height: 100vh; font-size: 14px; visibility: hidden; }
 
 /* ─── LOGIN ─── */
 .login-wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; background: var(--gray-bg); }
@@ -63,7 +63,8 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--gray-bg);
 
 .sidebar-section { padding: 16px 12px 8px; }
 .sidebar-section-label { font-size: 10.5px; font-weight: 700; letter-spacing: 0.08em; color: var(--gray-mid); text-transform: uppercase; padding: 0 8px; margin-bottom: 6px; }
-.nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: var(--radius); cursor: pointer; font-size: 13.5px; font-weight: 600; color: var(--text-soft); transition: all 0.15s; margin-bottom: 2px; border: none; background: none; width: 100%; text-align: left; font-family: inherit; }
+.nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: var(--radius); cursor: pointer; font-size: 13.5px; font-weight: 600; color: var(--text-soft); transition: all 0.15s; margin-bottom: 2px; border: none; background: none; width: 100%; text-align: left; font-family: inherit; text-decoration: none; }
+a.nav-item { display: flex; }
 .nav-item svg { width: 17px; height: 17px; flex-shrink: 0; opacity: 0.6; transition: opacity 0.15s; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .nav-item:hover { background: var(--blue-faint); color: var(--blue); }
 .nav-item:hover svg { opacity: 1; }
@@ -399,6 +400,16 @@ tbody td:first-child { padding-left: 18px; font-weight: 600; color: var(--text);
 .detail-peserta-search-wrap { position: relative; display: inline-block; }
 .detail-peserta-search-wrap svg { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; stroke: var(--gray-mid); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; pointer-events: none; }
 
+/* ─── BTN EDIT KEGIATAN ─── */
+.btn-sm.edit { border-color: #D1D5DB; color: var(--text-soft); background: var(--white); }
+.btn-sm.edit:hover { border-color: #9CA3AF; background: var(--gray-bg); }
+
+/* ─── UNDUH EXCEL ─── */
+.unduh-excel-wrap { margin-top: 14px; display: flex; justify-content: flex-end; }
+.btn-unduh-excel { height: 38px; padding: 0 16px; background: var(--white); border: 1.5px solid var(--gray-border); border-radius: var(--radius); font-family: inherit; font-size: 13px; font-weight: 600; color: var(--green); cursor: pointer; display: flex; align-items: center; gap: 7px; transition: all 0.15s; }
+.btn-unduh-excel:hover { background: var(--green-light); border-color: #86EFAC; }
+.btn-unduh-excel svg { width: 16px; height: 16px; stroke: var(--green); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
+
 /* ─── LOGOUT MOBILE ─── */
 .btn-logout-mobile { display: none; height: 34px; padding: 0 12px; background: none; border: 1.5px solid var(--gray-border); border-radius: var(--radius); font-family: inherit; font-size: 12.5px; font-weight: 700; color: var(--text-soft); cursor: pointer; align-items: center; gap: 6px; transition: all 0.15s; white-space: nowrap; }
 .btn-logout-mobile:hover { background: #FEE2E2; border-color: #FECACA; color: var(--red); }
@@ -468,20 +479,25 @@ tbody td:first-child { padding-left: 18px; font-weight: 600; color: var(--text);
     <div class="sidebar-section">
       <div class="sidebar-section-label">Menu</div>
 
-      <button class="nav-item" id="navKegiatan" onclick="goTo('kegiatan')" style="display:none">
+      <button class="nav-item active" id="navKegiatan" onclick="goTo('kegiatan')">
         <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
         Kegiatan
       </button>
 
-      <button class="nav-item" id="navPeserta" onclick="goTo('peserta')">
+      <a class="nav-item" id="navPeserta" href="datapeserta.html">
         <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
         Database Peserta
-      </button>
+      </a>
 
-      <button class="nav-item" id="navAkun" onclick="goTo('akun')" style="display:none">
-        <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-        Kelola Akun
-      </button>
+      <a class="nav-item" id="navKontak" href="kontak.html">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        Cari Kontak
+      </a>
+
+      <a class="nav-item" id="navPengaturan" href="pengaturan.html" style="display:none">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        Pengaturan
+      </a>
     </div>
 
     <div class="sidebar-footer">
@@ -604,84 +620,15 @@ tbody td:first-child { padding-left: 18px; font-weight: 600; color: var(--text);
               </tbody>
             </table>
           </div>
-        </div>
-      </div>
-
-      <!-- ─── PAGE: PESERTA ─── -->
-      <div class="section-page" id="page-peserta">
-        <!-- Header tetap (tidak ikut scroll horizontal) -->
-        <div class="filter-bar">
-          <input type="text" id="searchPeserta" placeholder="Cari nama peserta..." oninput="applyTableFilters()" style="height:38px;border:1.5px solid var(--gray-border);border-radius:var(--radius);padding:0 13px;font-family:inherit;font-size:13px;background:var(--white);min-width:260px;color:var(--text);transition:border-color 0.15s;outline:none;" onfocus="this.style.borderColor='var(--blue)'" onblur="this.style.borderColor='var(--gray-border)'">
-          <span class="badge-count" id="badgePeserta">0</span>
-        </div>
-
-        <!-- Hanya tabel yang scroll horizontal -->
-        <div class="table-outer" id="pesertaTableOuter">
-          <table id="pesertaTable">
-            <thead>
-              <tr id="pesertaTableHead">
-                <!-- header dirender JS -->
-              </tr>
-            </thead>
-            <tbody id="pesertaTbody">
-              <tr><td colspan="16" class="td-loading">Memuat data...</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- ─── PAGE: KELOLA AKUN ─── -->
-      <div class="section-page" id="page-akun">
-        <div class="card" style="margin-bottom:20px">
-          <div class="card-header">
-            <h2>Tambah Akun Baru</h2>
-          </div>
-          <div class="card-body">
-            <div class="form-row">
-              <div class="field">
-                <label>Nama Lengkap <span style="color:var(--red)">*</span></label>
-                <input type="text" id="akunNama" placeholder="Nama lengkap">
-              </div>
-              <div class="field">
-                <label>Username <span style="color:var(--red)">*</span></label>
-                <input type="text" id="akunUsername" placeholder="Unik, tanpa spasi" autocomplete="off">
-              </div>
-            </div>
-            <div class="form-row">
-              <div class="field">
-                <label>Password <span style="color:var(--red)">*</span></label>
-                <div class="input-wrap">
-                  <input type="password" id="akunPass" placeholder="Min. 6 karakter" autocomplete="new-password">
-                  <button class="eye-btn" type="button" onclick="togglePass('akunPass', this)">
-                    <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                  </button>
-                </div>
-              </div>
-              <div class="field">
-                <label>Role <span style="color:var(--red)">*</span></label>
-                <select id="akunRole">
-                  <option value="operator">Operator</option>
-                  <option value="administrator">Administrator</option>
-                </select>
-              </div>
-            </div>
-            <div class="form-actions">
-              <button class="btn-primary" id="btnTambahAkun" onclick="tambahAkun()">
-                <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                Buat Akun
-              </button>
-            </div>
+          <div class="unduh-excel-wrap" id="unduhExcelWrap" style="display:none;">
+            <button class="btn-unduh-excel" onclick="unduhExcelPeserta()">
+              <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Unduh Excel
+            </button>
           </div>
         </div>
-
-        <div class="section-header">
-          <h3>Daftar Akun</h3>
-          <span class="badge-count" id="badgeAkun">0</span>
-        </div>
-        <div class="akun-list" id="akunList">
-          <div class="loading-state">Memuat data...</div>
-        </div>
       </div>
+
 
     </div><!-- /page -->
   </div><!-- /content -->
@@ -769,6 +716,46 @@ tbody td:first-child { padding-left: 18px; font-weight: 600; color: var(--text);
   </div>
 </div>
 
+<div class="modal-overlay" id="editKegiatanOverlay" onclick="if(event.target===this)closeEditKegiatan()">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Edit Kegiatan</h3>
+      <button class="modal-close" onclick="closeEditKegiatan()">
+        <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:12.5px;color:var(--gray-text);margin-bottom:16px;background:var(--amber-light);border:1px solid #FDE68A;border-radius:6px;padding:8px 12px;">ID kegiatan tidak berubah — data peserta yang sudah terdaftar tetap aman.</p>
+      <div class="field">
+        <label>Nama Kegiatan <span style="color:var(--red)">*</span></label>
+        <input type="text" id="editInputNama" placeholder="Nama kegiatan">
+      </div>
+      <div class="field" style="position:relative;">
+        <label>Lokasi Kegiatan <span style="color:var(--red)">*</span></label>
+        <input type="text" id="editInputLokasi" placeholder="Ketik nama kota/kabupaten..." autocomplete="off" oninput="filterLokasiSuggestEdit(this)" onblur="validateLokasiEdit(this)">
+        <div id="lokasiSuggestBoxEdit" style="position:absolute;z-index:300;background:var(--white);border:1.5px solid var(--gray-border);border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,0.1);max-height:200px;overflow-y:auto;display:none;width:100%;top:calc(100% + 2px);left:0;"></div>
+      </div>
+      <div class="form-row">
+        <div class="field">
+          <label>Tanggal Pembukaan <span style="color:var(--red)">*</span></label>
+          <input type="date" id="editInputTglBuka">
+        </div>
+        <div class="field">
+          <label>Tanggal Penutupan <span style="color:var(--red)">*</span></label>
+          <input type="date" id="editInputTglTutup">
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeEditKegiatan()">Batal</button>
+      <button class="btn-primary" id="btnDoEditKegiatan" onclick="doEditKegiatan()">
+        <svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        Simpan Perubahan
+      </button>
+    </div>
+  </div>
+</div>
+
 <script>
 // ─── CONFIG ───
 const SUPABASE_URL = 'https://lusytejskqevwyyffeue.supabase.co';
@@ -806,6 +793,7 @@ const DESIGN_MODE = false;
 window.onload = () => {
   if (DESIGN_MODE) {
     currentUser = { id: 0, username: 'design', nama_lengkap: 'Design Preview', role: 'administrator' };
+    document.body.style.visibility = 'visible';
     showApp();
     return;
   }
@@ -813,6 +801,7 @@ window.onload = () => {
   if (saved) {
     try { currentUser = JSON.parse(saved); showApp(); } catch { sessionStorage.clear(); }
   }
+  document.body.style.visibility = 'visible';
 };
 
 async function doLogin() {
@@ -862,16 +851,11 @@ function showApp() {
   const rb = document.getElementById('roleBadge');
   rb.textContent = currentUser.role === 'administrator' ? 'Administrator' : 'Operator';
   rb.className = 'role-badge ' + currentUser.role;
+  // Menu Pengaturan hanya untuk administrator
   if (currentUser.role === 'administrator') {
-    document.getElementById('navKegiatan').style.display = 'flex';
-    document.getElementById('navAkun').style.display = 'flex';
-    document.querySelector('#page-kegiatan .card').style.display = '';
-    goTo('kegiatan');
-  } else {
-    document.getElementById('navKegiatan').style.display = 'flex';
-    document.querySelector('#page-kegiatan .card').style.display = '';
-    goTo('kegiatan');
+    document.getElementById('navPengaturan').style.display = 'flex';
   }
+  goTo('kegiatan');
 }
 
 // ─── SIDEBAR MOBILE ───
@@ -893,11 +877,9 @@ function goTo(page) {
   document.getElementById('page-' + page).classList.add('active');
   const navEl = document.getElementById('nav' + page.charAt(0).toUpperCase() + page.slice(1));
   if (navEl) navEl.classList.add('active');
-  const titles = { kegiatan: 'Kegiatan', peserta: 'Database Peserta', akun: 'Kelola Akun' };
+  const titles = { kegiatan: 'Kegiatan' };
   document.getElementById('topbarTitle').textContent = titles[page] || page;
   if (page === 'kegiatan') loadKegiatan();
-  if (page === 'peserta') loadPeserta();
-  if (page === 'akun') loadAkun();
   closeSidebar();
 }
 
@@ -955,6 +937,9 @@ function renderKegiatan(items) {
             <span class="toggle-thumb"></span>
           </span>
           ${item.aktif ? 'Aktif' : 'Nonaktif'}
+        </button>
+        <button class="btn-sm edit icon-only" onclick="openEditKegiatan(${item.id}, \`${escHtml(item.nama_kegiatan)}\`)" title="Edit kegiatan">
+          <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
         </button>
         <button class="btn-sm danger icon-only" onclick="hapusKegiatan(${item.id}, \`${escHtml(item.nama_kegiatan)}\`)" title="Hapus kegiatan">
           <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
@@ -1083,10 +1068,13 @@ async function lihatPesertaKegiatan(kegiatanId, namaKegiatan, lokasi) {
 
 function renderDetailPeserta(rows) {
   const tbody = document.getElementById('detailPesertaTbody');
+  const unduhWrap = document.getElementById('unduhExcelWrap');
   if (!rows.length) {
     tbody.innerHTML = '<tr><td colspan="6" class="td-empty">Tidak ada peserta yang cocok.</td></tr>';
+    if (unduhWrap) unduhWrap.style.display = 'none';
     return;
   }
+  if (unduhWrap) unduhWrap.style.display = 'flex';
   tbody.innerHTML = rows.map((row) => {
       const p = row.peserta || {};
       const safeId = p.id || '';
@@ -1463,6 +1451,8 @@ function tutupDetailPeserta() {
   // Tampilkan form tambah kegiatan untuk semua role (operator & admin keduanya boleh)
   document.querySelector('#page-kegiatan .card').style.display = '';
   document.getElementById('topbarTitle').textContent = 'Kegiatan';
+  const unduhWrap = document.getElementById('unduhExcelWrap');
+  if (unduhWrap) unduhWrap.style.display = 'none';
 }
 
 // ─── KOLOM TABEL ───
@@ -1719,6 +1709,171 @@ function escHtml(str) {
 
 // ─── LOKASI AUTOCOMPLETE ───
 const DAFTAR_LOKASI = ["Ambon","Balikpapan","Banda Aceh","Bandar Lampung","Bandung","Banjar","Banjarbaru","Banjarmasin","Batam","Batu","Baubau","Bekasi","Bengkulu","Bima","Binjai","Bitung","Blitar","Bogor","Bontang","Bukittinggi","Cilegon","Cimahi","Cirebon","Denpasar","Depok","Dumai","Gorontalo","Gunungsitoli","Jakarta Barat","Jakarta Pusat","Jakarta Selatan","Jakarta Timur","Jakarta Utara","Jambi","Jayapura","Kediri","Kendari","Kotamobagu","Kupang","Langsa","Lhokseumawe","Lubuk Linggau","Madiun","Magelang","Makassar","Malang","Manado","Mataram","Medan","Metro","Mojokerto","Padang","Padang Panjang","Padang Sidimpuan","Pagar Alam","Palangka Raya","Palembang","Palopo","Palu","Pangkalpinang","Parepare","Pariaman","Pasuruan","Payakumbuh","Pekalongan","Pekanbaru","Pematangsiantar","Pontianak","Prabumulih","Probolinggo","Sabang","Salatiga","Samarinda","Sawah Lunto","Semarang","Serang","Sibolga","Singkawang","Solok","Sorong","Subulussalam","Sukabumi","Sungai Penuh","Surabaya","Surakarta","Tangerang","Tangerang Selatan","Tanjung Balai","Tanjungpinang","Tarakan","Tasikmalaya","Tebing Tinggi","Tegal","Ternate","Tidore Kepulauan","Tomohon","Tual","Yogyakarta","Kabupaten Aceh Barat","Kabupaten Aceh Barat Daya","Kabupaten Aceh Besar","Kabupaten Aceh Jaya","Kabupaten Aceh Selatan","Kabupaten Aceh Singkil","Kabupaten Aceh Tamiang","Kabupaten Aceh Tengah","Kabupaten Aceh Tenggara","Kabupaten Aceh Timur","Kabupaten Aceh Utara","Kabupaten Agam","Kabupaten Alor","Kabupaten Asahan","Kabupaten Asmat","Kabupaten Badung","Kabupaten Balangan","Kabupaten Bandung","Kabupaten Bandung Barat","Kabupaten Banggai","Kabupaten Banggai Kepulauan","Kabupaten Banggai Laut","Kabupaten Bangka","Kabupaten Bangka Barat","Kabupaten Bangka Selatan","Kabupaten Bangka Tengah","Kabupaten Bangkalan","Kabupaten Bangli","Kabupaten Banjar","Kabupaten Banjarnegara","Kabupaten Bantaeng","Kabupaten Bantul","Kabupaten Banyuasin","Kabupaten Banyumas","Kabupaten Banyuwangi","Kabupaten Barito Kuala","Kabupaten Barito Selatan","Kabupaten Barito Timur","Kabupaten Barito Utara","Kabupaten Barru","Kabupaten Batang","Kabupaten Batang Hari","Kabupaten Batubara","Kabupaten Bekasi","Kabupaten Belitung","Kabupaten Belitung Timur","Kabupaten Belu","Kabupaten Bener Meriah","Kabupaten Bengkalis","Kabupaten Bengkayang","Kabupaten Bengkulu Selatan","Kabupaten Bengkulu Tengah","Kabupaten Bengkulu Utara","Kabupaten Berau","Kabupaten Biak Numfor","Kabupaten Bima","Kabupaten Bintan","Kabupaten Bireuen","Kabupaten Blitar","Kabupaten Blora","Kabupaten Boalemo","Kabupaten Bogor","Kabupaten Bojonegoro","Kabupaten Bolaang Mongondow","Kabupaten Bolaang Mongondow Selatan","Kabupaten Bolaang Mongondow Timur","Kabupaten Bolaang Mongondow Utara","Kabupaten Bombana","Kabupaten Bondowoso","Kabupaten Bone","Kabupaten Bone Bolango","Kabupaten Boven Digoel","Kabupaten Boyolali","Kabupaten Brebes","Kabupaten Buleleng","Kabupaten Bulukumba","Kabupaten Bulungan","Kabupaten Bungo","Kabupaten Buol","Kabupaten Buru","Kabupaten Buru Selatan","Kabupaten Buton","Kabupaten Buton Selatan","Kabupaten Buton Tengah","Kabupaten Buton Utara","Kabupaten Ciamis","Kabupaten Cianjur","Kabupaten Cilacap","Kabupaten Cirebon","Kabupaten Dairi","Kabupaten Deiyai","Kabupaten Deli Serdang","Kabupaten Demak","Kabupaten Dharmasraya","Kabupaten Dogiyai","Kabupaten Dompu","Kabupaten Donggala","Kabupaten Empat Lawang","Kabupaten Ende","Kabupaten Enrekang","Kabupaten Fak-Fak","Kabupaten Flores Timur","Kabupaten Garut","Kabupaten Gayo Lues","Kabupaten Gianyar","Kabupaten Gorontalo","Kabupaten Gorontalo Utara","Kabupaten Gowa","Kabupaten Gresik","Kabupaten Grobogan","Kabupaten Gunung Kidul","Kabupaten Gunung Mas","Kabupaten Halmahera Barat","Kabupaten Halmahera Selatan","Kabupaten Halmahera Tengah","Kabupaten Halmahera Timur","Kabupaten Halmahera Utara","Kabupaten Hulu Sungai Selatan","Kabupaten Hulu Sungai Tengah","Kabupaten Hulu Sungai Utara","Kabupaten Humbang Hasudutan","Kabupaten Indragiri Hilir","Kabupaten Indragiri Hulu","Kabupaten Indramayu","Kabupaten Intan Jaya","Kabupaten Jayapura","Kabupaten Jayawijaya","Kabupaten Jember","Kabupaten Jembrana","Kabupaten Jeneponto","Kabupaten Jepara","Kabupaten Jombang","Kabupaten Kaimana","Kabupaten Kampar","Kabupaten Kapuas","Kabupaten Kapuas Hulu","Kabupaten Karang Asem","Kabupaten Karanganyar","Kabupaten Karawang","Kabupaten Karimun","Kabupaten Karo","Kabupaten Katingan","Kabupaten Kaur","Kabupaten Kayong Utara","Kabupaten Kebumen","Kabupaten Kediri","Kabupaten Keerom","Kabupaten Kendal","Kabupaten Kep. Sangihe","Kabupaten Kepahiang","Kabupaten Kepulauan Anambas","Kabupaten Kepulauan Aru","Kabupaten Kepulauan Mentawai","Kabupaten Kepulauan Meranti","Kabupaten Kepulauan Morotai","Kabupaten Kepulauan Selayar","Kabupaten Kepulauan Seribu","Kabupaten Kepulauan Siau Tagulandang Biaro","Kabupaten Kepulauan Sula","Kabupaten Kepulauan Talaud","Kabupaten Kepulauan Tanimbar","Kabupaten Kepulauan Yapen","Kabupaten Kerinci","Kabupaten Ketapang","Kabupaten Klaten","Kabupaten Klungkung","Kabupaten Kolaka","Kabupaten Kolaka Timur","Kabupaten Kolaka Utara","Kabupaten Konawe","Kabupaten Konawe Kepulauan","Kabupaten Konawe Selatan","Kabupaten Konawe Utara","Kabupaten Kotabaru","Kabupaten Kotawaringin Barat","Kabupaten Kotawaringin Timur","Kabupaten Kuantan Singingi","Kabupaten Kuburaya","Kabupaten Kudus","Kabupaten Kulon Progo","Kabupaten Kuningan","Kabupaten Kupang","Kabupaten Kutai Barat","Kabupaten Kutai Kartanegara","Kabupaten Kutai Timur","Kabupaten Labuhanbatu","Kabupaten Labuhanbatu Selatan","Kabupaten Labuhanbatu Utara","Kabupaten Lahat","Kabupaten Lamandau","Kabupaten Lamongan","Kabupaten Lampung Barat","Kabupaten Lampung Selatan","Kabupaten Lampung Tengah","Kabupaten Lampung Timur","Kabupaten Lampung Utara","Kabupaten Landak","Kabupaten Langkat","Kabupaten Lanny Jaya","Kabupaten Lebak","Kabupaten Lebong","Kabupaten Lembata","Kabupaten Lima Puluh Koto","Kabupaten Lingga","Kabupaten Lombok Barat","Kabupaten Lombok Tengah","Kabupaten Lombok Timur","Kabupaten Lombok Utara","Kabupaten Lumajang","Kabupaten Luwu","Kabupaten Luwu Timur","Kabupaten Luwu Utara","Kabupaten Madiun","Kabupaten Magelang","Kabupaten Magetan","Kabupaten Mahakam Ulu","Kabupaten Majalengka","Kabupaten Majene","Kabupaten Malaka","Kabupaten Malang","Kabupaten Malinau","Kabupaten Maluku Barat Daya","Kabupaten Maluku Tengah","Kabupaten Maluku Tenggara","Kabupaten Mamasa","Kabupaten Mamuju","Kabupaten Mamuju Tengah","Kabupaten Mandailing Natal","Kabupaten Manggarai","Kabupaten Manggarai Barat","Kabupaten Manggarai Timur","Kabupaten Manokwari","Kabupaten Manokwari Selatan","Kabupaten Mappi","Kabupaten Maros","Kabupaten Maybrat","Kabupaten Melawi","Kabupaten Memberamo Raya","Kabupaten Membramo Tengah","Kabupaten Mempawah","Kabupaten Merangin","Kabupaten Merauke","Kabupaten Mesuji","Kabupaten Mimika","Kabupaten Minahasa","Kabupaten Minahasa Selatan","Kabupaten Minahasa Tenggara","Kabupaten Minahasa Utara","Kabupaten Mojokerto","Kabupaten Morowali","Kabupaten Morowali Utara","Kabupaten Muara Enim","Kabupaten Muaro Jambi","Kabupaten Muko-muko","Kabupaten Muna","Kabupaten Muna Barat","Kabupaten Murung Raya","Kabupaten Musi Banyuasin","Kabupaten Musi Rawas","Kabupaten Musi Rawas Utara","Kabupaten Nabire","Kabupaten Nagakeo","Kabupaten Nagan Raya","Kabupaten Natuna","Kabupaten Nduga","Kabupaten Ngada","Kabupaten Nganjuk","Kabupaten Ngawi","Kabupaten Nias","Kabupaten Nias Barat","Kabupaten Nias Selatan","Kabupaten Nias Utara","Kabupaten Nunukan","Kabupaten Ogan Ilir","Kabupaten Ogan Komering Ilir","Kabupaten Ogan Komering Ulu","Kabupaten Ogan Komering Ulu Selatan","Kabupaten Ogan Komering Ulu Timur","Kabupaten Pacitan","Kabupaten Padang Lawas","Kabupaten Padang Lawas utara","Kabupaten Padang Pariaman","Kabupaten Pakpak Bharat","Kabupaten Pamekasan","Kabupaten Pandeglang","Kabupaten Pangandaran","Kabupaten Pangkajene Kepulauan","Kabupaten Paniai","Kabupaten Parigi Moutong","Kabupaten Pasaman","Kabupaten Pasaman Barat","Kabupaten Pasangkayu","Kabupaten Paser","Kabupaten Pasuruan","Kabupaten Pati","Kabupaten Pegunungan Arfak","Kabupaten Pegunungan Bintang","Kabupaten Pekalongan","Kabupaten Pelalawan","Kabupaten Pemalang","Kabupaten Penajam Paser Utara","Kabupaten Penukal Abab Lematang Ilir","Kabupaten Pesawaran","Kabupaten Pesisir Barat","Kabupaten Pesisir Selatan","Kabupaten Pidie","Kabupaten Pidie Jaya","Kabupaten Pinrang","Kabupaten Pohuwato","Kabupaten Polewali Mandar","Kabupaten Ponorogo","Kabupaten Poso","Kabupaten Pringsewu","Kabupaten Probolinggo","Kabupaten Pulang Pisau","Kabupaten Pulau Taliabu","Kabupaten Puncak","Kabupaten Puncak Jaya","Kabupaten Purbalingga","Kabupaten Purwakarta","Kabupaten Purworejo","Kabupaten Raja Ampat","Kabupaten Rejang Lebong","Kabupaten Rembang","Kabupaten Rokan Hilir","Kabupaten Rokan Hulu","Kabupaten Rote-Ndao","Kabupaten Sabu Raijua","Kabupaten Sambas","Kabupaten Samosir","Kabupaten Sampang","Kabupaten Sanggau","Kabupaten Sarolangun","Kabupaten Sarmi","Kabupaten Sekadau","Kabupaten Seluma","Kabupaten Semarang","Kabupaten Serang","Kabupaten Serdang Bedagai","Kabupaten Seram Bagian Barat","Kabupaten Seram Bagian Timur","Kabupaten Seruyan","Kabupaten Siak","Kabupaten Sidenreng Rappang","Kabupaten Sijunjung","Kabupaten Sikka","Kabupaten Simalungun","Kabupaten Simeulue","Kabupaten Sinjai","Kabupaten Sintang","Kabupaten Situbondo","Kabupaten Sleman","Kabupaten Solok","Kabupaten Solok Selatan","Kabupaten Soppeng","Kabupaten Sorong","Kabupaten Sorong Selatan","Kabupaten Sragen","Kabupaten Subang","Kabupaten Sukabumi","Kabupaten Sukamara","Kabupaten Sukoharjo","Kabupaten Sumba Barat","Kabupaten Sumba Barat Daya","Kabupaten Sumba Tengah","Kabupaten Sumba Timur","Kabupaten Sumbawa","Kabupaten Sumbawa Barat","Kabupaten Sumedang","Kabupaten Sumenep","Kabupaten Supiori","Kabupaten Tabalong","Kabupaten Tabanan","Kabupaten Takalar","Kabupaten Tambrauw","Kabupaten Tana Tidung","Kabupaten Tana Toraja","Kabupaten Tanah Bumbu","Kabupaten Tanah Datar","Kabupaten Tanah Laut","Kabupaten Tangerang","Kabupaten Tanggamus","Kabupaten Tanjung Jabung Barat","Kabupaten Tanjung Jabung Timur","Kabupaten Tapanuli Selatan","Kabupaten Tapanuli Tengah","Kabupaten Tapanuli Utara","Kabupaten Tapin","Kabupaten Tasikmalaya","Kabupaten Tebo","Kabupaten Tegal","Kabupaten Teluk Bintuni","Kabupaten Teluk Wondama","Kabupaten Temanggung","Kabupaten Timor Tengah Selatan","Kabupaten Timor Tengah Utara","Kabupaten Toba","Kabupaten Tojo Una-Una","Kabupaten Tolikara","Kabupaten Tolitoli","Kabupaten Toraja Utara","Kabupaten Trenggalek","Kabupaten Tuban","Kabupaten Tulang Bawang","Kabupaten Tulang Bawang Barat","Kabupaten Tulungagung","Kabupaten Wakatobi","Kabupaten Wajo","Kabupaten Waropen","Kabupaten Way Kanan","Kabupaten Wonogiri","Kabupaten Wonosobo","Kabupaten Yahukimo","Kabupaten Yalimo"];
+
+// ─── EDIT KEGIATAN ───
+let _editKegiatanId = null;
+let _editLokasiValid = false;
+let _editLokasiSuggestIndex = -1;
+
+function openEditKegiatan(id, namaFull) {
+  _editKegiatanId = id;
+  // Parse nama & tanggal dari format "[23-26 April 2026] Nama Kegiatan"
+  const BULAN = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+  const matchBracket = namaFull.match(/^\[([^\]]+)\]\s*(.*)/);
+  let namaMurni = namaFull;
+  let tglBukaDate = '';
+  let tglTutupDate = '';
+  if (matchBracket) {
+    namaMurni = matchBracket[2];
+    const range = matchBracket[1];
+    // Sama bulan: "23-26 April 2026"
+    const mSama = range.match(/^(\d{1,2})-(\d{1,2})\s+(\w+)\s+(\d{4})$/);
+    // Beda bulan: "23 April 2026 - 2 Mei 2026"
+    const mBeda = range.match(/^(\d{1,2})\s+(\w+)\s+(\d{4})\s*-\s*(\d{1,2})\s+(\w+)\s+(\d{4})$/);
+    if (mSama) {
+      const bi = BULAN.indexOf(mSama[3]) + 1;
+      const y = mSama[4];
+      tglBukaDate = `${y}-${String(bi).padStart(2,'0')}-${String(mSama[1]).padStart(2,'0')}`;
+      tglTutupDate = `${y}-${String(bi).padStart(2,'0')}-${String(mSama[2]).padStart(2,'0')}`;
+    } else if (mBeda) {
+      const bi1 = BULAN.indexOf(mBeda[2]) + 1;
+      const bi2 = BULAN.indexOf(mBeda[5]) + 1;
+      tglBukaDate = `${mBeda[3]}-${String(bi1).padStart(2,'0')}-${String(mBeda[1]).padStart(2,'0')}`;
+      tglTutupDate = `${mBeda[6]}-${String(bi2).padStart(2,'0')}-${String(mBeda[4]).padStart(2,'0')}`;
+    }
+  }
+  document.getElementById('editInputNama').value = namaMurni;
+  // Cari lokasi dari allKegiatan
+  const kg = allKegiatan.find(k => k.id === id);
+  const lokasiVal = kg ? (kg.lokasi || '') : '';
+  const editLokasiInp = document.getElementById('editInputLokasi');
+  editLokasiInp.value = lokasiVal;
+  editLokasiInp.classList.remove('error');
+  _editLokasiValid = lokasiVal ? true : false;
+  document.getElementById('editInputTglBuka').value = tglBukaDate;
+  document.getElementById('editInputTglTutup').value = tglTutupDate;
+  document.getElementById('editKegiatanOverlay').classList.add('show');
+}
+
+function closeEditKegiatan() {
+  document.getElementById('editKegiatanOverlay').classList.remove('show');
+  document.getElementById('lokasiSuggestBoxEdit').style.display = 'none';
+  _editKegiatanId = null;
+}
+
+async function doEditKegiatan() {
+  const nama = document.getElementById('editInputNama').value.trim();
+  const lokasi = document.getElementById('editInputLokasi').value.trim();
+  const tglBuka = document.getElementById('editInputTglBuka').value;
+  const tglTutup = document.getElementById('editInputTglTutup').value;
+  let valid = true;
+  ['editInputNama','editInputLokasi','editInputTglBuka','editInputTglTutup'].forEach(id => document.getElementById(id).classList.remove('error'));
+  if (!nama) { document.getElementById('editInputNama').classList.add('error'); valid = false; }
+  if (!lokasi || !_editLokasiValid) { document.getElementById('editInputLokasi').classList.add('error'); valid = false; }
+  if (!tglBuka) { document.getElementById('editInputTglBuka').classList.add('error'); valid = false; }
+  if (!tglTutup) { document.getElementById('editInputTglTutup').classList.add('error'); valid = false; }
+  if (!valid) return;
+
+  const BULAN = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+  const buka = new Date(tglBuka + 'T00:00:00');
+  const tutup = new Date(tglTutup + 'T00:00:00');
+  let rangeStr;
+  if (buka.getMonth() === tutup.getMonth() && buka.getFullYear() === tutup.getFullYear()) {
+    rangeStr = `${buka.getDate()}-${tutup.getDate()} ${BULAN[buka.getMonth()]} ${buka.getFullYear()}`;
+  } else {
+    rangeStr = `${buka.getDate()} ${BULAN[buka.getMonth()]} ${buka.getFullYear()} - ${tutup.getDate()} ${BULAN[tutup.getMonth()]} ${tutup.getFullYear()}`;
+  }
+  const namaFinal = `[${rangeStr}] ${nama}`;
+
+  const btn = document.getElementById('btnDoEditKegiatan');
+  btn.disabled = true;
+  try {
+    const res = await sb(`kegiatan?id=eq.${_editKegiatanId}`, { method: 'PATCH', body: JSON.stringify({ nama_kegiatan: namaFinal, lokasi }) });
+    if (res.ok) {
+      showToast('Kegiatan berhasil diperbarui!', 'success');
+      closeEditKegiatan();
+      loadKegiatan();
+    } else {
+      showToast('Gagal menyimpan perubahan.', 'error');
+    }
+  } catch { showToast('Gagal terhubung ke Supabase.', 'error'); }
+  finally { btn.disabled = false; }
+}
+
+function filterLokasiSuggestEdit(inp) {
+  const q = inp.value.trim().toLowerCase();
+  const box = document.getElementById('lokasiSuggestBoxEdit');
+  _editLokasiValid = false;
+  _editLokasiSuggestIndex = -1;
+  if (!q) { box.style.display = 'none'; return; }
+  const matches = DAFTAR_LOKASI.filter(l => l.toLowerCase().includes(q)).slice(0, 20);
+  if (!matches.length) {
+    box.innerHTML = '<div class="lokasi-suggest-empty">Tidak ditemukan dalam daftar</div>';
+    box.style.display = 'block';
+    return;
+  }
+  box.innerHTML = matches.map((l) =>
+    `<div class="lokasi-suggest-item" data-val="${escHtml(l)}" onmousedown="pilihLokasiEdit('${escHtml(l)}')">${escHtml(l)}</div>`
+  ).join('');
+  box.style.display = 'block';
+}
+
+function pilihLokasiEdit(val) {
+  const inp = document.getElementById('editInputLokasi');
+  inp.value = val;
+  _editLokasiValid = true;
+  document.getElementById('lokasiSuggestBoxEdit').style.display = 'none';
+  inp.classList.remove('error');
+}
+
+function validateLokasiEdit(inp) {
+  setTimeout(() => {
+    document.getElementById('lokasiSuggestBoxEdit').style.display = 'none';
+    const val = inp.value.trim();
+    const exact = DAFTAR_LOKASI.find(l => l.toLowerCase() === val.toLowerCase());
+    if (exact) {
+      inp.value = exact;
+      _editLokasiValid = true;
+      inp.classList.remove('error');
+    } else {
+      _editLokasiValid = false;
+      if (val) inp.classList.add('error');
+    }
+  }, 150);
+}
+
+// ─── UNDUH EXCEL PESERTA ───
+function unduhExcelPeserta() {
+  if (!allDetailPeserta.length) return;
+  const rows = allDetailPeserta;
+  const headers = ['No','Timestamp','Nama Lengkap','NIP','NIK','Golongan','Mapel','Instansi/Unit Kerja','Jabatan','Provinsi','Kabupaten/Kota','Alamat','No WA','Telp Instansi'];
+  const escCsv = v => {
+    const s = (v === null || v === undefined) ? '' : String(v);
+    return s.includes(',') || s.includes('"') || s.includes('\n') ? `"${s.replace(/"/g,'""')}"` : s;
+  };
+  const dataRows = rows.map((row, i) => {
+    const p = row.peserta || {};
+    return [
+      i+1,
+      formatTs(row.created_at),
+      p.nama||'', p.nip||'', p.nik||'', p.golongan||'', p.mapel||'',
+      p.instansi||'', p.jabatan||'', p.provinsi||'', p.kabkota||'', p.alamat||'', p.wa||'', p.telp_instansi||''
+    ].map(escCsv).join(',');
+  });
+  const csvContent = [headers.join(','), ...dataRows].join('\r\n');
+  const BOM = '\uFEFF';
+  const blob = new Blob([BOM + csvContent], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const namaFile = (_detailKegiatanNama || 'peserta').replace(/[/\\?%*:|"<>]/g, '-');
+  a.href = url;
+  a.download = `Peserta - ${namaFile}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast('File Excel berhasil diunduh.', 'success');
+}
 
 let _lokasiValid = false;
 let _lokasiSuggestIndex = -1;
