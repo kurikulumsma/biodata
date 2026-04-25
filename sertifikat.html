@@ -1,0 +1,1430 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sertifikat – Biodata Kegiatan</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --blue: #1A5FB4; --blue-dark: #0D4A96; --blue-mid: #2563EB; --blue-light: #EEF4FF; --blue-faint: #F5F8FF;
+  --red: #C0392B; --red-light: #FEF2F2;
+  --green: #16A34A; --green-light: #F0FDF4;
+  --amber: #B45309; --amber-light: #FFFBEB;
+  --gray-bg: #F1F3F7; --gray-border: #E2E5ED; --gray-text: #6B7280; --gray-mid: #9CA3AF;
+  --text: #111827; --text-soft: #374151; --white: #FFFFFF;
+  --sidebar-w: 230px; --radius: 8px; --radius-lg: 12px;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.07); --shadow: 0 4px 16px rgba(0,0,0,0.08);
+}
+body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--gray-bg); color: var(--text); min-height: 100vh; font-size: 14px; }
+
+/* ─── LOGIN ─── */
+.login-wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; background: var(--gray-bg); }
+.login-card { background: var(--white); border-radius: 18px; border: 1px solid var(--gray-border); padding: 44px 40px; width: 100%; max-width: 380px; box-shadow: var(--shadow); }
+.login-brand { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 28px; }
+.login-title { font-size: 20px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+.login-sub { font-size: 13px; color: var(--gray-text); margin-bottom: 28px; }
+.login-card label { display: block; font-size: 12.5px; font-weight: 700; letter-spacing: 0.04em; color: var(--text-soft); text-transform: uppercase; margin-bottom: 6px; }
+.login-card input { width: 100%; height: 44px; border: 1.5px solid var(--gray-border); border-radius: var(--radius); padding: 0 14px; font-family: inherit; font-size: 14px; background: #FAFBFC; margin-bottom: 16px; color: var(--text); transition: border-color 0.15s, box-shadow 0.15s; }
+.login-card input:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(26,95,180,0.1); background: white; outline: none; }
+.btn-login { width: 100%; height: 46px; background: var(--blue); color: white; border: none; border-radius: var(--radius); font-family: inherit; font-size: 14px; font-weight: 700; cursor: pointer; transition: background 0.15s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+.btn-login:hover { background: var(--blue-dark); }
+.login-err { font-size: 12.5px; color: var(--red); background: var(--red-light); border: 1px solid #FECACA; border-radius: 6px; padding: 8px 12px; margin-top: -8px; margin-bottom: 14px; display: none; }
+.login-err.show { display: block; }
+
+/* ─── APP SHELL ─── */
+.app { display: none; min-height: 100vh; }
+.app.visible { display: flex; }
+
+/* ─── SIDEBAR OVERLAY (mobile) ─── */
+.sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 99; }
+.sidebar-overlay.show { display: block; }
+
+/* ─── SIDEBAR ─── */
+.sidebar {
+  width: var(--sidebar-w); background: var(--white); border-right: 1px solid var(--gray-border);
+  display: flex; flex-direction: column; min-height: 100vh;
+  position: fixed; top: 0; left: 0; z-index: 100;
+  transition: transform 0.25s cubic-bezier(0.4,0,0.2,1);
+}
+.sidebar-brand { padding: 14px 16px 12px; border-bottom: 1px solid var(--gray-border); display: flex; align-items: center; gap: 10px; }
+.sidebar-close-btn { display: none; width: 28px; height: 28px; border: none; background: none; cursor: pointer; border-radius: 6px; align-items: center; justify-content: center; flex-shrink: 0; }
+.sidebar-close-btn svg { width: 16px; height: 16px; stroke: var(--gray-text); fill: none; stroke-width: 2; stroke-linecap: round; }
+.sidebar-close-btn:hover { background: var(--gray-bg); }
+
+.sidebar-section { padding: 16px 12px 8px; }
+.sidebar-section-label { font-size: 10.5px; font-weight: 700; letter-spacing: 0.08em; color: var(--gray-mid); text-transform: uppercase; padding: 0 8px; margin-bottom: 6px; }
+.nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: var(--radius); cursor: pointer; font-size: 13.5px; font-weight: 600; color: var(--text-soft); transition: all 0.15s; margin-bottom: 2px; border: none; background: none; width: 100%; text-align: left; font-family: inherit; text-decoration: none; }
+a.nav-item { display: flex; }
+.nav-item svg { width: 17px; height: 17px; flex-shrink: 0; opacity: 0.6; transition: opacity 0.15s; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.nav-item:hover { background: var(--blue-faint); color: var(--blue); }
+.nav-item:hover svg { opacity: 1; }
+.nav-item.active { background: var(--blue-light); color: var(--blue); }
+.nav-item.active svg { opacity: 1; }
+
+.sidebar-footer { margin-top: auto; padding: 14px 12px; border-top: 1px solid var(--gray-border); }
+.user-card { display: flex; align-items: center; gap: 10px; padding: 10px 10px; border-radius: var(--radius); background: var(--gray-bg); }
+.user-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--blue-light); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.user-avatar svg { width: 16px; height: 16px; stroke: var(--blue); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.user-info { flex: 1; min-width: 0; }
+.user-name { font-size: 12.5px; font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.user-role { font-size: 11px; color: var(--gray-text); font-weight: 500; }
+.btn-logout-icon { width: 28px; height: 28px; border: none; background: none; cursor: pointer; display: flex; align-items: center; justify-content: center; border-radius: 6px; transition: background 0.15s; flex-shrink: 0; }
+.btn-logout-icon:hover { background: #FEE2E2; }
+.btn-logout-icon svg { width: 15px; height: 15px; stroke: var(--gray-text); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.btn-logout-icon:hover svg { stroke: var(--red); }
+
+/* ─── MAIN CONTENT ─── */
+.content { margin-left: var(--sidebar-w); flex: 1; min-height: 100vh; display: flex; flex-direction: column; min-width: 0; }
+.topbar { background: var(--white); border-bottom: 1px solid var(--gray-border); padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 50; gap: 12px; }
+.topbar-left { display: flex; align-items: center; gap: 12px; }
+.topbar-title { font-size: 16px; font-weight: 800; color: var(--text); white-space: nowrap; }
+.topbar-right { display: flex; align-items: center; gap: 12px; }
+.hamburger { display: none; width: 36px; height: 36px; border: none; background: none; cursor: pointer; border-radius: var(--radius); align-items: center; justify-content: center; flex-shrink: 0; }
+.hamburger:hover { background: var(--gray-bg); }
+.hamburger svg { width: 20px; height: 20px; stroke: var(--text); fill: none; stroke-width: 2; stroke-linecap: round; }
+.role-badge { font-size: 11.5px; font-weight: 700; padding: 4px 12px; border-radius: 20px; letter-spacing: 0.03em; white-space: nowrap; }
+.role-badge.administrator { background: #EEF4FF; color: var(--blue); border: 1px solid #C5D8F5; }
+.role-badge.operator { background: var(--green-light); color: var(--green); border: 1px solid #BBF7D0; }
+
+.page { padding: 24px 20px 64px; }
+
+/* ─── CARDS ─── */
+.card { background: var(--white); border-radius: var(--radius-lg); border: 1px solid var(--gray-border); overflow: hidden; margin-bottom: 20px; box-shadow: var(--shadow-sm); }
+.card-header { padding: 16px 20px; border-bottom: 1px solid var(--gray-border); display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.card-header h2 { font-size: 14px; font-weight: 700; color: var(--text); }
+.card-body { padding: 20px; }
+
+/* ─── FORM ─── */
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.field { margin-bottom: 14px; }
+.field label { display: block; font-size: 12px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--text-soft); margin-bottom: 6px; }
+.field input, .field textarea, .field select { width: 100%; height: 42px; border: 1.5px solid var(--gray-border); border-radius: var(--radius); padding: 0 13px; font-family: inherit; font-size: 13.5px; background: #FAFBFC; color: var(--text); transition: border-color 0.15s, box-shadow 0.15s; }
+.field textarea { height: auto; padding: 11px 13px; min-height: 70px; resize: vertical; }
+.field input:focus, .field textarea:focus, .field select:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(26,95,180,0.1); background: white; outline: none; }
+.form-actions { display: flex; gap: 10px; padding-top: 4px; }
+.btn-primary { height: 40px; background: var(--blue); color: white; border: none; border-radius: var(--radius); font-family: inherit; font-size: 13.5px; font-weight: 700; cursor: pointer; padding: 0 20px; transition: background 0.15s; display: flex; align-items: center; gap: 7px; white-space: nowrap; }
+.btn-primary:hover { background: var(--blue-dark); }
+.btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+.btn-primary svg { width: 16px; height: 16px; stroke: white; fill: none; stroke-width: 2.5; stroke-linecap: round; flex-shrink: 0; }
+.btn-secondary { height: 40px; background: var(--white); color: var(--text-soft); border: 1.5px solid var(--gray-border); border-radius: var(--radius); font-family: inherit; font-size: 13.5px; font-weight: 600; cursor: pointer; padding: 0 18px; transition: all 0.15s; display: flex; align-items: center; gap: 7px; }
+.btn-secondary:hover { border-color: #9CA3AF; }
+.btn-sm { height: 32px; padding: 0 12px; border-radius: 6px; font-family: inherit; font-size: 12px; font-weight: 600; cursor: pointer; border: 1.5px solid; transition: all 0.15s; display: flex; align-items: center; gap: 5px; white-space: nowrap; }
+.btn-sm svg { width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.btn-sm.activate { border-color: #86EFAC; color: var(--green); background: var(--green-light); }
+.btn-sm.activate:hover { background: #DCFCE7; }
+
+/* ─── MODAL DETAIL ─── */
+.modal-detail-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.35); z-index: 200; display: none; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(2px); }
+.modal-detail-overlay.show { display: flex; }
+.modal-detail { background: var(--white); border-radius: 16px; width: 100%; max-width: 520px; max-height: 85vh; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 20px 60px rgba(0,0,0,0.15); }
+.modal-detail-header { padding: 18px 22px 14px; border-bottom: 1px solid var(--gray-border); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+.modal-detail-header h3 { font-size: 14px; font-weight: 700; color: var(--text); }
+.modal-detail-close { width: 30px; height: 30px; border: none; background: none; cursor: pointer; border-radius: 6px; display: flex; align-items: center; justify-content: center; }
+.modal-detail-close:hover { background: var(--gray-bg); }
+.modal-detail-close svg { width: 16px; height: 16px; stroke: var(--gray-text); fill: none; stroke-width: 2; stroke-linecap: round; }
+.modal-detail-body { padding: 18px 22px; overflow-y: auto; }
+
+/* ─── CONFIRM DIALOG ─── */
+.confirm-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 300; display: none; align-items: center; justify-content: center; padding: 20px; }
+.confirm-overlay.show { display: flex; }
+.confirm-box { background: var(--white); border-radius: 14px; width: 100%; max-width: 380px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.2); }
+.confirm-box-header { padding: 22px 24px 14px; }
+.confirm-icon { width: 44px; height: 44px; border-radius: 12px; background: var(--red-light); display: flex; align-items: center; justify-content: center; margin-bottom: 14px; }
+.confirm-icon svg { width: 22px; height: 22px; stroke: var(--red); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.confirm-title { font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+.confirm-msg { font-size: 13px; color: var(--gray-text); line-height: 1.6; }
+.confirm-footer { padding: 14px 24px 20px; display: flex; gap: 10px; justify-content: flex-end; }
+.btn-confirm-cancel { height: 38px; background: var(--white); color: var(--text-soft); border: 1.5px solid var(--gray-border); border-radius: var(--radius); font-family: inherit; font-size: 13.5px; font-weight: 600; cursor: pointer; padding: 0 18px; }
+.btn-confirm-cancel:hover { border-color: #9CA3AF; }
+.btn-confirm-ok { height: 38px; background: var(--red); color: white; border: none; border-radius: var(--radius); font-family: inherit; font-size: 13.5px; font-weight: 700; cursor: pointer; padding: 0 18px; }
+.btn-confirm-ok:hover { background: #A93226; }
+
+/* ─── TOAST ─── */
+.toast { position: fixed; bottom: 24px; right: 24px; background: #1e293b; color: white; padding: 12px 20px; border-radius: 10px; font-size: 13.5px; font-weight: 500; opacity: 0; transform: translateY(8px); transition: all 0.25s; pointer-events: none; z-index: 999; max-width: 320px; }
+.toast.show { opacity: 1; transform: translateY(0); }
+.toast.success { background: var(--green); }
+.toast.error { background: var(--red); }
+
+/* ─── STATES ─── */
+.empty-state { text-align: center; padding: 48px 20px; color: var(--gray-text); font-size: 14px; }
+.empty-state svg { width: 36px; height: 36px; stroke: #D1D5DB; fill: none; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; margin-bottom: 12px; display: block; margin-inline: auto; }
+.loading-state { text-align: center; padding: 32px; color: var(--gray-text); font-size: 13.5px; }
+
+/* ─── SECTION PAGES ─── */
+.section-page { display: none; }
+.section-page.active { display: block; }
+
+/* ─── LOGOUT MOBILE ─── */
+.btn-logout-mobile { display: none; height: 34px; padding: 0 12px; background: none; border: 1.5px solid var(--gray-border); border-radius: var(--radius); font-family: inherit; font-size: 12.5px; font-weight: 700; color: var(--text-soft); cursor: pointer; align-items: center; gap: 6px; transition: all 0.15s; white-space: nowrap; }
+.btn-logout-mobile:hover { background: #FEE2E2; border-color: #FECACA; color: var(--red); }
+.btn-logout-mobile svg { stroke: currentColor; }
+
+/* ─── RESPONSIVE ─── */
+@media (max-width: 768px) {
+  .sidebar { transform: translateX(-100%); }
+  .sidebar.open { transform: translateX(0); box-shadow: 4px 0 20px rgba(0,0,0,0.15); }
+  .sidebar-close-btn { display: flex; }
+  .hamburger { display: flex; }
+  .content { margin-left: 0; }
+  .topbar { padding: 12px 16px; }
+  .topbar-title { font-size: 15px; }
+  .page { padding: 16px 14px 64px; }
+  .form-row { grid-template-columns: 1fr; }
+  .card-body { padding: 16px; }
+  .toast { bottom: 16px; right: 16px; left: 16px; max-width: none; text-align: center; }
+  .btn-logout-mobile { display: flex; }
+  .sert-tabs { flex-wrap: wrap; }
+  .sert-tab { flex: 1; justify-content: center; }
+}
+@media (max-width: 480px) {
+  .login-card { padding: 32px 24px; }
+  .role-badge { display: none; }
+}
+
+/* ─── SERTIFIKAT TABS — mirip setting-tab dari pengaturan.html ─── */
+.sert-tabs { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+.sert-tab { display: flex; align-items: center; gap: 8px; padding: 9px 16px; border-radius: var(--radius); border: 1.5px solid var(--gray-border); background: var(--white); font-family: inherit; font-size: 13px; font-weight: 600; color: var(--text-soft); cursor: pointer; transition: all 0.15s; white-space: nowrap; }
+.sert-tab svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; opacity: 0.6; }
+.sert-tab:hover { border-color: var(--blue); color: var(--blue); }
+.sert-tab.active { background: var(--blue-light); border-color: #C5D8F5; color: var(--blue); }
+.sert-tab.active svg { opacity: 1; }
+
+.sert-template-area { border:2px dashed var(--gray-border); border-radius:10px; transition:border-color 0.15s, background 0.15s; }
+.sert-template-area.drag-over { border-color:var(--blue); background:var(--blue-faint); }
+.sert-template-empty { display:flex; flex-direction:column; align-items:center; padding:28px 20px; gap:6px; }
+.sert-template-empty svg { width:32px; height:32px; stroke:var(--gray-mid); fill:none; stroke-width:1.5; }
+.sert-template-empty > div:first-of-type { font-size:13.5px; font-weight:700; color:var(--text); }
+.sert-template-empty code { font-size:11px; background:var(--gray-bg); padding:1px 5px; border-radius:4px; font-family:monospace; }
+.sert-template-loaded { display:flex; align-items:center; gap:10px; padding:12px 16px; }
+.sert-peserta-list { display:flex; flex-direction:column; }
+.sert-peserta-thead { display:grid; grid-template-columns: 36px 1fr 1fr 120px 36px 36px; gap:0 8px; padding:7px 4px; border-bottom:2px solid var(--gray-border); font-size:11px; font-weight:700; letter-spacing:0.04em; text-transform:uppercase; color:var(--gray-mid); }
+.sert-peserta-item { display:grid; grid-template-columns: 36px 1fr 1fr 120px 36px 36px; gap:0 8px; align-items:center; padding:8px 4px; border-bottom:1px solid var(--gray-border); }
+.sert-peserta-item:last-child { border-bottom:none; }
+.sert-peserta-item-nama { font-size:13px; font-weight:600; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.sert-peserta-item-sub { font-size:12px; color:var(--gray-text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+/* Toggle */
+.sert-toggle { position:relative; display:inline-flex; align-items:center; flex-shrink:0; }
+.sert-toggle input { opacity:0; width:0; height:0; position:absolute; }
+.sert-toggle-track { width:34px; height:19px; border-radius:20px; background:var(--gray-border); cursor:pointer; transition:background 0.2s; display:flex; align-items:center; padding:0 3px; }
+.sert-toggle input:checked + .sert-toggle-track { background:var(--blue); }
+.sert-toggle-thumb { width:13px; height:13px; border-radius:50%; background:white; box-shadow:0 1px 3px rgba(0,0,0,0.2); transition:transform 0.2s; flex-shrink:0; }
+.sert-toggle input:checked + .sert-toggle-track .sert-toggle-thumb { transform:translateX(15px); }
+/* Peran dropdown per baris */
+.sert-peserta-peran { width:120px; flex-shrink:0; }
+.sert-peserta-peran select { width:100%; height:30px; border:1.5px solid var(--gray-border); border-radius:6px; padding:0 6px; font-family:inherit; font-size:11.5px; background:#FAFBFC; color:var(--text); transition:border-color 0.15s; cursor:pointer; }
+.sert-peserta-peran select:focus { border-color:var(--blue); outline:none; }
+.sert-peserta-download { width:32px; height:32px; border:none; background:none; cursor:pointer; border-radius:6px; display:flex; align-items:center; justify-content:center; transition:background 0.15s; flex-shrink:0; }
+.sert-peserta-download:hover { background:var(--green-light); }
+.sert-peserta-download svg { width:15px; height:15px; stroke:var(--gray-mid); fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+.sert-peserta-download:hover svg { stroke:var(--green); }
+.sert-peserta-remove { width:28px; height:28px; border:none; background:none; cursor:pointer; border-radius:6px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.sert-peserta-remove:hover { background:var(--red-light); }
+.sert-peserta-remove svg { width:13px; height:13px; stroke:var(--gray-mid); fill:none; stroke-width:2; stroke-linecap:round; }
+.sert-peserta-remove:hover svg { stroke:var(--red); }
+/* Tambah dari DB button — full width di bawah list */
+.btn-add-from-db { width:100%; height:40px; background:var(--blue-faint); color:var(--blue); border:1.5px dashed #C5D8F5; border-radius:var(--radius); font-family:inherit; font-size:13px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:7px; transition:all 0.15s; margin-top:10px; }
+.btn-add-from-db:hover { background:var(--blue-light); border-color:var(--blue); }
+.btn-add-from-db svg { width:15px; height:15px; fill:none; stroke:currentColor; stroke-width:2.5; stroke-linecap:round; }
+.sert-db-item { display:flex; align-items:center; gap:10px; padding:10px 12px; border-bottom:1px solid var(--gray-border); cursor:pointer; transition:background 0.1s; }
+.sert-db-item:last-child { border-bottom:none; }
+.sert-db-item:hover { background:var(--blue-faint); }
+.sert-db-item-info { flex:1; }
+.sert-db-item-nama { font-size:13px; font-weight:600; color:var(--text); }
+.sert-db-item-sub { font-size:11.5px; color:var(--gray-text); }
+.sert-db-item-check { width:20px; height:20px; border-radius:50%; border:2px solid var(--gray-border); display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:all 0.15s; }
+.sert-db-item-check.added { background:var(--blue); border-color:var(--blue); }
+.sert-db-item-check svg { width:11px; height:11px; stroke:white; fill:none; stroke-width:2.5; stroke-linecap:round; stroke-linejoin:round; display:none; }
+.sert-db-item-check.added svg { display:block; }
+
+/* ─── BG WARNING ─── */
+.bg-warning { display:flex; align-items:center; gap:10px; background:var(--amber-light); border:1px solid #FCD34D; border-radius:8px; padding:10px 14px; font-size:12.5px; color:var(--amber); font-weight:600; margin-bottom:14px; }
+.bg-warning svg { width:16px;height:16px;stroke:var(--amber);fill:none;stroke-width:2;stroke-linecap:round;flex-shrink:0; }
+.bg-ok { display:flex; align-items:center; gap:10px; background:var(--green-light); border:1px solid #86EFAC; border-radius:8px; padding:10px 14px; font-size:12.5px; color:var(--green); font-weight:600; margin-bottom:14px; }
+.bg-ok svg { width:16px;height:16px;stroke:var(--green);fill:none;stroke-width:2;stroke-linecap:round;flex-shrink:0; }
+
+/* ─── BADGE COUNT ─── */
+.badge-count { background: var(--blue-light); color: var(--blue); font-size: 11px; font-weight: 700; padding: 2px 9px; border-radius: 20px; white-space: nowrap; }
+
+</style>
+</head>
+<body>
+
+<!-- ─── LOGIN ─── -->
+<div class="login-wrap" id="loginWrap">
+  <div class="login-card">
+    <div class="login-brand">
+      <img src="logosma.png" alt="Logo SMA" style="height:52px;width:auto;object-fit:contain;">
+    </div>
+    <div class="login-title">Selamat datang</div>
+    <div class="login-sub">Generator Sertifikat – Biodata Kemendikdasmen</div>
+    <label>Username</label>
+    <input type="text" id="loginUser" placeholder="Masukkan username" autocomplete="off">
+    <label>Password</label>
+    <input type="password" id="loginPass" placeholder="••••••••">
+    <div class="login-err" id="loginErr">Username atau password salah.</div>
+    <button class="btn-login" onclick="doLogin()" id="btnLogin">
+      <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:none;stroke:white;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+      Masuk
+    </button>
+  </div>
+</div>
+
+<!-- ─── APP ─── -->
+<div class="app" id="app">
+
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+  <!-- SIDEBAR -->
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <img src="logosma.png" alt="Logo SMA" style="height:36px;width:auto;object-fit:contain;flex:1;min-width:0;">
+      <button class="sidebar-close-btn" onclick="closeSidebar()">
+        <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Menu</div>
+
+      <a class="nav-item" href="admin.html" id="navKegiatan">
+        <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Kegiatan
+      </a>
+      <a class="nav-item" href="datapeserta.html" id="navPeserta">
+        <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Database Peserta
+      </a>
+      <a class="nav-item active" href="sertifikat.html" id="navSertifikat">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>
+        Sertifikat
+      </a>
+      <a class="nav-item" href="kontak.html" id="navKontak">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        Cari Kontak
+      </a>
+      <!-- Pengaturan: hanya administrator, disembunyikan via JS -->
+      <a class="nav-item" href="pengaturan.html" id="navPengaturan" style="display:none">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        Pengaturan
+      </a>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="user-card">
+        <div class="user-avatar">
+          <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </div>
+        <div class="user-info">
+          <div class="user-name" id="sidebarUserName">-</div>
+          <div class="user-role" id="sidebarUserRole">-</div>
+        </div>
+        <button class="btn-logout-icon" onclick="doLogout()" title="Keluar">
+          <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- MAIN CONTENT -->
+  <div class="content">
+    <div class="topbar">
+      <div class="topbar-left">
+        <button class="hamburger" id="hamburgerBtn" onclick="openSidebar()">
+          <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        <div class="topbar-title">Sertifikat</div>
+      </div>
+      <div class="topbar-right">
+        <span class="role-badge" id="roleBadge">-</span>
+        <button class="btn-logout-mobile" onclick="doLogout()" title="Keluar">
+          <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          Keluar
+        </button>
+      </div>
+    </div>
+
+    <div class="page">
+
+      <!-- ─── PAGE: SERTIFIKAT ─── -->
+      <div class="section-page active" id="page-sertifikat">
+
+        <!-- Tab nav — desain mirip pengaturan.html (outline button) -->
+        <div class="sert-tabs">
+          <button class="sert-tab active" id="sertTabKegiatan" onclick="switchSertTab('kegiatan')">
+            <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            Sertifikat Kegiatan
+          </button>
+          <button class="sert-tab" id="sertTabMandiri" onclick="switchSertTab('mandiri')">
+            <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            Sertifikat Non Kegiatan
+          </button>
+        </div>
+
+        <!-- ─ TAB: DARI KEGIATAN ─ -->
+        <div id="sertPanelKegiatan">
+
+          <!-- Step 1: Pilih kegiatan -->
+          <div class="card" id="sertStep1Card">
+            <div class="card-header"><h2>Langkah 1 — Pilih Kegiatan</h2></div>
+            <div class="card-body">
+              <div class="field">
+                <label>Pilih Kegiatan</label>
+                <select id="sertKegiatanSelect" onchange="sertPilihKegiatan()">
+                  <option value="">— Pilih kegiatan —</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 2 (muncul setelah pilih kegiatan) -->
+          <div id="sertStep2Wrap" style="display:none">
+
+            <!-- Template / Info -->
+            <div class="card">
+              <div class="card-header">
+                <h2>Langkah 2 — Pengaturan Sertifikat</h2>
+              </div>
+              <div class="card-body">
+                <!-- BG status -->
+                <div id="bgStatusWrap"></div>
+
+                <!-- Form fields -->
+                <div class="form-row">
+                  <div class="field">
+                    <label>Tanggal Kegiatan <span style="font-size:10px;color:var(--gray-mid);font-weight:500;">(&lt;&lt;tanggal&gt;&gt;)</span></label>
+                    <input type="text" id="sertTanggalKegiatan" placeholder="Memuat dari data kegiatan..." readonly style="background:#F5F8FF;color:var(--blue);font-weight:600;">
+                  </div>
+                  <div class="field">
+                    <label>Tanggal Sertifikat <span style="font-size:10px;color:var(--gray-mid);font-weight:500;">(&lt;&lt;tanggal_sertifikat&gt;&gt;)</span></label>
+                    <input type="text" id="sertTanggal" placeholder="Contoh: 23 April 2026">
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="field">
+                    <label>Prefix Nomor Sertifikat</label>
+                    <input type="text" id="sertNomorPrefix" placeholder="Contoh: SERT/2026/BIMTEK">
+                  </div>
+                  <div class="field">
+                    <label>Lokasi / Hotel <span style="font-size:10px;color:var(--gray-mid);font-weight:500;">(&lt;&lt;hotel&gt;&gt;)</span></label>
+                    <input type="text" id="sertHotel" placeholder="Contoh: Hotel Grand Sahid Jaya, Jakarta">
+                  </div>
+                </div>
+
+                <!-- Upload PDF Rincian -->
+                <div class="field" style="margin-top:6px;">
+                  <label>Upload PDF Rincian Kegiatan <span style="font-size:10px;color:var(--gray-mid);font-weight:500;">(halaman 2+, opsional)</span></label>
+                  <div class="sert-template-area" id="sertRincianArea" ondragover="sertDragOver(event,'sertRincianArea')" ondragleave="sertDragLeave('sertRincianArea')" ondrop="sertDropRincian(event,'kegiatan')">
+                    <div class="sert-template-empty" id="sertRincianEmpty">
+                      <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                      <div>Upload PDF Rincian Kegiatan</div>
+                      <div style="font-size:11px;color:var(--gray-mid);margin-top:2px;">Seret file ke sini atau klik tombol di bawah</div>
+                      <button class="btn-primary" style="margin-top:12px;" onclick="document.getElementById('sertRincianFile').click()">
+                        <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                        Upload PDF Rincian
+                      </button>
+                      <input type="file" id="sertRincianFile" accept=".pdf" style="display:none" onchange="sertLoadRincian(this,'kegiatan')">
+                    </div>
+                    <div class="sert-template-loaded" id="sertRincianLoaded" style="display:none">
+                      <svg viewBox="0 0 24 24" style="width:20px;height:20px;stroke:var(--green);flex-shrink:0"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                      <span id="sertRincianNama" style="flex:1;font-weight:600;font-size:13px;"></span>
+                      <button class="btn-sm" style="border-color:var(--gray-border);color:var(--text-soft);" onclick="document.getElementById('sertRincianFile').click()">Ganti</button>
+                      <button class="btn-sm" style="border-color:#FECACA;color:var(--red);" onclick="sertHapusRincian('kegiatan')">Hapus</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Daftar peserta dengan checklist -->
+            <div class="card">
+              <div class="card-header" style="flex-wrap:wrap;gap:10px;">
+                <h2>Langkah 3 — Pilih Penerima Sertifikat</h2>
+                <div style="display:flex;gap:8px;align-items:center;">
+                  <span class="badge-count" id="sertCheckedCount">0</span>
+                  <span style="font-size:12px;color:var(--gray-text);">dipilih</span>
+                </div>
+              </div>
+              <div class="card-body" style="padding-bottom:12px;">
+                <div style="display:flex;gap:10px;align-items:center;margin-bottom:12px;flex-wrap:wrap;">
+                  <input type="text" id="sertSearchPeserta" placeholder="Cari nama peserta..." oninput="sertFilterPeserta()" style="height:36px;border:1.5px solid var(--gray-border);border-radius:var(--radius);padding:0 12px;font-family:inherit;font-size:13px;flex:1;min-width:180px;outline:none;" onfocus="this.style.borderColor='var(--blue)'" onblur="this.style.borderColor='var(--gray-border)'">
+                  <button class="btn-sm activate" onclick="sertCheckAll(true)">Aktifkan Semua</button>
+                  <button class="btn-sm" style="border-color:var(--gray-border);color:var(--text-soft);" onclick="sertCheckAll(false)">Nonaktifkan Semua</button>
+                </div>
+                <div class="sert-peserta-thead">
+                  <div></div>
+                  <div>Nama</div>
+                  <div>Instansi</div>
+                  <div>Peran</div>
+                  <div></div>
+                  <div></div>
+                </div>
+                <div id="sertPesertaList" class="sert-peserta-list">
+                  <div class="empty-state" style="padding:32px 0;">
+                    <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                    Pilih kegiatan terlebih dahulu.
+                  </div>
+                </div>
+                <button class="btn-add-from-db" onclick="openSertTambahPeserta()">
+                  <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                  Tambah dari Database
+                </button>
+              </div>
+            </div>
+
+            <!-- Generate -->
+            <div class="card" style="margin-bottom:0">
+              <div class="card-body" style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+                <button class="btn-primary" id="btnSertGenerate" onclick="sertGenerate()">
+                  <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                  Unduh Semua (ZIP)
+                </button>
+                <div id="sertProgress" style="display:none;flex:1;font-size:12.5px;color:var(--gray-text);">
+                  <span id="sertProgressText">Menyiapkan...</span>
+                </div>
+              </div>
+            </div>
+
+          </div><!-- /step2wrap -->
+        </div><!-- /panelKegiatan -->
+
+        <!-- ─ TAB: MANDIRI ─ -->
+        <div id="sertPanelMandiri" style="display:none">
+
+          <!-- Template Mandiri -->
+          <div class="card">
+            <div class="card-header"><h2>Pengaturan Sertifikat</h2></div>
+            <div class="card-body">
+              <!-- BG status mandiri -->
+              <div id="bgStatusMandiriWrap"></div>
+
+              <div class="form-row">
+                <div class="field">
+                  <label>Nama Kegiatan</label>
+                  <input type="text" id="sertMandiriNamaKegiatan" placeholder="Untuk placeholder &lt;&lt;kegiatan&gt;&gt;">
+                </div>
+                <div class="field">
+                  <label>Tanggal Kegiatan</label>
+                  <input type="text" id="sertMandiriTanggalKegiatan" placeholder="Contoh: 14–16 April 2026">
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="field">
+                  <label>Tanggal Sertifikat</label>
+                  <input type="text" id="sertMandiriTanggal" placeholder="Contoh: 23 April 2026">
+                </div>
+                <div class="field">
+                  <label>Prefix Nomor Sertifikat</label>
+                  <input type="text" id="sertMandiriNomorPrefix" placeholder="Contoh: SERT/2026">
+                </div>
+                <div class="field">
+                  <label>Lokasi / Hotel <span style="font-size:10px;color:var(--gray-mid);font-weight:500;">(&lt;&lt;hotel&gt;&gt;)</span></label>
+                  <input type="text" id="sertMandiriHotel" placeholder="Contoh: Hotel Grand Sahid Jaya, Jakarta">
+                </div>
+              </div>
+
+              <!-- Upload PDF Rincian Mandiri -->
+              <div class="field" style="margin-top:6px;">
+                <label>Upload PDF Rincian Kegiatan <span style="font-size:10px;color:var(--gray-mid);font-weight:500;">(halaman 2+, opsional)</span></label>
+                <div class="sert-template-area" id="sertMandiriRincianArea" ondragover="sertDragOver(event,'sertMandiriRincianArea')" ondragleave="sertDragLeave('sertMandiriRincianArea')" ondrop="sertDropRincian(event,'mandiri')">
+                  <div class="sert-template-empty" id="sertMandiriRincianEmpty">
+                    <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                    <div>Upload PDF Rincian Kegiatan</div>
+                    <div style="font-size:11px;color:var(--gray-mid);margin-top:2px;">Seret file ke sini atau klik tombol di bawah</div>
+                    <button class="btn-primary" style="margin-top:12px;" onclick="document.getElementById('sertMandiriRincianFile').click()">
+                      <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                      Upload PDF Rincian
+                    </button>
+                    <input type="file" id="sertMandiriRincianFile" accept=".pdf" style="display:none" onchange="sertLoadRincian(this,'mandiri')">
+                  </div>
+                  <div class="sert-template-loaded" id="sertMandiriRincianLoaded" style="display:none">
+                    <svg viewBox="0 0 24 24" style="width:20px;height:20px;stroke:var(--green);flex-shrink:0"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                    <span id="sertMandiriRincianNama" style="flex:1;font-weight:600;font-size:13px;"></span>
+                    <button class="btn-sm" style="border-color:var(--gray-border);color:var(--text-soft);" onclick="document.getElementById('sertMandiriRincianFile').click()">Ganti</button>
+                    <button class="btn-sm" style="border-color:#FECACA;color:var(--red);" onclick="sertHapusRincian('mandiri')">Hapus</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header" style="flex-wrap:wrap;gap:10px;">
+              <h2>Daftar Penerima</h2>
+            </div>
+            <div class="card-body" style="padding-bottom:12px;">
+              <div class="sert-peserta-thead">
+                <div></div>
+                <div>Nama</div>
+                <div>Instansi</div>
+                <div>Peran</div>
+                <div></div>
+                <div></div>
+              </div>
+              <div id="sertMandiriList" class="sert-peserta-list">
+                <div class="empty-state" style="padding:24px 0;">
+                  <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                  Belum ada penerima. Tambahkan dari database.
+                </div>
+              </div>
+              <button class="btn-add-from-db" onclick="openSertMandiriTambah()">
+                <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Tambah dari Database
+              </button>
+            </div>
+          </div>
+
+          <!-- Generate mandiri -->
+          <div class="card" style="margin-bottom:0">
+            <div class="card-body" style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+              <button class="btn-primary" id="btnSertMandiriGenerate" onclick="sertMandiriGenerate()">
+                <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Unduh Semua (ZIP)
+              </button>
+              <div id="sertMandiriProgress" style="display:none;flex:1;font-size:12.5px;color:var(--gray-text);">
+                <span id="sertMandiriProgressText">Menyiapkan...</span>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /panelMandiri -->
+      </div><!-- /page-sertifikat -->
+
+    </div><!-- /page -->
+  </div><!-- /content -->
+</div><!-- /app -->
+
+<!-- ─── MODAL SERTIFIKAT: TAMBAH PESERTA DARI DB ─── -->
+<div class="modal-detail-overlay" id="modalSertTambahOverlay" onclick="if(event.target===this)closeSertTambahPeserta()">
+  <div class="modal-detail" style="max-width:560px;">
+    <div class="modal-detail-header">
+      <h3 id="modalSertTambahTitle">Tambah Peserta dari Database</h3>
+      <button class="modal-detail-close" onclick="closeSertTambahPeserta()">
+        <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-detail-body" style="padding:14px 18px;">
+      <input type="text" id="modalSertSearchDB" placeholder="Cari nama atau instansi..." oninput="sertSearchDB()" style="width:100%;height:38px;border:1.5px solid var(--gray-border);border-radius:var(--radius);padding:0 12px;font-family:inherit;font-size:13px;margin-bottom:10px;outline:none;" onfocus="this.style.borderColor='var(--blue)'" onblur="this.style.borderColor='var(--gray-border)'">
+      <div id="modalSertDBList" style="max-height:320px;overflow-y:auto;border:1px solid var(--gray-border);border-radius:8px;">
+        <div class="loading-state" style="padding:24px;">Memuat...</div>
+      </div>
+    </div>
+    <div style="padding:12px 18px;border-top:1px solid var(--gray-border);display:flex;justify-content:flex-end;gap:10px;">
+      <button class="btn-secondary" onclick="closeSertTambahPeserta()">Selesai</button>
+    </div>
+  </div>
+</div>
+
+<!-- ─── CONFIRM DIALOG ─── -->
+<div class="confirm-overlay" id="confirmOverlay">
+  <div class="confirm-box">
+    <div class="confirm-box-header">
+      <div class="confirm-icon">
+        <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+      </div>
+      <div class="confirm-title" id="confirmTitle">Konfirmasi</div>
+      <div class="confirm-msg" id="confirmMsg"></div>
+    </div>
+    <div class="confirm-footer">
+      <button class="btn-confirm-cancel" onclick="confirmResolve(false)">Batal</button>
+      <button class="btn-confirm-ok" id="confirmOkBtn" onclick="confirmResolve(true)">Hapus</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ─── CONFIG ───
+const SUPABASE_URL = 'https://lusytejskqevwyyffeue.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx1c3l0ZWpza3Fldnd5eWZmZXVlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYxMzUyODksImV4cCI6MjA5MTcxMTI4OX0.LKCfdnlB8TQTeB7NuZ1DXwSkCI9DK3WlD4xk-jzUTPU';
+
+// ─── STATE ───
+let currentUser = null;
+
+// ─── SUPABASE HELPER ───
+const sb = (path, opts = {}) => fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
+  headers: {
+    'apikey': SUPABASE_KEY,
+    'Authorization': `Bearer ${SUPABASE_KEY}`,
+    'Content-Type': 'application/json',
+    'Prefer': opts.prefer || 'return=representation',
+    ...(opts.headers || {})
+  },
+  ...opts
+});
+
+// ─── SHA-256 ───
+async function sha256(message) {
+  const msgBuffer = new TextEncoder().encode(message);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+window.onload = () => {
+  const saved = sessionStorage.getItem('adminUser');
+  if (saved) {
+    try { currentUser = JSON.parse(saved); showApp(); } catch { sessionStorage.clear(); }
+  }
+};
+
+async function doLogin() {
+  const username = document.getElementById('loginUser').value.trim();
+  const pass = document.getElementById('loginPass').value.trim();
+  const errEl = document.getElementById('loginErr');
+  const btn = document.getElementById('btnLogin');
+  errEl.classList.remove('show');
+  if (!username || !pass) { errEl.textContent = 'Isi username dan password.'; errEl.classList.add('show'); return; }
+  btn.disabled = true;
+  btn.innerHTML = '<svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:none;stroke:white;stroke-width:2;stroke-linecap:round;animation:spin 1s linear infinite"><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"/><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"/><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"/></svg> Memeriksa...';
+  try {
+    const hash = await sha256(pass);
+    const res = await sb(`admin_users?username=eq.${encodeURIComponent(username)}&password_hash=eq.${hash}&aktif=eq.true&select=id,username,nama_lengkap,role`);
+    const data = await res.json();
+    if (data.length > 0) {
+      currentUser = data[0];
+      sessionStorage.setItem('adminUser', JSON.stringify(currentUser));
+      showApp();
+    } else {
+      errEl.textContent = 'Username atau password salah.';
+      errEl.classList.add('show');
+    }
+  } catch {
+    errEl.textContent = 'Gagal terhubung ke server.';
+    errEl.classList.add('show');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:none;stroke:white;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg> Masuk';
+  }
+}
+
+function doLogout() {
+  sessionStorage.clear();
+  currentUser = null;
+  document.getElementById('app').classList.remove('visible');
+  document.getElementById('loginWrap').style.display = 'flex';
+  document.getElementById('loginUser').value = '';
+  document.getElementById('loginPass').value = '';
+}
+
+function showApp() {
+  document.getElementById('loginWrap').style.display = 'none';
+  document.getElementById('app').classList.add('visible');
+  document.getElementById('sidebarUserName').textContent = currentUser.nama_lengkap || currentUser.username;
+  document.getElementById('sidebarUserRole').textContent = currentUser.role === 'administrator' ? 'Administrator' : 'Operator';
+  const rb = document.getElementById('roleBadge');
+  rb.textContent = currentUser.role === 'administrator' ? 'Administrator' : 'Operator';
+  rb.className = 'role-badge ' + currentUser.role;
+  // Tampilkan menu Pengaturan hanya untuk administrator
+  if (currentUser.role === 'administrator') {
+    document.getElementById('navPengaturan').style.display = '';
+  }
+  loadSertifikatPage();
+  fetchSertBg();
+}
+
+// ─── SIDEBAR MOBILE ───
+function openSidebar() {
+  document.getElementById('sidebar').classList.add('open');
+  document.getElementById('sidebarOverlay').classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebarOverlay').classList.remove('show');
+  document.body.style.overflow = '';
+}
+
+// ─── UTILITIES ───
+let confirmResolve = () => {};
+function showConfirm(title, msg, okLabel = 'Hapus') {
+  return new Promise(resolve => {
+    document.getElementById('confirmTitle').textContent = title;
+    document.getElementById('confirmMsg').innerHTML = msg;
+    document.getElementById('confirmOkBtn').textContent = okLabel;
+    document.getElementById('confirmOverlay').classList.add('show');
+    confirmResolve = (val) => {
+      document.getElementById('confirmOverlay').classList.remove('show');
+      resolve(val);
+    };
+  });
+}
+
+function showToast(msg, type = '') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = `toast show ${type}`;
+  setTimeout(() => t.className = 'toast', 3000);
+}
+
+function escHtml(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+// ─── FORMAT TANGGAL RENTANG dari Supabase ───
+// Input: tanggal_mulai & tanggal_selesai (ISO: "2026-04-02", "2026-04-05")
+// Output: "2–5 April 2026" atau "31 April – 2 Mei 2026"
+const BULAN_ID = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+
+function formatTanggalRentang(mulaiStr, selesaiStr) {
+  if (!mulaiStr) return '';
+  const mulai = new Date(mulaiStr + 'T00:00:00');
+  const tglMulai = mulai.getDate();
+  const blnMulai = BULAN_ID[mulai.getMonth()];
+  const thnMulai = mulai.getFullYear();
+
+  if (!selesaiStr || selesaiStr === mulaiStr) {
+    return `${tglMulai} ${blnMulai} ${thnMulai}`;
+  }
+
+  const selesai = new Date(selesaiStr + 'T00:00:00');
+  const tglSelesai = selesai.getDate();
+  const blnSelesai = BULAN_ID[selesai.getMonth()];
+  const thnSelesai = selesai.getFullYear();
+
+  if (blnMulai === blnSelesai && thnMulai === thnSelesai) {
+    // Sama bulan & tahun: "2–5 April 2026"
+    return `${tglMulai}–${tglSelesai} ${blnSelesai} ${thnSelesai}`;
+  } else if (thnMulai === thnSelesai) {
+    // Beda bulan, sama tahun: "31 April – 2 Mei 2026"
+    return `${tglMulai} ${blnMulai} – ${tglSelesai} ${blnSelesai} ${thnSelesai}`;
+  } else {
+    // Beda tahun: "30 Desember 2025 – 2 Januari 2026"
+    return `${tglMulai} ${blnMulai} ${thnMulai} – ${tglSelesai} ${blnSelesai} ${thnSelesai}`;
+  }
+}
+
+// ─── SERTIFIKAT STATE ───
+let sertBgImageBytes = null;
+let sertBgMimeType = 'png';
+let sertRincianBytes = null;
+let sertMandiriRincianBytes = null;
+let sertPesertaData = [];
+let sertManualAdded = [];
+let sertMandiriPeserta = [];
+let sertCurrentKegiatanId = null;
+let sertCurrentKegiatanNama = '';
+let sertDBMode = 'kegiatan';
+let sertNomorCounter = 1;
+
+// ─── KOORDINAT TEKS TETAP (sesuai template sertifikat) ───
+const PDF_W = 842, PDF_H = 595;
+const SERT_LAYOUT = {
+  nomor_sertifikat: { y: 513, size: 11, bold: false, align: 'center' },
+  nama:             { y: 432, size: 14, bold: true,  align: 'center' },
+  instansi:         { y: 412, size: 12, bold: true,  align: 'center' },
+  provinsi:         { y: 393, size: 12, bold: true,  align: 'center' },
+  tanggal_sertifikat: { y: 283, size: 11, bold: false, align: 'center' },
+};
+
+// ─── FETCH BACKGROUND ───
+function renderBgStatus(ok, msg) {
+  const wrapK = document.getElementById('bgStatusWrap');
+  const wrapM = document.getElementById('bgStatusMandiriWrap');
+  const html = ok
+    ? `<div class="bg-ok"><svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>${msg || 'Background sertifikat berhasil dimuat.'}</div>`
+    : `<div class="bg-warning"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12" y2="16"/></svg>${msg}</div>`;
+  if (wrapK) wrapK.innerHTML = html;
+  if (wrapM) wrapM.innerHTML = html;
+}
+
+async function fetchSertBg() {
+  try {
+    const res = await fetch('./sertifikat-bg.png');
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    sertBgImageBytes = await res.arrayBuffer();
+    sertBgMimeType = 'png';
+    renderBgStatus(true, 'Background sertifikat berhasil dimuat (sertifikat-bg.png).');
+  } catch (e) {
+    renderBgStatus(false, `⚠️ Gagal memuat sertifikat-bg.png (${e.message}). Pastikan file tersedia di server yang sama.`);
+  }
+}
+
+function switchSertTab(tab) {
+  document.getElementById('sertTabKegiatan').classList.toggle('active', tab === 'kegiatan');
+  document.getElementById('sertTabMandiri').classList.toggle('active', tab === 'mandiri');
+  document.getElementById('sertPanelKegiatan').style.display = tab === 'kegiatan' ? '' : 'none';
+  document.getElementById('sertPanelMandiri').style.display = tab === 'mandiri' ? '' : 'none';
+}
+
+// ─── LOAD DAFTAR KEGIATAN ───
+async function loadSertifikatPage() {
+  const sel = document.getElementById('sertKegiatanSelect');
+  sel.innerHTML = '<option value="">— Pilih kegiatan —</option>';
+  try {
+    // Coba dengan kolom tanggal; kalau response bukan array (kolom tidak ada) fallback
+    let data;
+    const r1 = await sb('kegiatan?order=created_at.desc&select=id,nama_kegiatan,aktif,tanggal_mulai,tanggal_selesai');
+    const raw1 = await r1.json();
+    if (Array.isArray(raw1)) {
+      data = raw1;
+    } else {
+      const r2 = await sb('kegiatan?order=created_at.desc&select=id,nama_kegiatan,aktif');
+      data = await r2.json();
+    }
+    if (!Array.isArray(data)) { showToast('Gagal memuat daftar kegiatan', 'error'); return; }
+    window._kegiatanData = {};
+    data.forEach(k => {
+      const opt = document.createElement('option');
+      opt.value = k.id;
+      opt.textContent = k.nama_kegiatan + (k.aktif ? '' : ' (nonaktif)');
+      sel.appendChild(opt);
+      window._kegiatanData[k.id] = k;
+    });
+  } catch { showToast('Gagal memuat daftar kegiatan', 'error'); }
+}
+
+async function sertPilihKegiatan() {
+  const sel = document.getElementById('sertKegiatanSelect');
+  const kegId = sel.value;
+  if (!kegId) {
+    document.getElementById('sertStep2Wrap').style.display = 'none';
+    return;
+  }
+  sertCurrentKegiatanId = kegId;
+  // Ambil nama kegiatan tanpa "(nonaktif)" untuk placeholder sertifikat
+  const kegData = (window._kegiatanData || {})[kegId];
+  sertCurrentKegiatanNama = kegData ? kegData.nama_kegiatan : sel.options[sel.selectedIndex].text.replace(' (nonaktif)', '');
+  document.getElementById('sertStep2Wrap').style.display = '';
+  sertManualAdded = [];
+  sertNomorCounter = 1;
+
+  // Isi otomatis tanggal kegiatan dari data Supabase
+  const tanggalInput = document.getElementById('sertTanggalKegiatan');
+  if (kegData && (kegData.tanggal_mulai || kegData.tanggal_selesai)) {
+    tanggalInput.value = formatTanggalRentang(kegData.tanggal_mulai, kegData.tanggal_selesai);
+    tanggalInput.style.color = 'var(--blue)';
+    tanggalInput.style.fontWeight = '600';
+    tanggalInput.readOnly = false; // Bisa diedit manual jika perlu
+  } else {
+    tanggalInput.value = '';
+    tanggalInput.placeholder = 'Contoh: 14–16 April 2026';
+    tanggalInput.readOnly = false;
+  }
+
+  // Load peserta kegiatan
+  const list = document.getElementById('sertPesertaList');
+  list.innerHTML = '<div class="loading-state">Memuat peserta...</div>';
+  try {
+    // Query: join ke tabel peserta via foreign key
+    const res = await sb(`kegiatan_peserta?kegiatan_id=eq.${kegId}&select=peserta_id,peserta:peserta_id(id,nama,instansi,jabatan,provinsi)`);
+    const data = await res.json();
+
+    if (!Array.isArray(data) || data.length === 0) {
+      sertPesertaData = [];
+      renderSertPesertaList();
+      return;
+    }
+
+    sertPesertaData = data
+      .filter(r => r.peserta)
+      .map(r => ({
+        id: r.peserta_id,
+        nama: r.peserta?.nama || '-',
+        instansi: r.peserta?.instansi || '-',
+        jabatan: r.peserta?.jabatan || '',
+        provinsi: r.peserta?.provinsi || '',
+        checked: true,
+        source: 'kegiatan'
+      }));
+
+    renderSertPesertaList();
+  } catch(e) {
+    list.innerHTML = '<div class="loading-state">Gagal memuat peserta.</div>';
+    console.error('Gagal memuat peserta kegiatan:', e);
+  }
+}
+
+function getAllSertPeserta() {
+  return [...sertPesertaData, ...sertManualAdded];
+}
+
+function renderSertPesertaList() {
+  const list = document.getElementById('sertPesertaList');
+  const q = (document.getElementById('sertSearchPeserta').value || '').toLowerCase();
+  const all = getAllSertPeserta();
+  const sorted = [...all].sort((a, b) => a.nama.localeCompare(b.nama, 'id'));
+  const filtered = q ? sorted.filter(p => p.nama.toLowerCase().includes(q) || p.instansi.toLowerCase().includes(q)) : sorted;
+
+  if (!filtered.length) {
+    list.innerHTML = '<div class="empty-state" style="padding:24px 0;"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Belum ada peserta.</div>';
+    updateSertCheckedCount();
+    return;
+  }
+
+  list.innerHTML = filtered.map((p) => {
+    const realIdx = all.indexOf(p);
+    return `<div class="sert-peserta-item" id="sertitem_${realIdx}">
+      <label class="sert-toggle" title="${p.checked ? 'Aktif' : 'Nonaktif'}">
+        <input type="checkbox" ${p.checked ? 'checked' : ''} onchange="sertToggleCheck(${realIdx}, this.checked)">
+        <div class="sert-toggle-track"><div class="sert-toggle-thumb"></div></div>
+      </label>
+      <span class="sert-peserta-item-nama" title="${escHtml(p.nama)}">${escHtml(p.nama)}</span>
+      <span class="sert-peserta-item-sub" title="${escHtml(p.instansi)}">${escHtml(p.instansi)}</span>
+      <div class="sert-peserta-peran">
+        <select onchange="sertUpdatePeran(${realIdx}, this.value)">
+          <option value="Peserta" ${(p.peran||'Peserta')==='Peserta'?'selected':''}>Peserta</option>
+          <option value="Fasilitator" ${(p.peran||'')==='Fasilitator'?'selected':''}>Fasilitator</option>
+          <option value="Narasumber" ${(p.peran||'')==='Narasumber'?'selected':''}>Narasumber</option>
+          <option value="Panitia" ${(p.peran||'')==='Panitia'?'selected':''}>Panitia</option>
+        </select>
+      </div>
+      <button class="sert-peserta-download" title="Unduh sertifikat ini" onclick="sertDownloadSatu(${realIdx})">
+        <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      </button>
+      ${p.source === 'manual' ? `<button class="sert-peserta-remove" title="Hapus dari daftar" onclick="sertHapusManual(${realIdx})"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>` : '<div></div>'}
+    </div>`;
+  }).join('');
+  updateSertCheckedCount();
+}
+
+function sertToggleCheck(idx, val) {
+  const all = getAllSertPeserta();
+  if (all[idx]) all[idx].checked = val;
+  updateSertCheckedCount();
+}
+
+function sertUpdatePeran(idx, val) {
+  const all = getAllSertPeserta();
+  if (all[idx]) all[idx].peran = val;
+}
+
+function sertCheckAll(val) {
+  getAllSertPeserta().forEach(p => p.checked = val);
+  renderSertPesertaList();
+}
+
+function sertHapusManual(idx) {
+  const all = getAllSertPeserta();
+  const peserta = all[idx];
+  const manualIdx = sertManualAdded.indexOf(peserta);
+  if (manualIdx >= 0) sertManualAdded.splice(manualIdx, 1);
+  renderSertPesertaList();
+  renderSertDBModal();
+}
+
+function sertFilterPeserta() { renderSertPesertaList(); }
+
+function updateSertCheckedCount() {
+  const count = getAllSertPeserta().filter(p => p.checked).length;
+  document.getElementById('sertCheckedCount').textContent = count;
+}
+
+// ─── GENERATE PDF (pdf-lib) ───
+async function ensurePdfLib() {
+  if (window.PDFLib) return;
+  await new Promise((res, rej) => {
+    const s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js';
+    s.onload = res; s.onerror = rej;
+    document.head.appendChild(s);
+  });
+}
+
+async function ensureJSZip() {
+  if (window.JSZip) return;
+  await new Promise((res, rej) => {
+    const s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js';
+    s.onload = res; s.onerror = rej;
+    document.head.appendChild(s);
+  });
+}
+
+function sertBuildContext(peserta, idx, kegiatanNama, tanggalKegiatan, tanggalSertifikat, prefix, peran, hotel) {
+  const nomor = prefix ? `${prefix}/${String(idx + 1).padStart(3, '0')}` : String(idx + 1).padStart(3, '0');
+  return {
+    nama: peserta.nama,
+    instansi: peserta.instansi || '-',
+    provinsi: peserta.provinsi || '-',
+    kegiatan: kegiatanNama,
+    tanggal: tanggalKegiatan,
+    tanggal_sertifikat: tanggalSertifikat,
+    jabatan: peserta.jabatan || '',
+    peran: peran || 'Peserta',
+    nomor_sertifikat: nomor,
+    hotel: hotel || '-'
+  };
+}
+
+async function generateOnePDF(ctx, rincianBytes) {
+  await ensurePdfLib();
+  const { PDFDocument, rgb, StandardFonts } = window.PDFLib;
+
+  if (!sertBgImageBytes) throw new Error('Background sertifikat belum dimuat!');
+
+  const pdfDoc = await PDFDocument.create();
+  const page = pdfDoc.addPage([PDF_W, PDF_H]);
+
+  const bgImage = (sertBgMimeType === 'jpg')
+    ? await pdfDoc.embedJpg(sertBgImageBytes)
+    : await pdfDoc.embedPng(sertBgImageBytes);
+  page.drawImage(bgImage, { x: 0, y: 0, width: PDF_W, height: PDF_H });
+
+  const fR = await pdfDoc.embedFont(StandardFonts.Helvetica);
+  const fB = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+  const BLACK = rgb(0, 0, 0);
+  const cx = PDF_W / 2;
+
+  function drawCenter(text, font, size, y, color = BLACK) {
+    const w = font.widthOfTextAtSize(text, size);
+    page.drawText(text, { x: cx - w / 2, y, size, font, color });
+  }
+
+  function drawMixedCenter(parts, size, y) {
+    const totalW = parts.reduce((acc, p) => acc + (p.bold ? fB : fR).widthOfTextAtSize(p.text, size), 0);
+    let x = cx - totalW / 2;
+    for (const p of parts) {
+      const font = p.bold ? fB : fR;
+      page.drawText(p.text, { x, y, size, font, color: BLACK });
+      x += font.widthOfTextAtSize(p.text, size);
+    }
+  }
+
+  drawCenter(`Nomor : ${ctx.nomor_sertifikat}`, fR, 11, 513);
+  drawCenter(ctx.nama, fB, 14, 432);
+  drawCenter(ctx.instansi, fB, 12, 412);
+  drawCenter(ctx.provinsi, fB, 12, 393);
+  drawMixedCenter([
+    { text: 'atas partisipasi sebagai ', bold: false },
+    { text: ctx.peran,                   bold: true  },
+    { text: ' pada kegiatan ',           bold: false },
+    { text: ctx.kegiatan,                bold: true  },
+  ], 11, 363);
+  drawMixedCenter([
+    { text: 'yang diselenggarakan pada tanggal ', bold: false },
+    { text: ctx.tanggal,                          bold: true  },
+    { text: ' di ',                               bold: false },
+    { text: (ctx.hotel || '-') + '.',             bold: true  },
+  ], 11, 347);
+  drawCenter(`Jakarta, ${ctx.tanggal_sertifikat}`, fR, 11, 283);
+
+  if (rincianBytes) {
+    try {
+      const rDoc = await PDFDocument.load(rincianBytes, { ignoreEncryption: true });
+      const copied = await pdfDoc.copyPages(rDoc, rDoc.getPageIndices());
+      copied.forEach(p => pdfDoc.addPage(p));
+    } catch (e) { console.warn('Gagal merge PDF rincian:', e); }
+  }
+
+  return await pdfDoc.save();
+}
+
+function sanitizeFilename(str) {
+  return str.replace(/[^a-zA-Z0-9À-ÿ\s\-_]/g, '').replace(/\s+/g, '_').substring(0, 60);
+}
+
+function triggerDownload(bytes, filename, mime) {
+  const blob = new Blob([bytes], { type: mime });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename; a.click();
+  URL.revokeObjectURL(url);
+}
+
+async function sertDownloadSatu(idx) {
+  if (!sertBgImageBytes) { showToast('Background sertifikat belum dimuat!', 'error'); return; }
+  const all = getAllSertPeserta();
+  const p = all[idx];
+  if (!p) return;
+  const kegNama = sertCurrentKegiatanNama;
+  const tanggalKegiatan = document.getElementById('sertTanggalKegiatan').value || '-';
+  const tanggalSertifikat = document.getElementById('sertTanggal').value || '-';
+  const prefix = document.getElementById('sertNomorPrefix').value.trim();
+  const hotel = document.getElementById('sertHotel').value.trim();
+  const peran = p.peran || 'Peserta';
+  const ctx = sertBuildContext(p, idx, kegNama, tanggalKegiatan, tanggalSertifikat, prefix, peran, hotel);
+  try {
+    const bytes = await generateOnePDF(ctx, sertRincianBytes);
+    triggerDownload(bytes, `Sertifikat_${sanitizeFilename(p.nama)}.pdf`, 'application/pdf');
+    showToast(`Sertifikat ${p.nama} diunduh!`);
+  } catch (e) { showToast('Gagal generate PDF: ' + e.message, 'error'); }
+}
+
+async function sertGenerate() {
+  if (!sertBgImageBytes) { showToast('Background sertifikat belum dimuat!', 'error'); return; }
+  const checked = getAllSertPeserta().filter(p => p.checked);
+  if (!checked.length) { showToast('Pilih minimal 1 peserta!', 'error'); return; }
+
+  const btn = document.getElementById('btnSertGenerate');
+  const prog = document.getElementById('sertProgress');
+  const progText = document.getElementById('sertProgressText');
+  btn.disabled = true;
+  prog.style.display = '';
+  try {
+    await ensureJSZip();
+    const zip = new JSZip();
+    const kegNama = sertCurrentKegiatanNama;
+    const tanggalKegiatan = document.getElementById('sertTanggalKegiatan').value || '-';
+    const tanggalSertifikat = document.getElementById('sertTanggal').value || '-';
+    const prefix = document.getElementById('sertNomorPrefix').value.trim();
+    const hotel = document.getElementById('sertHotel').value.trim();
+    for (let i = 0; i < checked.length; i++) {
+      const p = checked[i];
+      progText.textContent = `Memproses ${i + 1}/${checked.length}: ${p.nama}`;
+      const allIdx = getAllSertPeserta().indexOf(p);
+      const peran = p.peran || 'Peserta';
+      const ctx = sertBuildContext(p, allIdx, kegNama, tanggalKegiatan, tanggalSertifikat, prefix, peran, hotel);
+      const bytes = await generateOnePDF(ctx, sertRincianBytes);
+      zip.file(`Sertifikat_${sanitizeFilename(p.nama)}.pdf`, bytes);
+    }
+    progText.textContent = 'Membuat ZIP...';
+    const blob = await zip.generateAsync({ type: 'blob' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = `Sertifikat_${sanitizeFilename(kegNama)}.zip`;
+    a.click();
+    URL.revokeObjectURL(url);
+    showToast(`${checked.length} sertifikat berhasil diunduh!`);
+  } catch (e) { showToast('Gagal generate: ' + e.message, 'error'); }
+  finally {
+    btn.disabled = false;
+    prog.style.display = 'none';
+  }
+}
+
+// ─── MANDIRI ───
+function openSertMandiriTambah() {
+  sertDBMode = 'mandiri';
+  openSertTambahPeserta();
+}
+
+function renderSertMandiriList() {
+  const list = document.getElementById('sertMandiriList');
+  if (!sertMandiriPeserta.length) {
+    list.innerHTML = '<div class="empty-state" style="padding:24px 0;"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Belum ada penerima.</div>';
+    return;
+  }
+  const sorted = [...sertMandiriPeserta].map((p, origIdx) => ({ ...p, origIdx })).sort((a, b) => a.nama.localeCompare(b.nama, 'id'));
+  list.innerHTML = sorted.map(({ origIdx: i, ...p }) => `
+    <div class="sert-peserta-item">
+      <div style="width:36px;display:flex;align-items:center;justify-content:center;"></div>
+      <span class="sert-peserta-item-nama" title="${escHtml(p.nama)}">${escHtml(p.nama)}</span>
+      <span class="sert-peserta-item-sub" title="${escHtml(p.instansi)}">${escHtml(p.instansi)}</span>
+      <div class="sert-peserta-peran">
+        <select onchange="sertMandiriUpdatePeran(${i}, this.value)">
+          <option value="Peserta" ${(p.peran||'Peserta')==='Peserta'?'selected':''}>Peserta</option>
+          <option value="Fasilitator" ${(p.peran||'')==='Fasilitator'?'selected':''}>Fasilitator</option>
+          <option value="Narasumber" ${(p.peran||'')==='Narasumber'?'selected':''}>Narasumber</option>
+          <option value="Panitia" ${(p.peran||'')==='Panitia'?'selected':''}>Panitia</option>
+        </select>
+      </div>
+      <button class="sert-peserta-download" title="Unduh sertifikat ini" onclick="sertMandiriDownloadSatu(${i})">
+        <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      </button>
+      <button class="sert-peserta-remove" onclick="sertMandiriHapus(${i})">
+        <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+  `).join('');
+}
+
+function sertMandiriUpdatePeran(i, val) { if (sertMandiriPeserta[i]) sertMandiriPeserta[i].peran = val; }
+
+function sertMandiriHapus(i) {
+  sertMandiriPeserta.splice(i, 1);
+  renderSertMandiriList();
+  renderSertDBModal();
+}
+
+async function sertMandiriDownloadSatu(i) {
+  if (!sertBgImageBytes) { showToast('Background sertifikat belum dimuat!', 'error'); return; }
+  const p = sertMandiriPeserta[i];
+  const kegNama = document.getElementById('sertMandiriNamaKegiatan').value || '';
+  const tanggalKegiatan = document.getElementById('sertMandiriTanggalKegiatan').value || '-';
+  const tanggalSertifikat = document.getElementById('sertMandiriTanggal').value || '-';
+  const prefix = document.getElementById('sertMandiriNomorPrefix').value.trim();
+  const hotel = document.getElementById('sertMandiriHotel').value.trim();
+  const peran = p.peran || 'Peserta';
+  const ctx = sertBuildContext(p, i, kegNama, tanggalKegiatan, tanggalSertifikat, prefix, peran, hotel);
+  try {
+    const bytes = await generateOnePDF(ctx, sertMandiriRincianBytes);
+    triggerDownload(bytes, `Sertifikat_${sanitizeFilename(p.nama)}.pdf`, 'application/pdf');
+    showToast(`Sertifikat ${p.nama} diunduh!`);
+  } catch (e) { showToast('Gagal: ' + e.message, 'error'); }
+}
+
+async function sertMandiriGenerate() {
+  if (!sertBgImageBytes) { showToast('Background sertifikat belum dimuat!', 'error'); return; }
+  if (!sertMandiriPeserta.length) { showToast('Tambahkan minimal 1 penerima!', 'error'); return; }
+  const btn = document.getElementById('btnSertMandiriGenerate');
+  const prog = document.getElementById('sertMandiriProgress');
+  const progText = document.getElementById('sertMandiriProgressText');
+  btn.disabled = true; prog.style.display = '';
+  try {
+    await ensureJSZip();
+    const zip = new JSZip();
+    const kegNama = document.getElementById('sertMandiriNamaKegiatan').value || '';
+    const tanggalKegiatan = document.getElementById('sertMandiriTanggalKegiatan').value || '-';
+    const tanggalSertifikat = document.getElementById('sertMandiriTanggal').value || '-';
+    const prefix = document.getElementById('sertMandiriNomorPrefix').value.trim();
+    const hotel = document.getElementById('sertMandiriHotel').value.trim();
+    for (let i = 0; i < sertMandiriPeserta.length; i++) {
+      const p = sertMandiriPeserta[i];
+      progText.textContent = `Memproses ${i + 1}/${sertMandiriPeserta.length}: ${p.nama}`;
+      const peran = p.peran || 'Peserta';
+      const ctx = sertBuildContext(p, i, kegNama, tanggalKegiatan, tanggalSertifikat, prefix, peran, hotel);
+      const bytes = await generateOnePDF(ctx, sertMandiriRincianBytes);
+      zip.file(`Sertifikat_${sanitizeFilename(p.nama)}.pdf`, bytes);
+    }
+    progText.textContent = 'Membuat ZIP...';
+    const blob = await zip.generateAsync({ type: 'blob' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = 'Sertifikat_Mandiri.zip'; a.click();
+    URL.revokeObjectURL(url);
+    showToast(`${sertMandiriPeserta.length} sertifikat diunduh!`);
+  } catch (e) { showToast('Gagal: ' + e.message, 'error'); }
+  finally { btn.disabled = false; prog.style.display = 'none'; }
+}
+
+// ─── MODAL DB ───
+let sertDBAllPeserta = [];
+
+async function openSertTambahPeserta() {
+  sertDBMode = sertDBMode || 'kegiatan';
+  document.getElementById('modalSertTambahTitle').textContent = 'Tambah Peserta dari Database';
+  document.getElementById('modalSertTambahOverlay').classList.add('show');
+  document.getElementById('modalSertSearchDB').value = '';
+  if (!sertDBAllPeserta.length) {
+    document.getElementById('modalSertDBList').innerHTML = '<div class="loading-state" style="padding:24px;">Memuat...</div>';
+    try {
+      const res = await sb('peserta?select=id,nama,instansi,jabatan,provinsi&order=nama.asc&limit=1000');
+      const raw = await res.json();
+      sertDBAllPeserta = raw.map(p => ({ ...p, nama_lengkap: p.nama }));
+    } catch { sertDBAllPeserta = []; }
+  }
+  renderSertDBModal();
+}
+
+function closeSertTambahPeserta() {
+  document.getElementById('modalSertTambahOverlay').classList.remove('show');
+}
+
+function sertSearchDB() { renderSertDBModal(); }
+
+function renderSertDBModal() {
+  const q = (document.getElementById('modalSertSearchDB').value || '').toLowerCase();
+  const filtered = q ? sertDBAllPeserta.filter(p =>
+    (p.nama_lengkap || '').toLowerCase().includes(q) ||
+    (p.instansi || '').toLowerCase().includes(q)
+  ) : sertDBAllPeserta;
+
+  const alreadyAdded = sertDBMode === 'mandiri'
+    ? new Set(sertMandiriPeserta.map(p => p.id))
+    : new Set([...sertPesertaData, ...sertManualAdded].map(p => p.id));
+
+  const list = document.getElementById('modalSertDBList');
+  if (!filtered.length) {
+    list.innerHTML = '<div class="loading-state" style="padding:24px;">Tidak ada hasil.</div>';
+    return;
+  }
+
+  list.innerHTML = filtered.slice(0, 100).map(p => {
+    const added = alreadyAdded.has(p.id);
+    return `<div class="sert-db-item" onclick="sertDBTogglePeserta(${p.id})">
+      <div class="sert-db-item-info">
+        <div class="sert-db-item-nama">${escHtml(p.nama_lengkap || '-')}</div>
+        <div class="sert-db-item-sub">${escHtml(p.instansi || '-')}</div>
+      </div>
+      <div class="sert-db-item-check ${added ? 'added' : ''}" id="dbchk_${p.id}">
+        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function sertDBTogglePeserta(pesertaId) {
+  const dbPeserta = sertDBAllPeserta.find(p => p.id === pesertaId);
+  if (!dbPeserta) return;
+
+  if (sertDBMode === 'mandiri') {
+    const idx = sertMandiriPeserta.findIndex(p => p.id === pesertaId);
+    if (idx >= 0) {
+      sertMandiriPeserta.splice(idx, 1);
+    } else {
+      sertMandiriPeserta.push({ id: dbPeserta.id, nama: dbPeserta.nama_lengkap, instansi: dbPeserta.instansi || '-', jabatan: dbPeserta.jabatan || '', provinsi: dbPeserta.provinsi || '', checked: true, source: 'db' });
+    }
+    renderSertMandiriList();
+  } else {
+    const allCurrent = getAllSertPeserta();
+    const exists = allCurrent.find(p => p.id === pesertaId);
+    if (exists) {
+      const manualIdx = sertManualAdded.findIndex(p => p.id === pesertaId);
+      if (manualIdx >= 0) sertManualAdded.splice(manualIdx, 1);
+    } else {
+      sertManualAdded.push({ id: dbPeserta.id, nama: dbPeserta.nama_lengkap, instansi: dbPeserta.instansi || '-', jabatan: dbPeserta.jabatan || '', provinsi: dbPeserta.provinsi || '', checked: true, source: 'manual' });
+    }
+    renderSertPesertaList();
+  }
+  renderSertDBModal();
+}
+
+// ─── DRAG & DROP RINCIAN PDF ───
+function sertDragOver(e, areaId) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'copy';
+  const el = document.getElementById(areaId);
+  if (el) el.style.borderColor = 'var(--blue)';
+}
+function sertDragLeave(areaId) {
+  const el = document.getElementById(areaId);
+  if (el) el.style.borderColor = '';
+}
+function sertDropRincian(e, mode) {
+  e.preventDefault();
+  const areaId = mode === 'mandiri' ? 'sertMandiriRincianArea' : 'sertRincianArea';
+  const el = document.getElementById(areaId);
+  if (el) el.style.borderColor = '';
+  const file = e.dataTransfer?.files?.[0];
+  if (!file || file.type !== 'application/pdf') { showToast('Hanya file PDF yang diterima!', 'error'); return; }
+  loadRincianFile(file, mode);
+}
+function sertLoadRincian(input, mode) {
+  const file = input.files[0];
+  if (!file) return;
+  loadRincianFile(file, mode);
+}
+function loadRincianFile(file, mode) {
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    if (mode === 'mandiri') {
+      sertMandiriRincianBytes = ev.target.result;
+      document.getElementById('sertMandiriRincianEmpty').style.display = 'none';
+      document.getElementById('sertMandiriRincianLoaded').style.display = 'flex';
+      document.getElementById('sertMandiriRincianNama').textContent = file.name;
+    } else {
+      sertRincianBytes = ev.target.result;
+      document.getElementById('sertRincianEmpty').style.display = 'none';
+      document.getElementById('sertRincianLoaded').style.display = 'flex';
+      document.getElementById('sertRincianNama').textContent = file.name;
+    }
+    showToast('PDF rincian berhasil dimuat!', 'success');
+  };
+  reader.readAsArrayBuffer(file);
+}
+function sertHapusRincian(mode) {
+  if (mode === 'mandiri') {
+    sertMandiriRincianBytes = null;
+    document.getElementById('sertMandiriRincianEmpty').style.display = '';
+    document.getElementById('sertMandiriRincianLoaded').style.display = 'none';
+    document.getElementById('sertMandiriRincianNama').textContent = '';
+  } else {
+    sertRincianBytes = null;
+    document.getElementById('sertRincianEmpty').style.display = '';
+    document.getElementById('sertRincianLoaded').style.display = 'none';
+    document.getElementById('sertRincianNama').textContent = '';
+  }
+}
+
+document.getElementById('loginPass').addEventListener('keydown', e => {
+  if (e.key === 'Enter') doLogin();
+});
+
+const style = document.createElement('style');
+style.textContent = '@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }';
+document.head.appendChild(style);
+</script>
+</body>
+</html>
