@@ -412,9 +412,8 @@ tr:hover td { background: var(--blue-faint); }
 
         <!-- Filter card -->
         <div class="filter-card">
-          <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:12px;display:flex;align-items:center;gap:8px;">
-            <svg viewBox="0 0 24 24" style="width:15px;height:15px;stroke:var(--blue);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            Filter & Pencarian
+          <div class="card-header" style="margin:-16px -20px 16px;border-radius:var(--radius-lg) var(--radius-lg) 0 0;">
+            <h2>Filter &amp; Pencarian</h2>
           </div>
 
           <!-- NPSN multi-input -->
@@ -446,8 +445,8 @@ tr:hover td { background: var(--blue-faint); }
           </div>
 
           <div class="filter-actions">
-            <button class="btn-secondary" onclick="resetFilters()" title="Reset semua filter" style="gap:6px;">
-              <svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+            <button class="btn-primary" onclick="resetFilters()" title="Reset semua filter" style="gap:6px;height:36px;padding:0 16px;font-size:13px;">
+              <svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:none;stroke:white;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
               Reset Filter
             </button>
             <span class="badge-count" id="badgeKontak" style="margin-left:4px;">0</span>
@@ -457,16 +456,14 @@ tr:hover td { background: var(--blue-faint); }
 
         <!-- Tabel hasil -->
         <div class="table-outer">
-          <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px 0;gap:8px;">
+          <div style="padding:10px 14px 0;">
             <span style="font-size:12px;color:var(--gray-text);" id="tabelInfo">—</span>
-            <button class="btn-reload-icon" onclick="loadKontakData()" title="Muat ulang data dari Supabase">
-              <svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
-            </button>
           </div>
           <table>
             <thead>
               <tr>
                 <th>Sync Terakhir</th>
+                <th></th>
                 <th>NPSN</th>
                 <th style="min-width:220px;">Nama Sekolah</th>
                 <th style="min-width:180px;">Provinsi</th>
@@ -476,10 +473,9 @@ tr:hover td { background: var(--blue-faint); }
                 <th>Nama Operator</th>
                 <th>HP Operator</th>
                 <th></th>
-              </tr>
             </thead>
             <tbody id="kontakTbody">
-              <tr><td colspan="10" class="td-loading">Muat data dari Pengaturan terlebih dahulu.</td></tr>
+              <tr><td colspan="11" class="td-loading">Muat data dari Pengaturan terlebih dahulu.</td></tr>
             </tbody>
           </table>
           <div class="pagination-wrap" id="paginationWrap" style="display:none;">
@@ -646,7 +642,7 @@ function initKontakPage() {
 }
 
 async function loadKontakData() {
-  document.getElementById('kontakTbody').innerHTML = '<tr><td colspan="10" class="td-loading"><svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;animation:spin 1s linear infinite;vertical-align:middle;margin-right:6px;"><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"/><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"/><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"/></svg>Memuat data dari Supabase...</td></tr>';
+  document.getElementById('kontakTbody').innerHTML = '<tr><td colspan="11" class="td-loading"><svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;animation:spin 1s linear infinite;vertical-align:middle;margin-right:6px;"><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"/><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"/><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"/></svg>Memuat data dari Supabase...</td></tr>';
   document.getElementById('paginationWrap').style.display = 'none';
   document.getElementById('tabelInfo').textContent = 'Memuat...';
   try {
@@ -661,7 +657,7 @@ async function loadKontakData() {
     }
     if (!all.length) {
       document.getElementById('sheetBanner').style.display = 'flex';
-      document.getElementById('kontakTbody').innerHTML = '<tr><td colspan="10" class="td-loading">Belum ada data sekolah.</td></tr>';
+      document.getElementById('kontakTbody').innerHTML = '<tr><td colspan="11" class="td-loading">Belum ada data sekolah.</td></tr>';
       return;
     }
     document.getElementById('sheetBanner').style.display = 'none';
@@ -671,7 +667,7 @@ async function loadKontakData() {
     applyFilters();
     showToast(`${all.length.toLocaleString('id')} data berhasil dimuat.`, 'success');
   } catch(e) {
-    document.getElementById('kontakTbody').innerHTML = `<tr><td colspan="10" class="td-loading">Gagal memuat data: ${escHtml(e.message)}</td></tr>`;
+    document.getElementById('kontakTbody').innerHTML = `<tr><td colspan="11" class="td-loading">Gagal memuat data: ${escHtml(e.message)}</td></tr>`;
     showToast('Gagal memuat data.', 'error');
   }
 }
@@ -706,6 +702,26 @@ function applyFilters() {
   const namaQ = (document.getElementById('filterNama').value || '').trim().toLowerCase();
   const provinsiQ = document.getElementById('filterProvinsi').value;
   const kabkotaQ = document.getElementById('filterKabkota').value;
+  const hasFilter = npsnChips.length > 0 || namaQ || provinsiQ || kabkotaQ;
+
+  // Jika tidak ada filter aktif, kosongkan tabel
+  if (!hasFilter) {
+    filteredKontakData = [];
+    document.getElementById('badgeKontak').textContent = 0;
+    currentPage = 1;
+    const tbody = document.getElementById('kontakTbody');
+    tbody.innerHTML = `<tr><td colspan="11" class="td-empty">
+      <div class="empty-state">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        Gunakan filter di atas untuk menampilkan data.
+      </div>
+    </td></tr>`;
+    document.getElementById('paginationWrap').style.display = 'none';
+    document.getElementById('tabelInfo').textContent = '—';
+    document.getElementById('btnDownloadExcel').style.display = 'none';
+    return;
+  }
+
   let result = [...allKontakData];
   if (npsnChips.length > 0) {
     const npsnSet = new Set(npsnChips.map(n => n.toString().trim()));
@@ -734,7 +750,7 @@ function renderKontakTable(items) {
   const tabelInfo = document.getElementById('tabelInfo');
 
   if (!items.length) {
-    tbody.innerHTML = `<tr><td colspan="10" class="td-empty">
+    tbody.innerHTML = `<tr><td colspan="11" class="td-empty">
       <div class="empty-state">
         <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
         Tidak ada data yang sesuai filter.
@@ -769,6 +785,11 @@ function renderKontakTable(items) {
           ${formatTglSync(d.sync_terakhir)}
         </span>
       </td>
+      <td style="padding:6px 10px;">
+        <button class="btn-copy-row" onclick="copyRowData(this, ${idx})" title="Salin data">
+          <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        </button>
+      </td>
       <td class="td-npsn">${escHtml(d.npsn || '-')}</td>
       ${tdTrunc(d.nama, 240)}
       <td style="min-width:180px;max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${escHtml(d.provinsi||'')}">${escHtml(d.provinsi || '-')}</td>
@@ -777,11 +798,6 @@ function renderKontakTable(items) {
       <td>${escHtml(d.no_hp || '-')}</td>
       ${tdTrunc(d.nama_operator, 160)}
       <td>${escHtml(d.hp_operator || '-')}</td>
-      <td style="padding:6px 10px;">
-        <button class="btn-copy-row" onclick="copyRowData(this, ${idx})" title="Salin data">
-          <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-        </button>
-      </td>
     </tr>`;
   }).join('');
 
