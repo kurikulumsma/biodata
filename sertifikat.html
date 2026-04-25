@@ -821,25 +821,44 @@ const SERT_LAYOUT = {
 
 // ─── FETCH BACKGROUND ───
 function renderBgStatus(ok, msg) {
+  // Kalau berhasil: tidak tampilkan apa-apa
+  // Kalau gagal: tampilkan warning
   const wrapK = document.getElementById('bgStatusWrap');
   const wrapM = document.getElementById('bgStatusMandiriWrap');
-  const html = ok
-    ? `<div class="bg-ok"><svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>${msg || 'Background sertifikat berhasil dimuat.'}</div>`
-    : `<div class="bg-warning"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12" y2="16"/></svg>${msg}</div>`;
+  const html = ok ? '' : `<div class="bg-warning"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12" y2="16"/></svg>${msg}</div>`;
   if (wrapK) wrapK.innerHTML = html;
   if (wrapM) wrapM.innerHTML = html;
 }
 
 async function fetchSertBg() {
-  try {
-    const res = await fetch('./sertifikat-bg.png');
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    sertBgImageBytes = await res.arrayBuffer();
-    sertBgMimeType = 'png';
-    renderBgStatus(true, 'Background sertifikat berhasil dimuat (sertifikat-bg.png).');
-  } catch (e) {
-    renderBgStatus(false, `⚠️ Gagal memuat sertifikat-bg.png (${e.message}). Pastikan file tersedia di server yang sama.`);
-  }
+  // Pakai Image + Canvas (bukan fetch) agar works saat buka via file://
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => {
+      try {
+        const canvas = document.createElement('canvas');
+        canvas.width = img.naturalWidth;
+        canvas.height = img.naturalHeight;
+        canvas.getContext('2d').drawImage(img, 0, 0);
+        canvas.toBlob(blob => {
+          blob.arrayBuffer().then(buf => {
+            sertBgImageBytes = buf;
+            sertBgMimeType = 'png';
+            renderBgStatus(true, 'Background sertifikat berhasil dimuat (sertifikat-bg.png).');
+            resolve();
+          });
+        }, 'image/png');
+      } catch (e) {
+        renderBgStatus(false, `⚠️ Gagal memproses sertifikat-bg.png (${e.message}).`);
+        resolve();
+      }
+    };
+    img.onerror = () => {
+      renderBgStatus(false, '⚠️ File sertifikat-bg.png tidak ditemukan. Pastikan file berada satu folder dengan HTML.');
+      resolve();
+    };
+    img.src = './sertifikat-bg.png';
+  });
 }
 
 function switchSertTab(tab) {
@@ -1083,23 +1102,43 @@ async function generateOnePDF(ctx, rincianBytes) {
     }
   }
 
-  drawCenter(`Nomor : ${ctx.nomor_sertifikat}`, fR, 11, 513);
-  drawCenter(ctx.nama, fB, 14, 432);
-  drawCenter(ctx.instansi, fB, 12, 412);
-  drawCenter(ctx.provinsi, fB, 12, 393);
+  // ── Nomor sertifikat — tulis nilai saja, label "Nomor :" sudah ada di BG ──
+  // Di template, "Nomor : <<nomor>>" ada di bawah logo, agak ke kanan tengah
+  // Estimasi: y=513, diawali setelah "Nomor : " → tulis seluruh "Nomor : xxx" sejajar label BG
+  drawCenter(`Nomor : ${ctx.nomor_sertifikat}`, fR, 10.5, 513);
+
+  // ── Nama (bold, besar) ──
+  // Di template nama ada di tengah, sekitar y=405 (dari bawah)
+  drawCenter(ctx.nama, fB, 16, 405);
+
+  // ── Instansi ──
+  drawCenter(ctx.instansi, fB, 12, 381);
+
+  // ── Provinsi ──
+  drawCenter(ctx.provinsi, fB, 12, 361);
+
+  // ── Baris "atas partisipasi": teks statis sudah di BG,
+  //    yang perlu ditulis: <<peran>> dan <<kegiatan>> inline dalam kalimat ──
+  // Kalimat di template: "atas partisipasi sebagai <<peran>> pada kegiatan <<kegiatan>>"
+  // Tulis seluruh kalimat supaya posisi mixed-bold tepat
   drawMixedCenter([
     { text: 'atas partisipasi sebagai ', bold: false },
     { text: ctx.peran,                   bold: true  },
     { text: ' pada kegiatan ',           bold: false },
     { text: ctx.kegiatan,                bold: true  },
-  ], 11, 363);
+  ], 10.5, 332);
+
+  // ── Baris "yang diselenggarakan": tulis seluruh kalimat ──
   drawMixedCenter([
     { text: 'yang diselenggarakan pada tanggal ', bold: false },
     { text: ctx.tanggal,                          bold: true  },
     { text: ' di ',                               bold: false },
     { text: (ctx.hotel || '-') + '.',             bold: true  },
-  ], 11, 347);
-  drawCenter(`Jakarta, ${ctx.tanggal_sertifikat}`, fR, 11, 283);
+  ], 10.5, 316);
+
+  // ── Tanggal sertifikat — tulis nilai saja setelah "Jakarta," ──
+  // "Jakarta, <<tanggal_sertifikat>>" di template sekitar y=243
+  drawCenter(`Jakarta, ${ctx.tanggal_sertifikat}`, fR, 10.5, 243);
 
   if (rincianBytes) {
     try {
