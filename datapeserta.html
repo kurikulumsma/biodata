@@ -19,19 +19,6 @@
 }
 body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--gray-bg); color: var(--text); min-height: 100vh; font-size: 14px; visibility: hidden; }
 
-/* ─── LOGIN ─── */
-.login-wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; background: var(--gray-bg); }
-.login-card { background: var(--white); border-radius: 18px; border: 1px solid var(--gray-border); padding: 44px 40px; width: 100%; max-width: 380px; box-shadow: var(--shadow); }
-.login-brand { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 28px; }
-.login-title { font-size: 20px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
-.login-sub { font-size: 13px; color: var(--gray-text); margin-bottom: 28px; }
-.login-card label { display: block; font-size: 12.5px; font-weight: 700; letter-spacing: 0.04em; color: var(--text-soft); text-transform: uppercase; margin-bottom: 6px; }
-.login-card input { width: 100%; height: 44px; border: 1.5px solid var(--gray-border); border-radius: var(--radius); padding: 0 14px; font-family: inherit; font-size: 14px; background: #FAFBFC; margin-bottom: 16px; color: var(--text); transition: border-color 0.15s, box-shadow 0.15s; }
-.login-card input:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(26,95,180,0.1); background: white; outline: none; }
-.btn-login { width: 100%; height: 46px; background: var(--blue); color: white; border: none; border-radius: var(--radius); font-family: inherit; font-size: 14px; font-weight: 700; cursor: pointer; transition: background 0.15s; display: flex; align-items: center; justify-content: center; gap: 8px; }
-.btn-login:hover { background: var(--blue-dark); }
-.login-err { font-size: 12.5px; color: var(--red); background: var(--red-light); border: 1px solid #FECACA; border-radius: 6px; padding: 8px 12px; margin-top: -8px; margin-bottom: 14px; display: none; }
-.login-err.show { display: block; }
 
 /* ─── APP SHELL ─── */
 .app { display: none; min-height: 100vh; }
@@ -85,6 +72,7 @@ a.nav-item { display: flex; }
 .role-badge { font-size: 11.5px; font-weight: 700; padding: 4px 12px; border-radius: 20px; letter-spacing: 0.03em; white-space: nowrap; }
 .role-badge.administrator { background: #EEF4FF; color: var(--blue); border: 1px solid #C5D8F5; }
 .role-badge.operator { background: var(--green-light); color: var(--green); border: 1px solid #BBF7D0; }
+.role-badge.keuangan { background: #FFF7ED; color: #C2410C; border: 1px solid #FED7AA; }
 .page { padding: 24px 20px 64px; }
 
 /* ─── FILTER BAR ─── */
@@ -206,26 +194,6 @@ tbody td:first-child { padding-left: 18px; font-weight: 600; color: var(--text);
 </style>
 </head>
 <body>
-
-<!-- ─── LOGIN ─── -->
-<div class="login-wrap" id="loginWrap">
-  <div class="login-card">
-    <div class="login-brand">
-      <img src="logosma.png" alt="Logo SMA" style="height:52px;width:auto;object-fit:contain;">
-    </div>
-    <div class="login-title">Selamat datang</div>
-    <div class="login-sub">Manajemen Kegiatan – Biodata Kemendikdasmen</div>
-    <label>Username</label>
-    <input type="text" id="loginUser" placeholder="Masukkan username" autocomplete="off">
-    <label>Password</label>
-    <input type="password" id="loginPass" placeholder="••••••••">
-    <div class="login-err" id="loginErr">Username atau password salah.</div>
-    <button class="btn-login" onclick="doLogin()" id="btnLogin">
-      <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:none;stroke:white;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
-      Masuk
-    </button>
-  </div>
-</div>
 
 <!-- ─── APP ─── -->
 <div class="app" id="app">
@@ -400,62 +368,36 @@ async function sha256(message) {
 window.onload = () => {
   const saved = sessionStorage.getItem('adminUser');
   if (saved) {
-    try { currentUser = JSON.parse(saved); showApp(); } catch { sessionStorage.clear(); }
+    try {
+      currentUser = JSON.parse(saved);
+      // sembunyikan kontak untuk keuangan
+      const navKontak = document.querySelector('a.nav-item[href="kontak.html"]');
+      if (navKontak) navKontak.style.display = currentUser.role === 'keuangan' ? 'none' : 'flex';
+      showApp();
+    } catch { sessionStorage.clear(); window.location.href = 'login.html'; }
+  } else {
+    window.location.href = 'login.html';
   }
   document.body.style.visibility = 'visible';
 };
 
-// ─── LOGIN ───
-async function doLogin() {
-  const username = document.getElementById('loginUser').value.trim();
-  const pass = document.getElementById('loginPass').value.trim();
-  const errEl = document.getElementById('loginErr');
-  const btn = document.getElementById('btnLogin');
-  errEl.classList.remove('show');
-  if (!username || !pass) { errEl.textContent = 'Isi username dan password.'; errEl.classList.add('show'); return; }
-  btn.disabled = true;
-  btn.innerHTML = 'Memeriksa...';
-  try {
-    const hash = await sha256(pass);
-    const res = await sb(`admin_users?username=eq.${encodeURIComponent(username)}&password_hash=eq.${hash}&aktif=eq.true&select=id,username,nama_lengkap,role`);
-    const data = await res.json();
-    if (data.length > 0) {
-      currentUser = data[0];
-      sessionStorage.setItem('adminUser', JSON.stringify(currentUser));
-      showApp();
-    } else {
-      errEl.textContent = 'Username atau password salah.';
-      errEl.classList.add('show');
-    }
-  } catch {
-    errEl.textContent = 'Gagal terhubung ke server.';
-    errEl.classList.add('show');
-  } finally {
-    btn.disabled = false;
-    btn.innerHTML = 'Masuk';
-  }
-}
+
 
 function doLogout() {
   sessionStorage.clear();
-  currentUser = null;
-  document.getElementById('app').classList.remove('visible');
-  document.getElementById('loginWrap').style.display = 'flex';
-  document.getElementById('loginUser').value = '';
-  document.getElementById('loginPass').value = '';
+  window.location.href = 'login.html';
 }
 
 function showApp() {
-  document.getElementById('loginWrap').style.display = 'none';
+  
   document.getElementById('app').classList.add('visible');
   document.getElementById('sidebarUserName').textContent = currentUser.nama_lengkap || currentUser.username;
-  document.getElementById('sidebarUserRole').textContent = currentUser.role === 'administrator' ? 'Administrator' : 'Operator';
+  const roleLabels = { administrator: 'Administrator', operator: 'Operator', keuangan: 'Keuangan' };
+  document.getElementById('sidebarUserRole').textContent = roleLabels[currentUser.role] || currentUser.role;
   const rb = document.getElementById('roleBadge');
-  rb.textContent = currentUser.role === 'administrator' ? 'Administrator' : 'Operator';
+  rb.textContent = roleLabels[currentUser.role] || currentUser.role;
   rb.className = 'role-badge ' + currentUser.role;
-  if (currentUser.role === 'administrator') {
-    document.getElementById('navPengaturan').style.display = 'flex';
-  }
+  document.getElementById('navPengaturan').style.display = currentUser.role === 'administrator' ? 'flex' : 'none';
   loadPeserta();
 }
 
@@ -657,9 +599,6 @@ function escHtml(str) {
   return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
 
-document.getElementById('loginPass').addEventListener('keydown', e => {
-  if (e.key === 'Enter') doLogin();
-});
 </script>
 </body>
 </html>

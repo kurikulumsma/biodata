@@ -19,24 +19,6 @@
 }
 body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--gray-bg); color: var(--text); min-height: 100vh; font-size: 14px; visibility: hidden; }
 
-/* ─── LOGIN ─── */
-.login-wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; background: var(--gray-bg); }
-.login-card { background: var(--white); border-radius: 18px; border: 1px solid var(--gray-border); padding: 44px 40px; width: 100%; max-width: 380px; box-shadow: var(--shadow); }
-.login-brand { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 28px; }
-.login-brand-icon { width: 38px; height: 38px; background: var(--blue); border-radius: 10px; display: flex; align-items: center; justify-content: center; }
-.login-brand-icon svg { width: 20px; height: 20px; fill: none; stroke: white; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-.login-brand-name { font-size: 17px; font-weight: 800; color: var(--text); }
-.login-brand-name span { color: var(--blue); }
-.login-title { font-size: 20px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
-.login-sub { font-size: 13px; color: var(--gray-text); margin-bottom: 28px; }
-.login-card label { display: block; font-size: 12.5px; font-weight: 700; letter-spacing: 0.04em; color: var(--text-soft); text-transform: uppercase; margin-bottom: 6px; }
-.login-card input { width: 100%; height: 44px; border: 1.5px solid var(--gray-border); border-radius: var(--radius); padding: 0 14px; font-family: inherit; font-size: 14px; background: #FAFBFC; margin-bottom: 16px; color: var(--text); transition: border-color 0.15s, box-shadow 0.15s; }
-.login-card input:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(26,95,180,0.1); background: white; outline: none; }
-.btn-login { width: 100%; height: 46px; background: var(--blue); color: white; border: none; border-radius: var(--radius); font-family: inherit; font-size: 14px; font-weight: 700; cursor: pointer; transition: background 0.15s; display: flex; align-items: center; justify-content: center; gap: 8px; }
-.btn-login:hover { background: var(--blue-dark); }
-.login-err { font-size: 12.5px; color: var(--red); background: var(--red-light); border: 1px solid #FECACA; border-radius: 6px; padding: 8px 12px; margin-top: -8px; margin-bottom: 14px; display: none; }
-.login-err.show { display: block; }
-
 /* ─── APP SHELL ─── */
 .app { display: none; min-height: 100vh; }
 .app.visible { display: flex; }
@@ -95,6 +77,8 @@ a.nav-item { display: flex; }
 .role-badge { font-size: 11.5px; font-weight: 700; padding: 4px 12px; border-radius: 20px; letter-spacing: 0.03em; white-space: nowrap; }
 .role-badge.administrator { background: #EEF4FF; color: var(--blue); border: 1px solid #C5D8F5; }
 .role-badge.operator { background: var(--green-light); color: var(--green); border: 1px solid #BBF7D0; }
+.role-badge.keuangan { background: #FFF7ED; color: #C2410C; border: 1px solid #FED7AA; }
+.akun-role-badge.keuangan { background: #FFF7ED; color: #C2410C; }
 
 .page { padding: 24px 20px 64px; }
 
@@ -129,6 +113,8 @@ a.nav-item { display: flex; }
 .kegiatan-item.nonaktif { border-style: dashed; }
 .kegiatan-item.nonaktif .kegiatan-info { opacity: 0.5; }
 .kegiatan-item.nonaktif .kegiatan-actions { opacity: 1; }
+/* Mode keuangan: nonaktif tidak redup */
+.kegiatan-item.nonaktif.keuangan-view .kegiatan-info { opacity: 1; }
 .kegiatan-item:hover { border-color: #b0bec5; }
 .kegiatan-info { flex: 1; min-width: 0; }
 .kegiatan-nama { font-size: 13.5px; font-weight: 700; color: var(--text); margin-bottom: 5px; }
@@ -440,26 +426,6 @@ tbody td:first-child { padding-left: 18px; font-weight: 600; color: var(--text);
 </style>
 </head>
 <body>
-
-<!-- ─── LOGIN ─── -->
-<div class="login-wrap" id="loginWrap">
-  <div class="login-card">
-    <div class="login-brand">
-      <img src="logosma.png" alt="Logo SMA" style="height:52px;width:auto;object-fit:contain;">
-    </div>
-    <div class="login-title">Selamat datang</div>
-    <div class="login-sub">Manajemen Kegiatan – Biodata Kemendikdasmen</div>
-    <label>Username</label>
-    <input type="text" id="loginUser" placeholder="Masukkan username" autocomplete="off">
-    <label>Password</label>
-    <input type="password" id="loginPass" placeholder="••••••••">
-    <div class="login-err" id="loginErr">Username atau password salah.</div>
-    <button class="btn-login" onclick="doLogin()" id="btnLogin">
-      <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:none;stroke:white;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
-      Masuk
-    </button>
-  </div>
-</div>
 
 <!-- ─── APP ─── -->
 <div class="app" id="app">
@@ -799,62 +765,44 @@ window.onload = () => {
   }
   const saved = sessionStorage.getItem('adminUser');
   if (saved) {
-    try { currentUser = JSON.parse(saved); showApp(); } catch { sessionStorage.clear(); }
+    try { currentUser = JSON.parse(saved); }
+    catch { sessionStorage.clear(); window.location.href = 'login.html'; return; }
+  } else {
+    window.location.href = 'login.html';
+    return;
   }
   document.body.style.visibility = 'visible';
+  showApp();
 };
-
-async function doLogin() {
-  const username = document.getElementById('loginUser').value.trim();
-  const pass = document.getElementById('loginPass').value.trim();
-  const errEl = document.getElementById('loginErr');
-  const btn = document.getElementById('btnLogin');
-  errEl.classList.remove('show');
-  if (!username || !pass) { errEl.textContent = 'Isi username dan password.'; errEl.classList.add('show'); return; }
-  btn.disabled = true;
-  btn.innerHTML = '<svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:none;stroke:white;stroke-width:2;stroke-linecap:round;animation:spin 1s linear infinite"><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"/><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"/><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"/></svg> Memeriksa...';
-  try {
-    const hash = await sha256(pass);
-    const res = await sb(`admin_users?username=eq.${encodeURIComponent(username)}&password_hash=eq.${hash}&aktif=eq.true&select=id,username,nama_lengkap,role`);
-    const data = await res.json();
-    if (data.length > 0) {
-      currentUser = data[0];
-      sessionStorage.setItem('adminUser', JSON.stringify(currentUser));
-      showApp();
-    } else {
-      errEl.textContent = 'Username atau password salah.';
-      errEl.classList.add('show');
-    }
-  } catch {
-    errEl.textContent = 'Gagal terhubung ke server.';
-    errEl.classList.add('show');
-  } finally {
-    btn.disabled = false;
-    btn.innerHTML = '<svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:none;stroke:white;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg> Masuk';
-  }
-}
 
 function doLogout() {
   sessionStorage.clear();
-  currentUser = null;
-  document.getElementById('app').classList.remove('visible');
-  document.getElementById('loginWrap').style.display = 'flex';
-  document.getElementById('loginUser').value = '';
-  document.getElementById('loginPass').value = '';
+  window.location.href = 'login.html';
 }
 
 function showApp() {
-  document.getElementById('loginWrap').style.display = 'none';
   document.getElementById('app').classList.add('visible');
   document.getElementById('sidebarUserName').textContent = currentUser.nama_lengkap || currentUser.username;
-  document.getElementById('sidebarUserRole').textContent = currentUser.role === 'administrator' ? 'Administrator' : 'Operator';
+
+  const roleLabels = { administrator: 'Administrator', operator: 'Operator', keuangan: 'Keuangan' };
+  const roleLabel = roleLabels[currentUser.role] || currentUser.role;
+  document.getElementById('sidebarUserRole').textContent = roleLabel;
   const rb = document.getElementById('roleBadge');
-  rb.textContent = currentUser.role === 'administrator' ? 'Administrator' : 'Operator';
+  rb.textContent = roleLabel;
   rb.className = 'role-badge ' + currentUser.role;
-  // Menu Pengaturan hanya untuk administrator
-  if (currentUser.role === 'administrator') {
-    document.getElementById('navPengaturan').style.display = 'flex';
-  }
+
+  const isAdmin = currentUser.role === 'administrator';
+  const isKeuangan = currentUser.role === 'keuangan';
+
+  // Set semua menu secara eksplisit — tidak pakai if, pakai ternary
+  // supaya tidak ada sisa state dari session sebelumnya
+  document.getElementById('navPengaturan').style.display = isAdmin ? 'flex' : 'none';
+  document.getElementById('navKontak').style.display = isKeuangan ? 'none' : 'flex';
+
+  // Form tambah kegiatan: sembunyikan untuk keuangan
+  const formTambah = document.querySelector('#page-kegiatan .card');
+  if (formTambah) formTambah.style.display = isKeuangan ? 'none' : '';
+
   goTo('kegiatan');
 }
 
@@ -911,8 +859,11 @@ function renderKegiatan(items) {
   }
   list.innerHTML = items.map(item => {
     const jumlahPeserta = item.kegiatan_peserta?.[0]?.count ?? 0;
+    const isKeuangan = currentUser && currentUser.role === 'keuangan';
+    // Keuangan: nonaktif tidak redup (tambah class keuangan-view)
+    const nonaktifClass = item.aktif ? '' : (isKeuangan ? 'nonaktif keuangan-view' : 'nonaktif');
     return `
-    <div class="kegiatan-item ${item.aktif ? '' : 'nonaktif'}">
+    <div class="kegiatan-item ${nonaktifClass}">
       <div class="kegiatan-info">
         <div class="kegiatan-nama">${escHtml(item.nama_kegiatan)}</div>
         <div class="kegiatan-meta">
@@ -932,6 +883,7 @@ function renderKegiatan(items) {
           <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
           Lihat Peserta
         </button>
+        ${!isKeuangan ? `
         <button class="btn-sm kegiatan-toggle-btn ${item.aktif ? 'deactivate' : 'activate'}" onclick="toggleKegiatan(${item.id}, ${!item.aktif})" title="${item.aktif ? 'Nonaktifkan kegiatan' : 'Aktifkan kegiatan'}">
           <span class="toggle-track ${item.aktif ? 'on' : 'off'}">
             <span class="toggle-thumb"></span>
@@ -944,6 +896,7 @@ function renderKegiatan(items) {
         <button class="btn-sm danger icon-only" onclick="hapusKegiatan(${item.id}, \`${escHtml(item.nama_kegiatan)}\`)" title="Hapus kegiatan">
           <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
         </button>
+        ` : ''}
       </div>
     </div>
   `}).join('');
@@ -1448,8 +1401,9 @@ function tutupDetailPeserta() {
   document.getElementById('kegiatanList').style.display = '';
   document.querySelector('.section-header').style.display = '';
   document.querySelector('.kegiatan-search-bar').style.display = '';
-  // Tampilkan form tambah kegiatan untuk semua role (operator & admin keduanya boleh)
-  document.querySelector('#page-kegiatan .card').style.display = '';
+  // Tampilkan form tambah kegiatan hanya untuk non-keuangan
+  const isKeuangan = currentUser && currentUser.role === 'keuangan';
+  document.querySelector('#page-kegiatan .card').style.display = isKeuangan ? 'none' : '';
   document.getElementById('topbarTitle').textContent = 'Kegiatan';
   const unduhWrap = document.getElementById('unduhExcelWrap');
   if (unduhWrap) unduhWrap.style.display = 'none';
@@ -1578,7 +1532,7 @@ function renderAkun(items) {
         <div class="akun-nama">${escHtml(item.nama_lengkap || item.username)}</div>
         <div class="akun-username">@${escHtml(item.username)}</div>
       </div>
-      <span class="akun-role-badge ${item.role}">${item.role === 'administrator' ? 'Administrator' : 'Operator'}</span>
+      <span class="akun-role-badge ${item.role}">${item.role === 'administrator' ? 'Administrator' : item.role === 'keuangan' ? 'Keuangan' : 'Operator'}</span>
       <div class="akun-actions">
         ${item.aktif
           ? `<button class="btn-sm deactivate" onclick="toggleAkun(${item.id}, false)">Nonaktifkan</button>`
@@ -1943,10 +1897,6 @@ document.addEventListener('keydown', function(e) {
   }
 });
 
-
-document.getElementById('loginPass').addEventListener('keydown', e => {
-  if (e.key === 'Enter') doLogin();
-});
 
 const style = document.createElement('style');
 style.textContent = '@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }';
