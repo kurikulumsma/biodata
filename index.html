@@ -310,6 +310,102 @@
   #nik[readonly] { background: #F1F5F9; color: #64748B; cursor: not-allowed; border-color: #CBD5E1; }
   .nik-lock-note { font-size: 11.5px; color: var(--gray-text); margin-top: 4px; display: none; }
   .nik-lock-note.show { display: block; }
+
+  /* ── TOOLTIP ── */
+  .label-wrap {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 8px;
+    margin-top: 8px;
+    position: relative;
+  }
+  .label-wrap label {
+    margin: 0 !important;
+    display: inline !important;
+  }
+  .info-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--blue-light);
+    border: 1.5px solid var(--blue-border);
+    cursor: pointer;
+    flex-shrink: 0;
+    position: relative;
+    transition: background 0.15s, border-color 0.15s;
+    -webkit-tap-highlight-color: transparent;
+    outline: none;
+  }
+  .info-btn svg {
+    width: 10px;
+    height: 10px;
+    fill: var(--blue);
+    pointer-events: none;
+  }
+  .info-btn:hover,
+  .info-btn.active {
+    background: var(--blue);
+    border-color: var(--blue);
+  }
+  .info-btn:hover svg,
+  .info-btn.active svg {
+    fill: white;
+  }
+  .tooltip-box {
+    display: none;
+    position: absolute;
+    left: 0;
+    top: calc(100% + 6px);
+    background: #1A1A2E;
+    color: #E2E8F0;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 1.5;
+    padding: 9px 12px;
+    border-radius: 8px;
+    width: max-content;
+    max-width: min(300px, calc(100vw - 48px));
+    z-index: 100;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+    pointer-events: none;
+  }
+  .tooltip-box::before {
+    content: '';
+    position: absolute;
+    top: -6px;
+    left: 12px;
+    width: 0; height: 0;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-bottom: 6px solid #1A1A2E;
+  }
+  /* Show on hover (desktop) */
+  .info-btn:hover + .tooltip-box {
+    display: block;
+  }
+  /* Show on active class (mobile tap) */
+  .info-btn.active + .tooltip-box {
+    display: block;
+  }
+  /* On small screens, prevent tooltip from overflowing right edge */
+  @media (max-width: 560px) {
+    .tooltip-box {
+      max-width: calc(100vw - 48px);
+    }
+  }
+
+  /* ── NIK RESULT SVG icons ── */
+  .nik-result .result-svg {
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+  }
+  .nik-result.found .result-svg { color: #22C55E; }
+  .nik-result.notfound .result-svg { color: #D97706; }
 </style>
 </head>
 <body>
@@ -348,8 +444,11 @@
         <h2>A. Informasi Kegiatan</h2>
       </div>
       <div class="field">
-        <label>Nama Kegiatan <span class="req">*</span></label>
-        <div class="hint">Pastikan memilih kegiatan yang sesuai dengan surat undangan!</div>
+        <div class="label-wrap">
+          <label>Nama Kegiatan <span class="req">*</span></label>
+          <button type="button" class="info-btn" onclick="toggleTooltip(this)" aria-label="Info"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg></button>
+          <div class="tooltip-box">Pastikan memilih kegiatan yang sesuai dengan surat undangan yang Anda terima.</div>
+        </div>
         <select id="nama_kegiatan" onchange="onKegiatanChange()">
           <option value="" disabled selected>-- Memuat daftar kegiatan... --</option>
         </select>
@@ -367,8 +466,11 @@
         <h2>B. Identitas Peserta</h2>
       </div>
       <div class="field">
-        <label>NIK <span class="req">*</span></label>
-        <div class="hint">Nomor Induk Kependudukan 16 digit (tanpa spasi)</div>
+        <div class="label-wrap">
+          <label>NIK <span class="req">*</span></label>
+          <button type="button" class="info-btn" onclick="toggleTooltip(this)" aria-label="Info"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg></button>
+          <div class="tooltip-box">Nomor Induk Kependudukan 16 digit sesuai KTP, tanpa spasi atau tanda baca.</div>
+        </div>
         <div class="nik-input-row">
           <input type="text" id="nikGateInput" placeholder="Contoh: 3XXXXXXXXXXXXXXX" maxlength="16" inputmode="numeric"
             onkeydown="if(event.key==='Enter') cekNIK()">
@@ -396,25 +498,37 @@
         <h2>C. Data Pribadi</h2>
       </div>
       <div class="field">
-        <label>Nama Lengkap <span class="req">*</span></label>
-        <div class="hint">Diisi beserta gelar, akan digunakan juga sebagai sertifikat (jika ada).</div>
+        <div class="label-wrap">
+          <label>Nama Lengkap <span class="req">*</span></label>
+          <button type="button" class="info-btn" onclick="toggleTooltip(this)" aria-label="Info"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg></button>
+          <div class="tooltip-box">Isi lengkap beserta gelar akademik. Nama ini akan digunakan pada sertifikat kegiatan (jika ada).</div>
+        </div>
         <input type="text" id="nama" placeholder="Contoh: Dr. Budi Santoso, M.Pd.">
       </div>
       <div class="field-row">
         <div class="field">
-          <label>NIP <span class="req">*</span></label>
-          <div class="hint">Jika tidak ada, isi dengan tanda ( - )</div>
+          <div class="label-wrap">
+            <label>NIP <span class="req">*</span></label>
+            <button type="button" class="info-btn" onclick="toggleTooltip(this)" aria-label="Info"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg></button>
+            <div class="tooltip-box">Nomor Induk Pegawai. Jika Anda bukan PNS atau tidak memiliki NIP, isi dengan tanda ( - ).</div>
+          </div>
           <input type="text" id="nip" placeholder="19XXXXXXXXXX">
         </div>
         <div class="field">
-          <label>NIK <span class="req">*</span></label>
-          <div class="hint">Terisi otomatis dari input di atas</div>
+          <div class="label-wrap">
+            <label>NIK <span class="req">*</span></label>
+            <button type="button" class="info-btn" onclick="toggleTooltip(this)" aria-label="Info"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg></button>
+            <div class="tooltip-box">Terisi otomatis dari NIK yang sudah Anda masukkan di langkah pertama. Tidak dapat diubah.</div>
+          </div>
           <input type="text" id="nik" placeholder="3XXXXXXXXXXXXXXX" readonly>
         </div>
       </div>
       <div class="field">
-        <label>Pangkat / Golongan <span class="req">*</span></label>
-        <div class="hint">Jika tidak ada, pilih ( - )</div>
+        <div class="label-wrap">
+          <label>Pangkat / Golongan <span class="req">*</span></label>
+          <button type="button" class="info-btn" onclick="toggleTooltip(this)" aria-label="Info"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg></button>
+          <div class="tooltip-box">Pilih golongan kepangkatan Anda (I–IV). Jika tidak memiliki pangkat/golongan (misalnya tendik non-PNS), pilih ( - ).</div>
+        </div>
         <div class="golongan-group">
           <div class="gol-pill"><input type="radio" name="golongan" id="gol-I" value="I"><label for="gol-I">I</label></div>
           <div class="gol-pill"><input type="radio" name="golongan" id="gol-II" value="II"><label for="gol-II">II</label></div>
@@ -425,13 +539,19 @@
       </div>
       <div class="field-row">
         <div class="field">
-          <label>Mata Pelajaran yang Diampu <span class="req">*</span></label>
-          <div class="hint">Untuk guru. Jika tidak ada, isi ( - )</div>
+          <div class="label-wrap">
+            <label>Mata Pelajaran yang Diampu <span class="req">*</span></label>
+            <button type="button" class="info-btn" onclick="toggleTooltip(this)" aria-label="Info"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg></button>
+            <div class="tooltip-box">Isi mata pelajaran yang Anda ampu, contoh: Matematika, Bahasa Indonesia. Jika bukan guru atau tidak ada, isi ( - ).</div>
+          </div>
           <input type="text" id="mapel" placeholder="Contoh: Matematika">
         </div>
         <div class="field">
-          <label>Jabatan <span class="req">*</span></label>
-          <div class="hint">Jika tidak ada, isi ( - )</div>
+          <div class="label-wrap">
+            <label>Jabatan <span class="req">*</span></label>
+            <button type="button" class="info-btn" onclick="toggleTooltip(this)" aria-label="Info"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg></button>
+            <div class="tooltip-box">Jabatan fungsional atau struktural Anda, contoh: Guru Madya, Kepala Sekolah, Pengawas. Jika tidak ada, isi ( - ).</div>
+          </div>
           <input type="text" id="jabatan" placeholder="Contoh: Guru Madya">
         </div>
       </div>
@@ -452,13 +572,19 @@
       </div>
       <div class="field-row">
         <div class="field">
-          <label>NPSN <span class="req">*</span></label>
-          <div class="hint">Jika tidak ada, isi ( - )</div>
+          <div class="label-wrap">
+            <label>NPSN <span class="req">*</span></label>
+            <button type="button" class="info-btn" onclick="toggleTooltip(this)" aria-label="Info"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg></button>
+            <div class="tooltip-box">Nomor Pokok Sekolah Nasional, terdiri dari 8 digit angka. Bisa dicek di data.kemdikbud.go.id. Jika tidak ada, isi ( - ).</div>
+          </div>
           <input type="text" id="npsn" placeholder="8 digit angka NPSN">
         </div>
         <div class="field">
-          <label>Instansi / Unit Kerja <span class="req">*</span></label>
-          <div class="hint">Isi nama instansi.</div>
+          <div class="label-wrap">
+            <label>Instansi / Unit Kerja <span class="req">*</span></label>
+            <button type="button" class="info-btn" onclick="toggleTooltip(this)" aria-label="Info"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg></button>
+            <div class="tooltip-box">Nama sekolah atau unit kerja tempat Anda bertugas. Tulis nama lengkap, contoh: SMA Negeri 1 Jakarta.</div>
+          </div>
           <input type="text" id="instansi" placeholder="Nama sekolah / instansi">
         </div>
       </div>
@@ -467,8 +593,11 @@
         <textarea id="alamat" placeholder="Jl. No. Kecamatan. Kelurahan."></textarea>
       </div>
       <div class="field">
-        <label>No. Telepon Instansi / Unit Kerja <span class="req">*</span></label>
-        <div class="hint">Jika tidak ada, isi ( - )</div>
+        <div class="label-wrap">
+          <label>No. Telepon Instansi / Unit Kerja <span class="req">*</span></label>
+          <button type="button" class="info-btn" onclick="toggleTooltip(this)" aria-label="Info"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg></button>
+          <div class="tooltip-box">Nomor telepon kantor/sekolah, bukan nomor pribadi. Format: 021XXXXXXX. Jika tidak ada, isi ( - ).</div>
+        </div>
         <input type="tel" id="telp_instansi" placeholder="021XXXXXXX" style="max-width:260px">
       </div>
     </div>
@@ -578,6 +707,22 @@
     </button>
   </div>
 </div>
+
+<script>
+// ── TOOLTIP TOGGLE (mobile tap support) ──────────────────────────
+function toggleTooltip(btn) {
+  const isActive = btn.classList.contains('active');
+  // Close all open tooltips
+  document.querySelectorAll('.info-btn.active').forEach(b => b.classList.remove('active'));
+  if (!isActive) btn.classList.add('active');
+}
+// Close tooltip when tapping elsewhere
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.info-btn')) {
+    document.querySelectorAll('.info-btn.active').forEach(b => b.classList.remove('active'));
+  }
+});
+</script>
 
 <script>
 const wilayah = {
@@ -720,17 +865,17 @@ async function cekNIK() {
     if (data && data.length > 0) {
       // Data ditemukan — prefill form
       prefillForm(data[0]);
-      showNikResult('found', `✅ Data ditemukan! Periksa dan koreksi jika ada perubahan.`);
+      showNikResult('found', `Data ditemukan! Periksa dan koreksi jika ada perubahan.`);
     } else {
       // Peserta baru
       clearFormFields();
       document.getElementById('nik').value = nikVal;
-      showNikResult('notfound', `⚠️ Peserta baru terdeteksi. Silakan isi formulir secara lengkap.`);
+      showNikResult('notfound', `Peserta baru terdeteksi. Silakan isi formulir secara lengkap.`);
     }
   } catch(e) {
     clearFormFields();
     document.getElementById('nik').value = nikVal;
-    showNikResult('notfound', `⚠️ Tidak dapat memeriksa data. Silakan isi formulir secara lengkap.`);
+    showNikResult('notfound', `Tidak dapat memeriksa data. Silakan isi formulir secara lengkap.`);
   } finally {
     btn.disabled = false;
     label.textContent = 'Cek Ulang';
@@ -746,8 +891,14 @@ async function cekNIK() {
 function showNikResult(type, text) {
   const el = document.getElementById('nikResult');
   el.className = 'nik-result show ' + type;
-  el.querySelector('#nikResultText').textContent = text;
-  el.querySelector('#nikResultIcon').textContent = '';
+  document.getElementById('nikResultText').textContent = text;
+
+  const iconEl = document.getElementById('nikResultIcon');
+  if (type === 'found') {
+    iconEl.innerHTML = `<svg class="result-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="10" fill="#22C55E"/><polyline points="7,12 10.5,15.5 17,9" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+  } else {
+    iconEl.innerHTML = `<svg class="result-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" fill="#F59E0B"/><line x1="12" y1="9" x2="12" y2="13" stroke="white" stroke-width="2" stroke-linecap="round"/><line x1="12" y1="17" x2="12.01" y2="17" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>`;
+  }
 }
 
 function prefillForm(d) {
