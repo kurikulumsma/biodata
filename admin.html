@@ -17,7 +17,7 @@
   --sidebar-w: 230px; --radius: 8px; --radius-lg: 12px;
   --shadow-sm: 0 1px 3px rgba(0,0,0,0.07); --shadow: 0 4px 16px rgba(0,0,0,0.08);
 }
-body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--gray-bg); color: var(--text); min-height: 100vh; font-size: 14px; visibility: hidden; }
+body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--gray-bg); color: var(--text); min-height: 100vh; font-size: 14px; }
 
 /* ─── APP SHELL ─── */
 .app { display: none; min-height: 100vh; }
@@ -986,11 +986,28 @@ async function loadPeserta() {
   }
 }
 
+let _kopBase64Cache = null;
+async function preloadKopSurat() {
+  if (_kopBase64Cache) return;
+  try {
+    const baseUrl = window.location.href.replace(/[^/]*$/, '');
+    const r = await fetch(baseUrl + 'kopsurat.png');
+    if (!r.ok) return;
+    const blob = await r.blob();
+    _kopBase64Cache = await new Promise(res => {
+      const fr = new FileReader();
+      fr.onload = () => res(fr.result);
+      fr.readAsDataURL(blob);
+    });
+  } catch { /* biarkan null */ }
+}
+
 async function lihatPesertaKegiatan(kegiatanId, namaKegiatan, lokasi) {
   _detailKegiatanId = kegiatanId;
   _detailKegiatanNama = namaKegiatan;
   _detailKegiatanLokasi = lokasi;
   _detailKegiatanTglBuka = '';
+  preloadKopSurat(); // preload di background
   // Sembunyikan list kegiatan, tampilkan panel detail
   document.getElementById('kegiatanList').style.display = 'none';
   document.querySelector('.section-header').style.display = 'none';
@@ -1031,6 +1048,7 @@ function renderDetailPeserta(rows) {
   tbody.innerHTML = rows.map((row) => {
       const p = row.peserta || {};
       const safeId = p.id || '';
+      const pEncoded = btoa(unescape(encodeURIComponent(JSON.stringify(p))));
       return `<tr>
         <td class="td-ts">${escHtml(formatTs(row.created_at))}</td>
         <td style="font-weight:600;color:var(--text)">${escHtml(p.nama || '-')}</td>
@@ -1039,10 +1057,10 @@ function renderDetailPeserta(rows) {
         <td>${escHtml(p.kabkota || '-')}</td>
         <td>
           <div class="td-actions">
-            <button class="icon-btn-info" title="Lihat detail peserta" onclick='showDetailPeserta(${JSON.stringify(p)})'>
+            <button class="icon-btn-info" title="Lihat detail peserta" data-p="${pEncoded}" onclick="showDetailPesertaFromBtn(this)">
               <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
             </button>
-            <button class="icon-btn-print" title="Cetak / Download PDF biodata" onclick='cetakBiodata(${JSON.stringify(p)}, this)'>
+            <button class="icon-btn-print" title="Cetak / Download PDF biodata" data-p="${pEncoded}" onclick="cetakBiodataFromBtn(this)">
               <svg viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
             </button>
             <button class="icon-btn" title="Hapus dari kegiatan" onclick="hapusPesertaKegiatan(${safeId}, \`${escHtml(p.nama || '')}\`)">
@@ -1073,7 +1091,6 @@ async function hapusPesertaKegiatan(pesertaId, nama) {
 }
 
 async function cetakBiodata(p, btnEl) {
-  // tampilkan badge sudah dicetak
   if (btnEl) {
     const tdActions = btnEl.closest('.td-actions');
     if (tdActions && !tdActions.querySelector('.badge-printed')) {
@@ -1086,20 +1103,16 @@ async function cetakBiodata(p, btnEl) {
   const namaKegiatan = _detailKegiatanNama || '';
   const lokasi = _detailKegiatanLokasi || '';
 
-  // Nama kegiatan murni + ambil tanggal awal dari format "[23-26 April 2026] Nama Kegiatan"
   let namaKegiatanMurni = namaKegiatan;
   let tglPembukaan = '';
   const BULAN_LIST = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
   const bulanRe = BULAN_LIST.join('|');
-  // Strip prefix [tgl] dari nama kegiatan jika ada
   const matchBracket = namaKegiatan.match(/^\[([^\]]+)\]\s*(.*)/);
   if (matchBracket) {
     namaKegiatanMurni = matchBracket[2];
     const range = matchBracket[1];
-    // Format sama bulan: "3-5 Maret 2026" → ambil "3 Maret 2026" (angka SEBELUM tanda -)
-    const mSama = range.match(new RegExp('^(\\d{1,2})[-\u2013]\\d{1,2}\\s+(' + bulanRe + ')\\s+(\\d{4})'));
-    // Format beda bulan: "3 Maret 2026 - 1 April 2026" → ambil "3 Maret 2026"
-    const mBeda = range.match(new RegExp('^(\\d{1,2})\\s+(' + bulanRe + ')\\s+(\\d{4})'));
+    const mSama = range.match(new RegExp('^(\d{1,2})[-–]\d{1,2}\s+(' + bulanRe + ')\s+(\d{4})'));
+    const mBeda = range.match(new RegExp('^(\d{1,2})\s+(' + bulanRe + ')\s+(\d{4})'));
     if (mSama) tglPembukaan = mSama[1] + ' ' + mSama[2] + ' ' + mSama[3];
     else if (mBeda) tglPembukaan = mBeda[1] + ' ' + mBeda[2] + ' ' + mBeda[3];
   }
@@ -1118,147 +1131,39 @@ async function cetakBiodata(p, btnEl) {
 <style>
   @page { size: A4 portrait; margin: 0.5in; }
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: 'Times New Roman', Times, serif;
-    font-size: 12pt;
-    color: #000;
-    background: #fff;
-    line-height: 1.5;
-  }
-  .kop {
-    width: 100%;
-    margin-bottom: 14pt;
-  }
-  .kop img {
-    width: 100%;
-    height: auto;
-    display: block;
-  }
-  .judul {
-    text-align: center;
-    font-size: 14pt;
-    font-weight: bold;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    line-height: 1.5;
-  }
-  .sub-judul {
-    text-align: center;
-    font-size: 14pt;
-    font-weight: bold;
-    text-transform: uppercase;
-    margin-bottom: 16pt;
-    line-height: 1.5;
-  }
-  table.biodata {
-    width: 100%;
-    border-collapse: collapse;
-  }
-  table.biodata td {
-    padding: 3pt 0;
-    vertical-align: top;
-    font-size: 12pt;
-    line-height: 1.8;
-  }
-  table.biodata td.label {
-    width: 42%;
-    padding-right: 8pt;
-  }
-  table.biodata td.sep {
-    width: 4%;
-    text-align: center;
-  }
-  table.biodata td.value {
-    width: 54%;
-  }
-  .ttd-section {
-    margin-top: 32pt;
-    display: flex;
-    justify-content: flex-end;
-  }
-  .ttd-box {
-    text-align: center;
-    width: 200pt;
-    line-height: 1.5;
-  }
-  .ttd-lokasi-tgl {
-    font-size: 12pt;
-    margin-bottom: 60pt;
-  }
-  .ttd-nama {
-    font-size: 12pt;
-    font-weight: bold;
-    display: inline-block;
-    min-width: 180pt;
-  }
+  body { font-family: 'Times New Roman', Times, serif; font-size: 12pt; color: #000; background: #fff; line-height: 1.5; }
+  .kop { width: 100%; margin-bottom: 14pt; }
+  .kop img { width: 100%; height: auto; display: block; }
+  .judul { text-align: center; font-size: 14pt; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; line-height: 1.5; }
+  .sub-judul { text-align: center; font-size: 14pt; font-weight: bold; text-transform: uppercase; margin-bottom: 16pt; line-height: 1.5; }
+  table.biodata { width: 100%; border-collapse: collapse; }
+  table.biodata td { padding: 3pt 0; vertical-align: top; font-size: 12pt; line-height: 1.8; }
+  table.biodata td.label { width: 42%; padding-right: 8pt; }
+  table.biodata td.sep { width: 4%; text-align: center; }
+  table.biodata td.value { width: 54%; }
+  .ttd-section { margin-top: 32pt; display: flex; justify-content: flex-end; }
+  .ttd-box { text-align: center; width: 200pt; line-height: 1.5; }
+  .ttd-lokasi-tgl { font-size: 12pt; margin-bottom: 60pt; }
+  .ttd-nama { font-size: 12pt; font-weight: bold; display: inline-block; min-width: 180pt; }
 </style>
 </head>
 <body>
-  <div class="kop">
-    <img src="kopsurat.png" alt="Kop Surat">
-  </div>
-
+  <div class="kop"><img src="kopsurat.png" alt="Kop Surat"></div>
   <div class="judul">BIODATA PESERTA</div>
   <div class="sub-judul">${f(namaKegiatanMurni)}</div>
-
   <table class="biodata">
-    <tr>
-      <td class="label">Nama</td>
-      <td class="sep">:</td>
-      <td class="value">${f(p.nama)}</td>
-    </tr>
-    <tr>
-      <td class="label">NIP</td>
-      <td class="sep">:</td>
-      <td class="value">${f(p.nip)}</td>
-    </tr>
-    <tr>
-      <td class="label">Pangkat/Golongan</td>
-      <td class="sep">:</td>
-      <td class="value">${f(p.golongan)}</td>
-    </tr>
-    <tr>
-      <td class="label">Jabatan</td>
-      <td class="sep">:</td>
-      <td class="value">${f(p.jabatan)}</td>
-    </tr>
-    <tr>
-      <td class="label">No. HP (WA)</td>
-      <td class="sep">:</td>
-      <td class="value">${f(p.wa)}</td>
-    </tr>
-    <tr>
-      <td class="label">NPWP/NIK</td>
-      <td class="sep">:</td>
-      <td class="value">${f(p.nik)}</td>
-    </tr>
-    <tr>
-      <td class="label">Instansi</td>
-      <td class="sep">:</td>
-      <td class="value">${f(p.instansi)}</td>
-    </tr>
-    <tr>
-      <td class="label">Alamat</td>
-      <td class="sep">:</td>
-      <td class="value">${f(p.alamat)}</td>
-    </tr>
-    <tr>
-      <td class="label">Telepon</td>
-      <td class="sep">:</td>
-      <td class="value">${f(p.telp_instansi)}</td>
-    </tr>
-    <tr>
-      <td class="label">Kabupaten/Kota</td>
-      <td class="sep">:</td>
-      <td class="value">${f(p.kabkota)}</td>
-    </tr>
-    <tr>
-      <td class="label">Provinsi</td>
-      <td class="sep">:</td>
-      <td class="value">${f(p.provinsi)}</td>
-    </tr>
+    <tr><td class="label">Nama</td><td class="sep">:</td><td class="value">${f(p.nama)}</td></tr>
+    <tr><td class="label">NIP</td><td class="sep">:</td><td class="value">${f(p.nip)}</td></tr>
+    <tr><td class="label">Pangkat/Golongan</td><td class="sep">:</td><td class="value">${f(p.golongan)}</td></tr>
+    <tr><td class="label">Jabatan</td><td class="sep">:</td><td class="value">${f(p.jabatan)}</td></tr>
+    <tr><td class="label">No. HP (WA)</td><td class="sep">:</td><td class="value">${f(p.wa)}</td></tr>
+    <tr><td class="label">NPWP/NIK</td><td class="sep">:</td><td class="value">${f(p.nik)}</td></tr>
+    <tr><td class="label">Instansi</td><td class="sep">:</td><td class="value">${f(p.instansi)}</td></tr>
+    <tr><td class="label">Alamat</td><td class="sep">:</td><td class="value">${f(p.alamat)}</td></tr>
+    <tr><td class="label">Telepon</td><td class="sep">:</td><td class="value">${f(p.telp_instansi)}</td></tr>
+    <tr><td class="label">Kabupaten/Kota</td><td class="sep">:</td><td class="value">${f(p.kabkota)}</td></tr>
+    <tr><td class="label">Provinsi</td><td class="sep">:</td><td class="value">${f(p.provinsi)}</td></tr>
   </table>
-
   <div class="ttd-section">
     <div class="ttd-box">
       <div class="ttd-lokasi-tgl">${f(lokasiTanggal)}</div>
@@ -1268,7 +1173,6 @@ async function cetakBiodata(p, btnEl) {
 </body>
 </html>`;
 
-  // Preload kop surat sebagai absolute URL agar tidak gagal di iframe
   const baseUrl = window.location.href.replace(/[^/]*$/, '');
 
   async function getKopBase64() {
@@ -1301,11 +1205,18 @@ async function cetakBiodata(p, btnEl) {
     setTimeout(() => document.body.removeChild(iframe), 1000);
   }, 600);
 }
+function showDetailPesertaFromBtn(btn) {
+  try {
+    const p = JSON.parse(decodeURIComponent(escape(atob(btn.dataset.p))));
+    showDetailPeserta(p);
+  } catch(e) { console.error('showDetailPeserta decode error', e); }
+}
 
-let _editPesertaId = null;
-
-function tutupDetailPesertaModal() {
-  document.getElementById('modalDetailOverlay').classList.remove('show');
+function cetakBiodataFromBtn(btn) {
+  try {
+    const p = JSON.parse(decodeURIComponent(escape(atob(btn.dataset.p))));
+    cetakBiodata(p, btn);
+  } catch(e) { console.error('cetakBiodata decode error', e); }
 }
 
 function showDetailPeserta(p) {
