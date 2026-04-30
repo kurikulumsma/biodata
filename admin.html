@@ -1237,6 +1237,10 @@ function showDetailPeserta(p) {
   document.getElementById('modalDetailOverlay').classList.add('show');
 }
 
+function tutupDetailPesertaModal() {
+  document.getElementById('modalDetailOverlay').classList.remove('show');
+}
+
 async function simpanEditPeserta() {
   if (!_editPesertaId) { tutupDetailPesertaModal(); return; }
   const KEYS = ['nama','nip','golongan','nik','mapel','instansi','jabatan','wa','provinsi','kabkota','alamat','telp_instansi'];
