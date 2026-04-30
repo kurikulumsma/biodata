@@ -555,9 +555,19 @@
           <input type="text" id="jabatan" placeholder="Contoh: Guru Madya">
         </div>
       </div>
-      <div class="field">
-        <label>Nomor Telepon (WhatsApp) <span class="req">*</span></label>
-        <input type="tel" id="wa" placeholder="Contoh: 081234567890" style="max-width:300px">
+      <div class="field-row">
+        <div class="field">
+          <label>Nomor Telepon (WhatsApp) <span class="req">*</span></label>
+          <input type="tel" id="wa" placeholder="Contoh: 081234567890">
+        </div>
+        <div class="field">
+          <div class="label-wrap">
+            <label>Email <span class="req">*</span></label>
+            <button type="button" class="info-btn" onclick="toggleTooltip(this)" aria-label="Info"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg></button>
+            <div class="tooltip-box">Alamat email aktif yang bisa dihubungi. Akan digunakan untuk keperluan komunikasi kegiatan.</div>
+          </div>
+          <input type="email" id="email" placeholder="Contoh: budi@gmail.com">
+        </div>
       </div>
     </div>
   </div>
@@ -685,6 +695,7 @@
         <div class="summary-row"><span class="summary-label">Mata Pelajaran</span><span class="summary-value" id="sum_mapel">-</span></div>
         <div class="summary-row"><span class="summary-label">Jabatan</span><span class="summary-value" id="sum_jabatan">-</span></div>
         <div class="summary-row"><span class="summary-label">No. WhatsApp</span><span class="summary-value" id="sum_wa">-</span></div>
+        <div class="summary-row"><span class="summary-label">Email</span><span class="summary-value" id="sum_email">-</span></div>
       </div>
     </div>
 
@@ -912,6 +923,7 @@ function prefillForm(d) {
   setVal('mapel', d.mapel);
   setVal('jabatan', d.jabatan);
   setVal('wa', d.wa);
+  setVal('email', d.email);
   setVal('npsn', d.npsn);
   setVal('instansi', d.instansi);
   setVal('alamat', d.alamat);
@@ -949,7 +961,7 @@ function clearFormFields() {
 // ────────────────────────────────────────────────────────────────
 
 async function submitForm() {
-  const ids = ['nama','nip','nik','mapel','jabatan','wa','npsn','instansi','alamat','telp_instansi','provinsi','kabkota'];
+  const ids = ['nama','nip','nik','mapel','jabatan','wa','email','npsn','instansi','alamat','telp_instansi','provinsi','kabkota'];
   let valid = true;
 
   const kegEl = document.getElementById('nama_kegiatan');
@@ -990,6 +1002,7 @@ async function submitForm() {
     mapel: document.getElementById('mapel').value,
     jabatan: document.getElementById('jabatan').value,
     wa: document.getElementById('wa').value,
+    email: document.getElementById('email').value,
     npsn: document.getElementById('npsn').value,
     instansi: document.getElementById('instansi').value,
     alamat: document.getElementById('alamat').value,
@@ -1075,6 +1088,7 @@ function tampilkanSukses(d) {
   document.getElementById('sum_mapel').textContent = d.mapel;
   document.getElementById('sum_jabatan').textContent = d.jabatan;
   document.getElementById('sum_wa').textContent = d.wa;
+  document.getElementById('sum_email').textContent = d.email;
   document.getElementById('sum_npsn').textContent = d.npsn;
   document.getElementById('sum_instansi').textContent = d.instansi;
   document.getElementById('sum_alamat').textContent = d.alamat;
