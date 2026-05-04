@@ -15,8 +15,9 @@
   --radius: 8px;
   --shadow: 0 4px 16px rgba(0,0,0,0.08);
 }
-body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--gray-bg); color: var(--text); min-height: 100vh; font-size: 14px; }
-.login-wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; background: var(--gray-bg); }
+body { font-family: 'Plus Jakarta Sans', sans-serif; background: #0c1e3c; color: var(--text); min-height: 100vh; font-size: 14px; }
+#particle-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+.login-wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; position: relative; z-index: 1; }
 .login-card { background: var(--white); border-radius: 18px; border: 1px solid var(--gray-border); padding: 44px 40px; width: 100%; max-width: 380px; box-shadow: var(--shadow); }
 .login-brand { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 28px; }
 .login-title { font-size: 20px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
@@ -34,13 +35,14 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--gray-bg);
 </head>
 <body>
 
+<canvas id="particle-canvas"></canvas>
 <div class="login-wrap">
   <div class="login-card">
     <div class="login-brand">
       <img src="logosma.png" alt="Logo SMA" style="height:52px;width:auto;object-fit:contain;">
     </div>
     <div class="login-title">Selamat datang</div>
-    <div class="login-sub">Manajemen Kegiatan – Biodata Kemendikdasmen</div>
+    <div class="login-sub">Manajemen kegiatan Direktorat Sekolah Menengah Atas</div>
     <label>Username</label>
     <input type="text" id="loginUser" placeholder="Masukkan username" autocomplete="off">
     <label>Password</label>
@@ -130,6 +132,78 @@ document.getElementById('loginPass').addEventListener('keydown', e => {
 const style = document.createElement('style');
 style.textContent = '@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }';
 document.head.appendChild(style);
+</script>
+
+<script>
+(function() {
+  const canvas = document.getElementById('particle-canvas');
+  const ctx = canvas.getContext('2d');
+  let W, H, particles = [], animId;
+
+  const DOT_COLOR   = 'rgba(100,170,255,';
+  const LINE_COLOR  = 'rgba(80,150,240,';
+  const BG_COLOR    = '#0c1e3c';
+  const COUNT       = 70;
+  const MAX_DIST    = 130;
+  const SPEED       = 0.35;
+
+  function resize() {
+    W = canvas.width  = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+
+  function mkP() {
+    return {
+      x: Math.random() * W,
+      y: Math.random() * H,
+      vx: (Math.random() - 0.5) * SPEED,
+      vy: (Math.random() - 0.5) * SPEED,
+      r: Math.random() * 1.2 + 0.6
+    };
+  }
+
+  function init() {
+    resize();
+    particles = Array.from({ length: COUNT }, mkP);
+  }
+
+  function draw() {
+    ctx.fillStyle = BG_COLOR;
+    ctx.fillRect(0, 0, W, H);
+
+    for (let i = 0; i < particles.length; i++) {
+      const p = particles[i];
+      p.x += p.vx; p.y += p.vy;
+      if (p.x < 0 || p.x > W) p.vx *= -1;
+      if (p.y < 0 || p.y > H) p.vy *= -1;
+
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = DOT_COLOR + '0.7)';
+      ctx.fill();
+
+      for (let j = i + 1; j < particles.length; j++) {
+        const q = particles[j];
+        const dx = p.x - q.x, dy = p.y - q.y;
+        const d = Math.sqrt(dx * dx + dy * dy);
+        if (d < MAX_DIST) {
+          const alpha = (1 - d / MAX_DIST) * 0.35;
+          ctx.beginPath();
+          ctx.moveTo(p.x, p.y);
+          ctx.lineTo(q.x, q.y);
+          ctx.strokeStyle = LINE_COLOR + alpha + ')';
+          ctx.lineWidth = 0.6;
+          ctx.stroke();
+        }
+      }
+    }
+    animId = requestAnimationFrame(draw);
+  }
+
+  window.addEventListener('resize', () => { resize(); });
+  init();
+  draw();
+})();
 </script>
 </body>
 </html>
