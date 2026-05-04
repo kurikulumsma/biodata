@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Database Peserta – Admin Panel</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
@@ -77,7 +78,25 @@ a.nav-item { display: flex; }
 
 /* ─── FILTER BAR ─── */
 .filter-bar { display: flex; gap: 10px; margin-bottom: 14px; align-items: center; flex-wrap: wrap; }
+.filter-bar-right { margin-left: auto; display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.btn-unduh-excel { height: 38px; padding: 0 14px; background: var(--white); border: 1.5px solid var(--gray-border); border-radius: var(--radius); font-family: inherit; font-size: 13px; font-weight: 600; color: var(--green); cursor: pointer; display: flex; align-items: center; gap: 7px; transition: all 0.15s; white-space: nowrap; }
+.btn-unduh-excel:hover { background: var(--green-light); border-color: #86EFAC; }
+.btn-unduh-excel svg { width: 16px; height: 16px; stroke: var(--green); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
 .badge-count { background: var(--blue-light); color: var(--blue); font-size: 11px; font-weight: 700; padding: 2px 9px; border-radius: 20px; white-space: nowrap; }
+
+/* ─── SYNC BADGE (timestamp) ─── */
+.sync-badge { display: inline-flex; align-items: center; gap: 4px; background: var(--blue-light); border: 1px solid #C5D8F5; border-radius: 6px; padding: 3px 8px; font-size: 11.5px; font-weight: 600; color: var(--blue); white-space: nowrap; }
+.sync-badge svg { width: 11px; height: 11px; stroke: var(--blue); fill: none; stroke-width: 2; stroke-linecap: round; flex-shrink: 0; }
+
+/* ─── PAGINATION ─── */
+.pagination-wrap { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 16px; background: var(--white); border-top: 1px solid var(--gray-border); border-radius: 0 0 var(--radius-lg) var(--radius-lg); flex-wrap: wrap; }
+.pagination-info { font-size: 12.5px; color: var(--gray-text); white-space: nowrap; }
+.pagination-nav { display: flex; align-items: center; gap: 4px; }
+.pg-btn { height: 32px; min-width: 32px; padding: 0 8px; border: 1.5px solid var(--gray-border); background: var(--white); border-radius: 6px; font-family: inherit; font-size: 12.5px; font-weight: 600; color: var(--text-soft); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px; transition: all 0.15s; white-space: nowrap; }
+.pg-btn:hover:not(:disabled) { border-color: var(--blue); color: var(--blue); background: var(--blue-light); }
+.pg-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.pg-btn.active { background: var(--blue); border-color: var(--blue); color: white; }
+.pg-btn svg { width: 13px; height: 13px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 
 /* ─── TABLE ─── */
 .table-outer { overflow-x: auto; border-radius: var(--radius-lg); border: 1px solid var(--gray-border); box-shadow: var(--shadow-sm); }
@@ -269,6 +288,12 @@ tbody td:first-child { padding-left: 18px; font-weight: 600; color: var(--text);
       <div class="filter-bar">
         <input type="text" id="searchPeserta" placeholder="Cari nama peserta..." oninput="applyTableFilters()" style="height:38px;border:1.5px solid var(--gray-border);border-radius:var(--radius);padding:0 13px;font-family:inherit;font-size:13px;background:var(--white);min-width:260px;color:var(--text);transition:border-color 0.15s;outline:none;" onfocus="this.style.borderColor='var(--blue)'" onblur="this.style.borderColor='var(--gray-border)'">
         <span class="badge-count" id="badgePeserta">0</span>
+        <div class="filter-bar-right" id="filterBarRight">
+          <button class="btn-unduh-excel" onclick="unduhExcel()">
+            <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Unduh Excel
+          </button>
+        </div>
       </div>
 
       <div class="table-outer" id="pesertaTableOuter">
@@ -280,6 +305,11 @@ tbody td:first-child { padding-left: 18px; font-weight: 600; color: var(--text);
             <tr><td colspan="16" class="td-loading">Memuat data...</td></tr>
           </tbody>
         </table>
+        <!-- Pagination bawah di dalam table-outer, scroll horizontal ikut tabel -->
+        <div class="pagination-wrap" id="paginationWrap" style="display:none; position:sticky; left:0; min-width:100%; width:max-content;">
+          <span class="pagination-info" id="paginationInfo">—</span>
+          <div class="pagination-nav" id="paginationNav"></div>
+        </div>
       </div>
     </div>
   </div>
@@ -343,6 +373,9 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 // ─── STATE ───
 let currentUser = null;
 let allPeserta = [];
+let filteredPeserta = [];
+let currentPage = 1;
+let perPage = 20;
 
 // ─── SUPABASE HELPER ───
 const sb = (path, opts = {}) => fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
@@ -398,6 +431,8 @@ function showApp() {
   rb.textContent = roleLabels[currentUser.role] || currentUser.role;
   rb.className = 'role-badge ' + currentUser.role;
   document.getElementById('navPengaturan').style.display = currentUser.role === 'administrator' ? 'flex' : 'none';
+  const filterBarRight = document.getElementById('filterBarRight');
+  if (filterBarRight) filterBarRight.style.display = currentUser.role === 'administrator' ? 'flex' : 'none';
   loadPeserta();
 }
 
@@ -415,7 +450,7 @@ function closeSidebar() {
 
 // ─── KOLOM TABEL ───
 const TABLE_COLS = [
-  { key: 'created_at',    label: 'Timestamp' },
+  { key: 'created_at',    label: 'Update Terakhir' },
   { key: 'nama',          label: 'Nama Lengkap' },
   { key: 'nip',           label: 'NIP' },
   { key: 'golongan',      label: 'Pangkat/Golongan' },
@@ -424,6 +459,7 @@ const TABLE_COLS = [
   { key: 'instansi',      label: 'Instansi/Unit Kerja' },
   { key: 'jabatan',       label: 'Jabatan' },
   { key: 'wa',            label: 'Nomor Telepon (WhatsApp)' },
+  { key: 'email',         label: 'Email' },
   { key: 'provinsi',      label: 'Provinsi' },
   { key: 'kabkota',       label: 'Kabupaten/Kota' },
   { key: 'alamat',        label: 'Alamat Instansi/Unit Kerja' },
@@ -454,9 +490,41 @@ async function loadPeserta() {
 
 function applyTableFilters() {
   const q = (document.getElementById('searchPeserta')?.value || '').trim().toLowerCase();
-  const items = q ? allPeserta.filter(p => (p.nama || '').toLowerCase().includes(q)) : [...allPeserta];
-  document.getElementById('badgePeserta').textContent = items.length;
-  renderPeserta(items);
+  filteredPeserta = q ? allPeserta.filter(p => (p.nama || '').toLowerCase().includes(q)) : [...allPeserta];
+  document.getElementById('badgePeserta').textContent = filteredPeserta.length;
+  currentPage = 1;
+  renderPeserta(filteredPeserta);
+}
+
+function unduhExcel() {
+  if (!filteredPeserta.length) { showToast('Tidak ada data untuk diunduh.', 'error'); return; }
+  const HEADERS = ['No','Update Terakhir','Nama Lengkap','NIP','Pangkat/Golongan','NIK','Mata Pelajaran','Instansi/Unit Kerja','Jabatan','No. WhatsApp','Email','Provinsi','Kabupaten/Kota','Alamat Instansi','Telepon Instansi'];
+  const rows = filteredPeserta.map((p, i) => [
+    i+1,
+    formatTs(p.created_at), p.nama||'', p.nip||'', p.golongan||'', p.nik||'',
+    p.mapel||'', p.instansi||'', p.jabatan||'', p.wa||'', p.email||'',
+    p.provinsi||'', p.kabkota||'', p.alamat||'', p.telp_instansi||''
+  ]);
+
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.aoa_to_sheet([HEADERS, ...rows]);
+  // Set lebar kolom otomatis berdasarkan konten
+  const colWidths = HEADERS.map((h, ci) => {
+    const maxLen = Math.max(h.length, ...rows.map(r => String(r[ci]||'').length));
+    return { wch: Math.min(maxLen + 2, 50) };
+  });
+  ws['!cols'] = colWidths;
+  XLSX.utils.book_append_sheet(wb, ws, 'Database Peserta');
+  XLSX.writeFile(wb, 'Database Peserta.xlsx');
+  showToast('File Excel berhasil diunduh.', 'success');
+}
+
+function goToPage(page) {
+  const totalPages = Math.ceil(filteredPeserta.length / perPage);
+  if (page < 1 || page > totalPages) return;
+  currentPage = page;
+  renderPeserta(filteredPeserta);
+  document.getElementById('pesertaTableOuter').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 function formatTs(ts) {
@@ -464,7 +532,7 @@ function formatTs(ts) {
   try {
     const d = new Date(ts);
     const pad = n => String(n).padStart(2, '0');
-    return `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    return `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()}`;
   } catch { return ts; }
 }
 
@@ -472,16 +540,28 @@ function renderPeserta(items) {
   const tbody = document.getElementById('pesertaTbody');
   if (!items.length) {
     tbody.innerHTML = `<tr><td colspan="16" class="td-empty">Belum ada peserta terdaftar.</td></tr>`;
+    document.getElementById('paginationWrap').style.display = 'none';
     return;
   }
+  const totalPages = Math.ceil(items.length / perPage);
+  if (currentPage > totalPages) currentPage = totalPages;
+  const start = (currentPage - 1) * perPage;
+  const end = start + perPage;
+  const pageItems = items.slice(start, end);
+
   const isAdmin = currentUser && currentUser.role === 'administrator';
   function tdTrunc(val, maxW) {
     const v = val || '-';
     return `<td class="td-truncate" style="max-width:${maxW}px" title="${escHtml(v)}">${escHtml(v)}</td>`;
   }
-  tbody.innerHTML = items.map(item => `
+  tbody.innerHTML = pageItems.map(item => `
     <tr>
-      <td class="td-ts">${escHtml(formatTs(item.created_at))}</td>
+      <td style="white-space:nowrap;">
+        <span class="sync-badge">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          ${escHtml(formatTs(item.created_at))}
+        </span>
+      </td>
       <td>${escHtml(item.nama || '-')}</td>
       <td>${escHtml(item.nip || '-')}</td>
       <td>${escHtml(item.golongan || '-')}</td>
@@ -490,6 +570,7 @@ function renderPeserta(items) {
       ${tdTrunc(item.instansi, 180)}
       ${tdTrunc(item.jabatan, 140)}
       <td>${escHtml(item.wa || '-')}</td>
+      <td>${escHtml(item.email || '-')}</td>
       <td>${escHtml(item.provinsi || '-')}</td>
       <td>${escHtml(item.kabkota || '-')}</td>
       ${tdTrunc(item.alamat, 180)}
@@ -509,7 +590,61 @@ function renderPeserta(items) {
       </td>
     </tr>
   `).join('');
+
+  renderPagination(items.length, totalPages);
 }
+
+function renderPagination(total, totalPages) {
+  const paginationWrap = document.getElementById('paginationWrap');
+  const paginationInfo = document.getElementById('paginationInfo');
+  const paginationNav = document.getElementById('paginationNav');
+
+  if (totalPages <= 1) {
+    paginationWrap.style.display = 'none';
+    return;
+  }
+  paginationWrap.style.display = 'flex';
+  paginationInfo.textContent = `Halaman ${currentPage} dari ${totalPages.toLocaleString('id')}`;
+
+  let nav = '';
+  nav += `<button class="pg-btn" ${currentPage===1?'disabled':''} onclick="goToPage(${currentPage-1})">
+    <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+  </button>`;
+
+  const pages = getPageRange(currentPage, totalPages);
+  pages.forEach(p => {
+    if (p === '...') {
+      nav += `<span style="display:flex;align-items:center;padding:0 4px;color:var(--gray-mid);font-size:13px;">…</span>`;
+    } else {
+      nav += `<button class="pg-btn${p===currentPage?' active':''}" onclick="goToPage(${p})">${p}</button>`;
+    }
+  });
+
+  nav += `<button class="pg-btn" ${currentPage===totalPages?'disabled':''} onclick="goToPage(${currentPage+1})">
+    <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+  </button>`;
+
+  paginationNav.innerHTML = nav;
+}
+
+function getPageRange(current, total) {
+  if (total <= 7) return Array.from({length: total}, (_,i) => i+1);
+  const result = [];
+  if (current <= 4) {
+    for (let i = 1; i <= 5; i++) result.push(i);
+    result.push('...'); result.push(total);
+  } else if (current >= total - 3) {
+    result.push(1); result.push('...');
+    for (let i = total-4; i <= total; i++) result.push(i);
+  } else {
+    result.push(1); result.push('...');
+    result.push(current-1); result.push(current); result.push(current+1);
+    result.push('...'); result.push(total);
+  }
+  return result;
+}
+
+function updatePaginationUI() {} // deprecated, kept for safety
 
 async function hapusPeserta(id, nama) {
   const ok = await showConfirm('Hapus Peserta', `Hapus data peserta "<strong>${escHtml(nama)}</strong>"? Tindakan ini tidak bisa dibatalkan.`);
@@ -530,7 +665,7 @@ function showDetailPeserta(p) {
   const LABELS = [
     ['nama','Nama Lengkap'],['nip','NIP'],['golongan','Pangkat/Golongan'],
     ['nik','NIK'],['mapel','Mata Pelajaran'],['instansi','Instansi/Unit Kerja'],
-    ['jabatan','Jabatan'],['wa','No. WhatsApp'],['provinsi','Provinsi'],
+    ['jabatan','Jabatan'],['wa','No. WhatsApp'],['email','Email'],['provinsi','Provinsi'],
     ['kabkota','Kabupaten/Kota'],['alamat','Alamat Instansi'],['telp_instansi','Telepon Instansi']
   ];
   const rows = LABELS.map(([k,l]) => `
