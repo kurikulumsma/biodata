@@ -138,13 +138,17 @@ a.nav-item { display: flex; }
 .npsn-hint { font-size: 11.5px; color: var(--gray-text); margin-top: 5px; }
 
 /* ─── TABEL KONTAK ─── */
-.table-outer { border-radius: var(--radius-lg); border: 1px solid var(--gray-border); overflow: auto; background: var(--white); box-shadow: var(--shadow-sm); }
-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-thead { background: var(--gray-bg); }
-th { padding: 10px 14px; text-align: left; font-size: 11.5px; font-weight: 700; color: var(--gray-text); white-space: nowrap; border-bottom: 1px solid var(--gray-border); letter-spacing: 0.03em; text-transform: uppercase; }
-td { padding: 11px 14px; border-bottom: 1px solid #F3F4F6; vertical-align: middle; }
-tr:last-child td { border-bottom: none; }
-tr:hover td { background: var(--blue-faint); }
+.table-outer { overflow-x: auto; border-radius: var(--radius-lg); border: 1px solid var(--gray-border); box-shadow: var(--shadow-sm); }
+table { width: 100%; border-collapse: collapse; background: var(--white); font-size: 13px; }
+thead tr { background: #F8FAFC; border-bottom: 1.5px solid var(--gray-border); }
+thead th { padding: 0; text-align: left; font-size: 11.5px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--gray-text); white-space: nowrap; position: relative; user-select: none; }
+thead th:first-child .th-inner { padding-left: 18px; }
+.th-inner { display: flex; align-items: center; gap: 4px; padding: 10px 12px; }
+tbody tr { border-bottom: 1px solid #F1F3F7; transition: background 0.1s; }
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: var(--blue-faint); }
+tbody td { padding: 10px 12px; color: var(--text-soft); vertical-align: middle; white-space: nowrap; }
+tbody td:first-child { padding-left: 18px; }
 .td-npsn { font-family: monospace; font-size: 12.5px; font-weight: 700; color: var(--blue); }
 .td-truncate { max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: default; position: relative; }
 .td-truncate[title]:hover::after {
@@ -191,6 +195,19 @@ tr:hover td { background: var(--blue-faint); }
 
 /* ─── FILTER ACTIONS ─── */
 .filter-actions { display: flex; align-items: center; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
+
+/* ─── FILTER BAR (atas tabel) ─── */
+.filter-bar-top { display: flex; align-items: center; justify-content: flex-end; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+.btn-unduh-excel { height: 38px; padding: 0 14px; background: var(--white); border: 1.5px solid var(--gray-border); border-radius: var(--radius); font-family: inherit; font-size: 13px; font-weight: 600; color: var(--green); cursor: pointer; display: flex; align-items: center; gap: 7px; transition: all 0.15s; white-space: nowrap; }
+.btn-unduh-excel:hover { background: var(--green-light); border-color: #86EFAC; }
+.btn-unduh-excel svg { width: 16px; height: 16px; stroke: var(--green); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
+.btn-reset-filter { height: 38px; padding: 0 14px; background: var(--white); border: 1.5px solid var(--gray-border); border-radius: var(--radius); font-family: inherit; font-size: 13px; font-weight: 600; color: var(--text-soft); cursor: pointer; display: flex; align-items: center; gap: 7px; transition: all 0.15s; white-space: nowrap; }
+.btn-reset-filter:hover { border-color: #9CA3AF; background: var(--gray-bg); }
+.btn-reset-filter svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
+.btn-salin-tabel { height: 38px; padding: 0 14px; background: var(--white); border: 1.5px solid var(--gray-border); border-radius: var(--radius); font-family: inherit; font-size: 13px; font-weight: 600; color: var(--text-soft); cursor: pointer; display: flex; align-items: center; gap: 7px; transition: all 0.15s; white-space: nowrap; }
+.btn-salin-tabel:hover { border-color: var(--blue); color: var(--blue); background: var(--blue-light); }
+.btn-salin-tabel svg { width: 15px; height: 15px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
+.btn-salin-tabel.copied { border-color: var(--green); color: var(--green); background: var(--green-light); }
 
 /* ─── UPLOAD ZONE ─── */
 .upload-zone { border: 2px dashed var(--gray-border); border-radius: var(--radius); padding: 32px 20px; text-align: center; cursor: pointer; transition: all 0.15s; background: #FAFBFC; }
@@ -409,52 +426,52 @@ tr:hover td { background: var(--blue-faint); }
           </div>
 
           <div class="filter-actions">
-            <button class="btn-primary" onclick="resetFilters()" title="Reset semua filter" style="gap:6px;height:36px;padding:0 16px;font-size:13px;">
-              <svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:none;stroke:white;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
-              Reset Filter
-            </button>
             <span class="badge-count" id="badgeKontak" style="margin-left:4px;">0</span>
             <span style="font-size:12px;color:var(--gray-text);">hasil</span>
           </div>
         </div>
 
+        <!-- Filter bar atas tabel -->
+        <div class="filter-bar-top" id="filterBarTop" style="display:none;">
+          <button class="btn-reset-filter" onclick="resetFilters()">
+            <svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+            Reset Filter
+          </button>
+          <button class="btn-salin-tabel" id="btnSalinTabel" onclick="salinTabel(this)">
+            <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            Salin Tabel
+          </button>
+          <button class="btn-unduh-excel" onclick="downloadExcel()">
+            <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Unduh Excel
+          </button>
+        </div>
+
         <!-- Tabel hasil -->
         <div class="table-outer">
-          <div style="padding:10px 14px 0;">
-            <span style="font-size:12px;color:var(--gray-text);" id="tabelInfo">—</span>
-          </div>
           <table>
             <thead>
               <tr>
-                <th>Sync Terakhir</th>
-                <th></th>
-                <th>NPSN</th>
-                <th style="min-width:220px;">Nama Sekolah</th>
-                <th style="min-width:180px;">Provinsi</th>
-                <th>Kabupaten/Kota</th>
-                <th>Kepala Sekolah</th>
-                <th>No. Telp Sekolah</th>
-                <th>Nama Operator</th>
-                <th>HP Operator</th>
-                <th></th>
+                <th><div class="th-inner" style="padding-left:18px;">Sync Terakhir</div></th>
+                <th><div class="th-inner">Salin</div></th>
+                <th><div class="th-inner">NPSN</div></th>
+                <th style="min-width:220px;"><div class="th-inner">Nama Sekolah</div></th>
+                <th style="min-width:180px;"><div class="th-inner">Provinsi</div></th>
+                <th><div class="th-inner">Kabupaten/Kota</div></th>
+                <th><div class="th-inner">Kepala Sekolah</div></th>
+                <th><div class="th-inner">No. Telp Sekolah</div></th>
+                <th><div class="th-inner">Nama Operator</div></th>
+                <th><div class="th-inner">HP Operator</div></th>
+              </tr>
             </thead>
             <tbody id="kontakTbody">
-              <tr><td colspan="11" class="td-loading">Muat data dari Pengaturan terlebih dahulu.</td></tr>
+              <tr><td colspan="10" class="td-loading">Muat data dari Pengaturan terlebih dahulu.</td></tr>
             </tbody>
           </table>
-          <div class="pagination-wrap" id="paginationWrap" style="display:none;">
+          <div class="pagination-wrap" id="paginationWrap" style="display:none; position:sticky; left:0; min-width:100%; width:max-content;">
             <span class="pagination-info" id="paginationInfo">—</span>
             <div class="pagination-nav" id="paginationNav"></div>
           </div>
-        </div>
-
-        <!-- Tombol download Excel -->
-        <div style="margin-top:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-          <button class="btn-secondary" id="btnDownloadExcel" onclick="downloadExcel()" style="display:none;">
-            <svg viewBox="0 0 24 24" style="width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-            Unduh Excel
-          </button>
-          <span id="downloadInfo" style="font-size:12px;color:var(--gray-text);"></span>
         </div>
       </div>
 
@@ -490,7 +507,7 @@ let allKontakData = [];
 let filteredKontakData = [];
 let npsnChips = [];
 let currentPage = 1;
-const PAGE_SIZE = 50;
+const PAGE_SIZE = 20;
 
 // ─── SUPABASE HELPER ───
 const sb = (path, opts = {}) => fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
@@ -577,9 +594,9 @@ function initKontakPage() {
 }
 
 async function loadKontakData() {
-  document.getElementById('kontakTbody').innerHTML = '<tr><td colspan="11" class="td-loading"><svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;animation:spin 1s linear infinite;vertical-align:middle;margin-right:6px;"><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"/><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"/><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"/></svg>Memuat data dari Supabase...</td></tr>';
+  document.getElementById('kontakTbody').innerHTML = '<tr><td colspan="10" class="td-loading"><svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;animation:spin 1s linear infinite;vertical-align:middle;margin-right:6px;"><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"/><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"/><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"/></svg>Memuat data dari Supabase...</td></tr>';
   document.getElementById('paginationWrap').style.display = 'none';
-  document.getElementById('tabelInfo').textContent = 'Memuat...';
+  document.getElementById('filterBarTop').style.display = 'none';
   try {
     let all = [], from = 0, batchSize = 1000;
     while (true) {
@@ -592,7 +609,7 @@ async function loadKontakData() {
     }
     if (!all.length) {
       document.getElementById('sheetBanner').style.display = 'flex';
-      document.getElementById('kontakTbody').innerHTML = '<tr><td colspan="11" class="td-loading">Belum ada data sekolah.</td></tr>';
+      document.getElementById('kontakTbody').innerHTML = '<tr><td colspan="10" class="td-loading">Belum ada data sekolah.</td></tr>';
       return;
     }
     document.getElementById('sheetBanner').style.display = 'none';
@@ -602,7 +619,7 @@ async function loadKontakData() {
     applyFilters();
     showToast(`${all.length.toLocaleString('id')} data berhasil dimuat.`, 'success');
   } catch(e) {
-    document.getElementById('kontakTbody').innerHTML = `<tr><td colspan="11" class="td-loading">Gagal memuat data: ${escHtml(e.message)}</td></tr>`;
+    document.getElementById('kontakTbody').innerHTML = `<tr><td colspan="10" class="td-loading">Gagal memuat data: ${escHtml(e.message)}</td></tr>`;
     showToast('Gagal memuat data.', 'error');
   }
 }
@@ -645,15 +662,14 @@ function applyFilters() {
     document.getElementById('badgeKontak').textContent = 0;
     currentPage = 1;
     const tbody = document.getElementById('kontakTbody');
-    tbody.innerHTML = `<tr><td colspan="11" class="td-empty">
+    tbody.innerHTML = `<tr><td colspan="10" class="td-empty">
       <div class="empty-state">
         <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
         Gunakan filter di atas untuk menampilkan data.
       </div>
     </td></tr>`;
     document.getElementById('paginationWrap').style.display = 'none';
-    document.getElementById('tabelInfo').textContent = '—';
-    document.getElementById('btnDownloadExcel').style.display = 'none';
+    document.getElementById('filterBarTop').style.display = 'none';
     return;
   }
 
@@ -682,28 +698,26 @@ function formatTglSync(val) {
 function renderKontakTable(items) {
   const tbody = document.getElementById('kontakTbody');
   const paginationWrap = document.getElementById('paginationWrap');
-  const tabelInfo = document.getElementById('tabelInfo');
 
   if (!items.length) {
-    tbody.innerHTML = `<tr><td colspan="11" class="td-empty">
+    tbody.innerHTML = `<tr><td colspan="10" class="td-empty">
       <div class="empty-state">
         <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
         Tidak ada data yang sesuai filter.
       </div>
     </td></tr>`;
     paginationWrap.style.display = 'none';
-    tabelInfo.textContent = 'Tidak ada data';
-    document.getElementById('btnDownloadExcel').style.display = 'none';
+    document.getElementById('filterBarTop').style.display = 'none';
     return;
   }
+
+  document.getElementById('filterBarTop').style.display = 'flex';
 
   const totalPages = Math.ceil(items.length / PAGE_SIZE);
   if (currentPage > totalPages) currentPage = totalPages;
   const start = (currentPage - 1) * PAGE_SIZE;
   const end = Math.min(start + PAGE_SIZE, items.length);
   const pageItems = items.slice(start, end);
-
-  tabelInfo.textContent = `Menampilkan ${(start+1).toLocaleString('id')}–${end.toLocaleString('id')} dari ${items.length.toLocaleString('id')} data`;
 
   function tdTrunc(val, maxW) {
     const v = val || '-';
@@ -714,14 +728,14 @@ function renderKontakTable(items) {
     const idx = start + i;
     return `
     <tr>
-      <td style="white-space:nowrap;">
+      <td style="white-space:nowrap;padding-left:18px;">
         <span class="sync-badge">
           <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
           ${formatTglSync(d.sync_terakhir)}
         </span>
       </td>
       <td style="padding:6px 10px;">
-        <button class="btn-copy-row" onclick="copyRowData(this, ${idx})" title="Salin data">
+        <button class="btn-copy-row" onclick="copyRowData(this, ${idx})" title="Salin data baris ini">
           <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
         </button>
       </td>
@@ -735,8 +749,6 @@ function renderKontakTable(items) {
       <td>${escHtml(d.hp_operator || '-')}</td>
     </tr>`;
   }).join('');
-
-  document.getElementById('btnDownloadExcel').style.display = 'flex';
 
   // Render pagination
   renderPagination(items.length, totalPages);
@@ -817,25 +829,54 @@ function copyRowData(btn, idx) {
   }).catch(() => showToast('Gagal menyalin.', 'error'));
 }
 
+function salinTabel(btn) {
+  if (!filteredKontakData.length) { showToast('Tidak ada data untuk disalin.', 'error'); return; }
+  const HEADERS = ['NPSN','Nama Sekolah','Provinsi','Kabupaten/Kota','Kepala Sekolah','No. Telp/HP','Nama Operator','HP Operator'];
+  const rows = filteredKontakData.map(d => [
+    d.npsn || '',
+    d.nama || '',
+    d.provinsi || '',
+    d.kabupaten || '',
+    d.nama_kepsek || '',
+    d.no_hp || '',
+    d.nama_operator || '',
+    d.hp_operator || ''
+  ]);
+  const tsv = [HEADERS, ...rows].map(r => r.join('\t')).join('\n');
+  navigator.clipboard.writeText(tsv).then(() => {
+    btn.classList.add('copied');
+    btn.innerHTML = `<svg viewBox="0 0 24 24" style="width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><polyline points="20 6 9 17 4 12"/></svg> Tersalin!`;
+    setTimeout(() => {
+      btn.classList.remove('copied');
+      btn.innerHTML = `<svg viewBox="0 0 24 24" style="width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Salin Tabel`;
+    }, 2200);
+    showToast(`${filteredKontakData.length.toLocaleString('id')} baris disalin ke clipboard!`, 'success');
+  }).catch(() => showToast('Gagal menyalin.', 'error'));
+}
+
 function downloadExcel() {
   if (!filteredKontakData.length) { showToast('Tidak ada data untuk diunduh.', 'error'); return; }
-  const rows = filteredKontakData.map(d => ({
-    'Sync Terakhir':    formatTglSync(d.sync_terakhir),
-    'NPSN':            d.npsn || '',
-    'Nama Sekolah':    d.nama || '',
-    'Provinsi':        d.provinsi || '',
-    'Kabupaten/Kota':  d.kabupaten || '',
-    'Kepala Sekolah':  d.nama_kepsek || '',
-    'No. Telp/HP':     d.no_hp || '',
-    'Nama Operator':   d.nama_operator || '',
-    'HP Operator':     d.hp_operator || ''
-  }));
-  const ws = XLSX.utils.json_to_sheet(rows);
+  const HEADERS = ['NPSN','Nama Sekolah','Provinsi','Kabupaten/Kota','Kepala Sekolah','No. Telp/HP','Nama Operator','HP Operator'];
+  const rows = filteredKontakData.map(d => [
+    d.npsn || '',
+    d.nama || '',
+    d.provinsi || '',
+    d.kabupaten || '',
+    d.nama_kepsek || '',
+    d.no_hp || '',
+    d.nama_operator || '',
+    d.hp_operator || ''
+  ]);
   const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.aoa_to_sheet([HEADERS, ...rows]);
+  const colWidths = HEADERS.map((h, ci) => {
+    const maxLen = Math.max(h.length, ...rows.map(r => String(r[ci]||'').length));
+    return { wch: Math.min(maxLen + 2, 50) };
+  });
+  ws['!cols'] = colWidths;
   XLSX.utils.book_append_sheet(wb, ws, 'Kontak Sekolah');
   const tgl = new Date().toISOString().slice(0,10).replace(/-/g,'');
   XLSX.writeFile(wb, `kontak_sekolah_${tgl}.xlsx`);
-  document.getElementById('downloadInfo').textContent = `${filteredKontakData.length.toLocaleString('id')} baris diunduh`;
   showToast(`${filteredKontakData.length.toLocaleString('id')} data berhasil diunduh!`, 'success');
 }
 
@@ -847,8 +888,7 @@ function resetFilters() {
   document.getElementById('filterProvinsi').value = '';
   populateKabkotaDropdown();
   document.getElementById('filterKabkota').value = '';
-  document.getElementById('btnDownloadExcel').style.display = 'none';
-  document.getElementById('downloadInfo').textContent = '';
+  document.getElementById('filterBarTop').style.display = 'none';
   applyFilters();
 }
 
