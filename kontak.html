@@ -395,6 +395,10 @@ tbody td:first-child { padding-left: 18px; }
         <div class="filter-card">
           <div class="card-header" style="margin:-16px -20px 16px;border-radius:var(--radius-lg) var(--radius-lg) 0 0;">
             <h2>Filter &amp; Pencarian</h2>
+            <button id="btnResetFilter" onclick="resetFilters()" style="display:none;height:30px;padding:0 12px;background:none;border:1.5px solid var(--gray-border);border-radius:6px;font-family:inherit;font-size:12px;font-weight:600;color:var(--gray-text);cursor:pointer;display:none;align-items:center;gap:6px;transition:all 0.15s;white-space:nowrap;" onmouseover="this.style.borderColor='#9CA3AF';this.style.color='var(--text-soft)'" onmouseout="this.style.borderColor='var(--gray-border)';this.style.color='var(--gray-text)'">
+              <svg viewBox="0 0 24 24" style="width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+              Reset
+            </button>
           </div>
 
           <!-- NPSN multi-input -->
@@ -433,10 +437,6 @@ tbody td:first-child { padding-left: 18px; }
 
         <!-- Filter bar atas tabel -->
         <div class="filter-bar-top" id="filterBarTop" style="display:none;">
-          <button class="btn-reset-filter" onclick="resetFilters()">
-            <svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
-            Reset Filter
-          </button>
           <button class="btn-salin-tabel" id="btnSalinTabel" onclick="salinTabel(this)">
             <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
             Salin Tabel
@@ -670,8 +670,11 @@ function applyFilters() {
     </td></tr>`;
     document.getElementById('paginationWrap').style.display = 'none';
     document.getElementById('filterBarTop').style.display = 'none';
+    document.getElementById('btnResetFilter').style.display = 'none';
     return;
   }
+
+  document.getElementById('btnResetFilter').style.display = 'flex';
 
   let result = [...allKontakData];
   if (npsnChips.length > 0) {
@@ -889,6 +892,7 @@ function resetFilters() {
   populateKabkotaDropdown();
   document.getElementById('filterKabkota').value = '';
   document.getElementById('filterBarTop').style.display = 'none';
+  document.getElementById('btnResetFilter').style.display = 'none';
   applyFilters();
 }
 
