@@ -61,12 +61,12 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 
 // Kalau sudah punya session yang valid, langsung redirect
 window.onload = () => {
-  const saved = sessionStorage.getItem('adminUser');
+  const saved = localStorage.getItem('adminUser');
   if (saved) {
     try {
       const user = JSON.parse(saved);
       if (user && user.role) { redirectByRole(user.role); return; }
-    } catch { sessionStorage.clear(); }
+    } catch { localStorage.clear(); }
   }
 };
 
@@ -110,7 +110,7 @@ async function doLogin() {
     const data = await res.json();
     if (data.length > 0) {
       // Simpan session lalu redirect
-      sessionStorage.setItem('adminUser', JSON.stringify(data[0]));
+      localStorage.setItem('adminUser', JSON.stringify(data[0]));
       redirectByRole(data[0].role);
     } else {
       errEl.textContent = 'Username atau password salah.';
