@@ -399,7 +399,7 @@ async function sha256(message) {
 
 // ─── INIT ───
 window.onload = () => {
-  const saved = sessionStorage.getItem('adminUser');
+  const saved = localStorage.getItem('adminUser');
   if (saved) {
     try {
       currentUser = JSON.parse(saved);
@@ -407,7 +407,7 @@ window.onload = () => {
       const navKontak = document.querySelector('a.nav-item[href="kontak.html"]');
       if (navKontak) navKontak.style.display = currentUser.role === 'keuangan' ? 'none' : 'flex';
       showApp();
-    } catch { sessionStorage.clear(); window.location.href = 'login.html'; }
+    } catch { localStorage.clear(); window.location.href = 'login.html'; }
   } else {
     window.location.href = 'login.html';
   }
@@ -417,7 +417,7 @@ window.onload = () => {
 
 
 function doLogout() {
-  sessionStorage.clear();
+  localStorage.clear();
   window.location.href = 'login.html';
 }
 
