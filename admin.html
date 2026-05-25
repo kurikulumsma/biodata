@@ -763,10 +763,10 @@ window.onload = () => {
     showApp();
     return;
   }
-  const saved = sessionStorage.getItem('adminUser');
+  const saved = localStorage.getItem('adminUser');
   if (saved) {
     try { currentUser = JSON.parse(saved); }
-    catch { sessionStorage.clear(); window.location.href = 'login.html'; return; }
+    catch { localStorage.clear(); window.location.href = 'login.html'; return; }
   } else {
     window.location.href = 'login.html';
     return;
@@ -776,7 +776,7 @@ window.onload = () => {
 };
 
 function doLogout() {
-  sessionStorage.clear();
+  localStorage.clear();
   window.location.href = 'login.html';
 }
 
