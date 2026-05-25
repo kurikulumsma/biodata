@@ -373,14 +373,14 @@ tbody td:first-child { padding-left: 18px; font-weight: 600; color: var(--text);
 .input-wrap .eye-btn svg { width: 16px; height: 16px; stroke: var(--gray-mid); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 
 /* ─── SEARCH BAR KEGIATAN ─── */
-.kegiatan-search-bar { margin-bottom: 14px; }
+.kegiatan-search-bar { margin-bottom: 10px; }
 .kegiatan-search-bar input { height: 38px; border: 1.5px solid var(--gray-border); border-radius: var(--radius); padding: 0 13px 0 36px; font-family: inherit; font-size: 13px; background: var(--white); color: var(--text); transition: border-color 0.15s; outline: none; width: 100%; max-width: 320px; }
 .kegiatan-search-bar input:focus { border-color: var(--blue); }
 .kegiatan-search-wrap { position: relative; display: inline-block; }
 .kegiatan-search-wrap svg { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; stroke: var(--gray-mid); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; pointer-events: none; }
 
 /* ─── SEARCH BAR DETAIL PESERTA ─── */
-.detail-peserta-search-bar { margin-bottom: 12px; }
+.detail-peserta-search-bar { margin-bottom: 12px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .detail-peserta-search-bar input { height: 38px; border: 1.5px solid var(--gray-border); border-radius: var(--radius); padding: 0 13px 0 36px; font-family: inherit; font-size: 13px; background: var(--white); color: var(--text); transition: border-color 0.15s; outline: none; width: 100%; max-width: 320px; }
 .detail-peserta-search-bar input:focus { border-color: var(--blue); }
 .detail-peserta-search-wrap { position: relative; display: inline-block; }
@@ -504,40 +504,6 @@ tbody td:first-child { padding-left: 18px; font-weight: 600; color: var(--text);
 
       <!-- ─── PAGE: KEGIATAN ─── -->
       <div class="section-page" id="page-kegiatan">
-        <div class="card">
-          <div class="card-header">
-            <h2>Tambah Kegiatan Baru</h2>
-          </div>
-          <div class="card-body">
-            <div class="form-row">
-              <div class="field">
-                <label>Nama Kegiatan <span style="color:var(--red)">*</span></label>
-                <input type="text" id="inputNama" placeholder="Contoh: Kurasi Konten MPI">
-              </div>
-              <div class="field" style="position:relative;">
-                <label>Lokasi Kegiatan <span style="color:var(--red)">*</span></label>
-                <input type="text" id="inputLokasi" placeholder="Ketik nama kota/kabupaten..." autocomplete="off" oninput="filterLokasiSuggest(this)" onblur="validateLokasi(this)">
-                <div id="lokasiSuggestBox" style="position:absolute;z-index:300;background:var(--white);border:1.5px solid var(--gray-border);border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,0.1);max-height:200px;overflow-y:auto;display:none;width:100%;top:calc(100% + 2px);left:0;"></div>
-              </div>
-            </div>
-            <div class="form-row">
-              <div class="field">
-                <label>Tanggal Pembukaan <span style="color:var(--red)">*</span></label>
-                <input type="date" id="inputTglBuka">
-              </div>
-              <div class="field">
-                <label>Tanggal Penutupan <span style="color:var(--red)">*</span></label>
-                <input type="date" id="inputTglTutup">
-              </div>
-            </div>
-            <div class="form-actions">
-              <button class="btn-primary" id="btnTambah" onclick="tambahKegiatan()">
-                <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                Tambah Kegiatan
-              </button>
-            </div>
-          </div>
-        </div>
 
         <div class="section-header">
           <h3>Daftar Kegiatan</h3>
@@ -548,7 +514,12 @@ tbody td:first-child { padding-left: 18px; font-weight: 600; color: var(--text);
             <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
             <input type="text" id="searchKegiatan" placeholder="Cari nama kegiatan..." oninput="filterKegiatan()" autocomplete="off">
           </div>
+          </div>
         </div>
+        <button id="btnBukaTambah" onclick="bukaTambahKegiatan()" class="btn-primary" style="display:flex;align-items:center;justify-content:center;gap:7px;width:100%;height:38px;margin-bottom:14px;font-size:13px;">
+          <svg viewBox="0 0 24 24" style="width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round;"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Tambah Kegiatan Baru
+        </button>
         <div class="kegiatan-list" id="kegiatanList">
           <div class="loading-state">Memuat data...</div>
         </div>
@@ -568,6 +539,10 @@ tbody td:first-child { padding-left: 18px; font-weight: 600; color: var(--text);
               <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
               <input type="text" id="searchDetailPeserta" placeholder="Cari nama peserta..." oninput="filterDetailPeserta()" autocomplete="off">
             </div>
+            <button class="btn-unduh-excel" id="unduhExcelWrap" onclick="unduhExcelPeserta()" style="display:none;margin-left:auto;">
+              <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Unduh Excel
+            </button>
           </div>
           <div class="table-outer">
             <table>
@@ -585,12 +560,6 @@ tbody td:first-child { padding-left: 18px; font-weight: 600; color: var(--text);
                 <tr><td colspan="6" class="td-loading">Memuat data...</td></tr>
               </tbody>
             </table>
-          </div>
-          <div class="unduh-excel-wrap" id="unduhExcelWrap" style="display:none;">
-            <button class="btn-unduh-excel" onclick="unduhExcelPeserta()">
-              <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-              Unduh Excel
-            </button>
           </div>
         </div>
       </div>
@@ -627,6 +596,48 @@ tbody td:first-child { padding-left: 18px; font-weight: 600; color: var(--text);
     </div>
     <div class="modal-riwayat-body" id="modalRiwayatBody">
       <div class="loading-state">Memuat...</div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── MODAL TAMBAH KEGIATAN ─── -->
+<div class="confirm-overlay" id="modalTambahOverlay" onclick="if(event.target===this)tutupTambahKegiatan()" style="z-index:250;">
+  <div style="background:var(--white);border-radius:14px;width:100%;max-width:680px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.18);">
+    <div style="padding:18px 22px 14px;border-bottom:1px solid var(--gray-border);display:flex;align-items:center;justify-content:space-between;">
+      <h3 style="font-size:14px;font-weight:700;color:var(--text);">Tambah Kegiatan Baru</h3>
+      <button onclick="tutupTambahKegiatan()" style="width:30px;height:30px;border:none;background:none;cursor:pointer;border-radius:6px;display:flex;align-items:center;justify-content:center;" onmouseover="this.style.background='var(--gray-bg)'" onmouseout="this.style.background='none'">
+        <svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:var(--gray-text);fill:none;stroke-width:2;stroke-linecap:round;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div style="padding:20px 22px;">
+      <div class="form-row">
+        <div class="field">
+          <label>Nama Kegiatan <span style="color:var(--red)">*</span></label>
+          <input type="text" id="inputNama" placeholder="Contoh: Kurasi Konten MPI">
+        </div>
+        <div class="field" style="position:relative;">
+          <label>Lokasi Kegiatan <span style="color:var(--red)">*</span></label>
+          <input type="text" id="inputLokasi" placeholder="Ketik nama kota/kabupaten..." autocomplete="off" oninput="filterLokasiSuggest(this)" onblur="validateLokasi(this)">
+          <div id="lokasiSuggestBox" style="position:absolute;z-index:400;background:var(--white);border:1.5px solid var(--gray-border);border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,0.1);max-height:200px;overflow-y:auto;display:none;width:100%;top:calc(100% + 2px);left:0;"></div>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="field">
+          <label>Tanggal Pembukaan <span style="color:var(--red)">*</span></label>
+          <input type="date" id="inputTglBuka">
+        </div>
+        <div class="field">
+          <label>Tanggal Penutupan <span style="color:var(--red)">*</span></label>
+          <input type="date" id="inputTglTutup">
+        </div>
+      </div>
+    </div>
+    <div style="padding:0 22px 20px;display:flex;gap:10px;justify-content:flex-end;">
+      <button class="btn-confirm-cancel" onclick="tutupTambahKegiatan()">Batal</button>
+      <button class="btn-primary" id="btnTambah" onclick="tambahKegiatan()" style="height:38px;padding:0 18px;display:inline-flex;align-items:center;gap:7px;">
+        <svg viewBox="0 0 24 24" style="width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round;"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Tambah Kegiatan
+      </button>
     </div>
   </div>
 </div>
@@ -799,9 +810,9 @@ function showApp() {
   document.getElementById('navPengaturan').style.display = isAdmin ? 'flex' : 'none';
   document.getElementById('navKontak').style.display = isKeuangan ? 'none' : 'flex';
 
-  // Form tambah kegiatan: sembunyikan untuk keuangan
-  const formTambah = document.querySelector('#page-kegiatan .card');
-  if (formTambah) formTambah.style.display = isKeuangan ? 'none' : '';
+  // Tombol tambah kegiatan: sembunyikan untuk keuangan
+  const btnBukaTambah = document.getElementById('btnBukaTambah');
+  if (btnBukaTambah) btnBukaTambah.style.display = isKeuangan ? 'none' : 'flex';
 
   goTo('kegiatan');
 }
@@ -836,12 +847,13 @@ async function loadKegiatan() {
   const list = document.getElementById('kegiatanList');
   list.innerHTML = '<div class="loading-state">Memuat data...</div>';
   try {
-    const res = await sb('kegiatan?order=created_at.desc&select=id,nama_kegiatan,lokasi,aktif,kegiatan_peserta(count)');
+    const res = await sb('kegiatan?select=id,nama_kegiatan,lokasi,aktif,kegiatan_peserta(count)');
     const data = await res.json();
     allKegiatan = data;
     const searchEl = document.getElementById('searchKegiatan');
     if (searchEl) searchEl.value = '';
-    renderKegiatan(data);
+    sortKegiatanByTanggal(allKegiatan);
+    renderKegiatan(allKegiatan);
   } catch {
     list.innerHTML = '<div class="loading-state">Gagal memuat data.</div>';
   }
@@ -902,6 +914,48 @@ function renderKegiatan(items) {
   `}).join('');
 }
 
+// ─── SORT KEGIATAN BY TANGGAL ───
+// nama_kegiatan format: "[23-26 April 2026] Nama" atau "[23 April - 2 Mei 2026] Nama"
+const BULAN_IDX = {januari:0,februari:1,maret:2,april:3,mei:4,juni:5,juli:6,agustus:7,september:8,oktober:9,november:10,desember:11};
+function parseNamaTanggal(namaKegiatan) {
+  // Ambil konten dalam [ ]
+  const m = namaKegiatan.match(/^\[([^\]]+)\]/);
+  if (!m) return null;
+  const tgl = m[1].trim().toLowerCase();
+  // Format: "23-26 april 2026" → ambil tanggal terakhir (26) bulan tahun
+  // Format: "23 april - 2 mei 2026" → ambil bagian kanan dari " - "
+  let day, monthStr, year;
+  const rangeMultiBulan = tgl.match(/\d+\s+\w+\s+\d+\s*-\s*(\d+)\s+(\w+)\s+(\d{4})/);
+  if (rangeMultiBulan) {
+    day = parseInt(rangeMultiBulan[1]);
+    monthStr = rangeMultiBulan[2];
+    year = parseInt(rangeMultiBulan[3]);
+  } else {
+    // "23-26 april 2026" atau "23 april 2026"
+    const single = tgl.match(/(\d+)(?:-\d+)?\s+(\w+)\s+(\d{4})/);
+    if (!single) return null;
+    // Ambil tanggal terakhir jika ada range
+    const rangeDay = tgl.match(/\d+-(\d+)/);
+    day = rangeDay ? parseInt(rangeDay[1]) : parseInt(single[1]);
+    monthStr = single[2];
+    year = parseInt(single[3]);
+  }
+  const month = BULAN_IDX[monthStr];
+  if (month === undefined) return null;
+  return new Date(year, month, day);
+}
+
+function sortKegiatanByTanggal(arr) {
+  arr.sort((a, b) => {
+    const ta = parseNamaTanggal(a.nama_kegiatan);
+    const tb = parseNamaTanggal(b.nama_kegiatan);
+    if (!ta && !tb) return 0;
+    if (!ta) return 1;
+    if (!tb) return -1;
+    return tb - ta; // descending: paling future di atas
+  });
+}
+
 function filterKegiatan() {
   const q = (document.getElementById('searchKegiatan').value || '').trim().toLowerCase();
   const filtered = q ? allKegiatan.filter(k => k.nama_kegiatan.toLowerCase().includes(q)) : allKegiatan;
@@ -943,6 +997,7 @@ async function tambahKegiatan() {
       _lokasiValid = false;
       document.getElementById('inputTglBuka').value = '';
       document.getElementById('inputTglTutup').value = '';
+      tutupTambahKegiatan();
       showToast('Kegiatan berhasil ditambahkan!', 'success');
       loadKegiatan();
     } else {
@@ -950,7 +1005,15 @@ async function tambahKegiatan() {
       showToast('Gagal: ' + (err.message || 'Unknown error'), 'error');
     }
   } catch { showToast('Gagal terhubung ke Supabase.', 'error'); }
-  finally { btn.disabled = false; btn.innerHTML = '<svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Tambah Kegiatan'; }
+  finally { btn.disabled = false; btn.innerHTML = '<svg viewBox="0 0 24 24" style="width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round;"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Tambah Kegiatan'; }
+}
+
+function bukaTambahKegiatan() {
+  document.getElementById('modalTambahOverlay').classList.add('show');
+  setTimeout(() => document.getElementById('inputNama').focus(), 50);
+}
+function tutupTambahKegiatan() {
+  document.getElementById('modalTambahOverlay').classList.remove('show');
 }
 
 async function toggleKegiatan(id, aktif) {
@@ -1012,14 +1075,15 @@ async function lihatPesertaKegiatan(kegiatanId, namaKegiatan, lokasi) {
   document.getElementById('kegiatanList').style.display = 'none';
   document.querySelector('.section-header').style.display = 'none';
   document.querySelector('.kegiatan-search-bar').style.display = 'none';
-  document.querySelector('#page-kegiatan .card').style.display = 'none'; // sembunyikan form sementara saja saat lihat peserta
+  const btnBukaTambah2 = document.getElementById('btnBukaTambah');
+  if (btnBukaTambah2) btnBukaTambah2.style.display = 'none';
   const panel = document.getElementById('detailPesertaPanel');
   panel.classList.add('active');
   document.getElementById('detailPesertaTbody').innerHTML = '<tr><td colspan="6" class="td-loading">Memuat data...</td></tr>';
   document.getElementById('badgeDetailPeserta').textContent = '0';
   document.getElementById('topbarTitle').textContent = 'Peserta: ' + namaKegiatan;
   try {
-    const res = await sb(`kegiatan_peserta?kegiatan_id=eq.${kegiatanId}&select=created_at,peserta(id,nama,nip,golongan,nik,mapel,instansi,jabatan,wa,provinsi,kabkota,alamat,telp_instansi)&order=created_at.asc`);
+    const res = await sb(`kegiatan_peserta?kegiatan_id=eq.${kegiatanId}&select=created_at,peserta(id,nama,nip,golongan,nik,mapel,instansi,jabatan,wa,email,provinsi,kabkota,alamat,telp_instansi)&order=created_at.asc`);
     const data = await res.json();
     const tbody = document.getElementById('detailPesertaTbody');
     document.getElementById('badgeDetailPeserta').textContent = data.length;
@@ -1044,7 +1108,7 @@ function renderDetailPeserta(rows) {
     if (unduhWrap) unduhWrap.style.display = 'none';
     return;
   }
-  if (unduhWrap) unduhWrap.style.display = 'flex';
+  if (unduhWrap) unduhWrap.style.display = 'inline-flex';
   tbody.innerHTML = rows.map((row) => {
       const p = row.peserta || {};
       const safeId = p.id || '';
@@ -1316,9 +1380,10 @@ function tutupDetailPeserta() {
   document.getElementById('kegiatanList').style.display = '';
   document.querySelector('.section-header').style.display = '';
   document.querySelector('.kegiatan-search-bar').style.display = '';
-  // Tampilkan form tambah kegiatan hanya untuk non-keuangan
+  // Tampilkan tombol tambah kegiatan hanya untuk non-keuangan
   const isKeuangan = currentUser && currentUser.role === 'keuangan';
-  document.querySelector('#page-kegiatan .card').style.display = isKeuangan ? 'none' : '';
+  const btnBukaTambah = document.getElementById('btnBukaTambah');
+  if (btnBukaTambah) btnBukaTambah.style.display = isKeuangan ? 'none' : 'flex';
   document.getElementById('topbarTitle').textContent = 'Kegiatan';
   const unduhWrap = document.getElementById('unduhExcelWrap');
   if (unduhWrap) unduhWrap.style.display = 'none';
@@ -1715,7 +1780,7 @@ function validateLokasiEdit(inp) {
 function unduhExcelPeserta() {
   if (!allDetailPeserta.length) return;
   const rows = allDetailPeserta;
-  const headers = ['No','Timestamp','Nama Lengkap','NIP','NIK','Golongan','Mapel','Instansi/Unit Kerja','Jabatan','Provinsi','Kabupaten/Kota','Alamat','No WA','Telp Instansi'];
+  const headers = ['No','Timestamp','Nama Lengkap','NIP','NIK','Golongan','Mapel','Instansi/Unit Kerja','Jabatan','Provinsi','Kabupaten/Kota','Alamat','No WA','Email','Telp Instansi'];
   const escCsv = v => {
     const s = (v === null || v === undefined) ? '' : String(v);
     return s.includes(',') || s.includes('"') || s.includes('\n') ? `"${s.replace(/"/g,'""')}"` : s;
@@ -1726,7 +1791,7 @@ function unduhExcelPeserta() {
       i+1,
       formatTs(row.created_at),
       p.nama||'', p.nip||'', p.nik||'', p.golongan||'', p.mapel||'',
-      p.instansi||'', p.jabatan||'', p.provinsi||'', p.kabkota||'', p.alamat||'', p.wa||'', p.telp_instansi||''
+      p.instansi||'', p.jabatan||'', p.provinsi||'', p.kabkota||'', p.alamat||'', p.wa||'', p.email||'', p.telp_instansi||''
     ].map(escCsv).join(',');
   });
   const csvContent = [headers.join(','), ...dataRows].join('\r\n');
