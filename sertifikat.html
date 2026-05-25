@@ -664,9 +664,9 @@ async function sha256(message) {
 }
 
 window.onload = () => {
-  const saved = sessionStorage.getItem('adminUser');
+  const saved = localStorage.getItem('adminUser');
   if (saved) {
-    try { currentUser = JSON.parse(saved); showApp(); } catch { sessionStorage.clear(); }
+    try { currentUser = JSON.parse(saved); showApp(); } catch { localStorage.clear(); }
   }
 };
 
@@ -685,7 +685,7 @@ async function doLogin() {
     const data = await res.json();
     if (data.length > 0) {
       currentUser = data[0];
-      sessionStorage.setItem('adminUser', JSON.stringify(currentUser));
+      localStorage.setItem('adminUser', JSON.stringify(currentUser));
       showApp();
     } else {
       errEl.textContent = 'Username atau password salah.';
@@ -701,7 +701,7 @@ async function doLogin() {
 }
 
 function doLogout() {
-  sessionStorage.clear();
+  localStorage.clear();
   currentUser = null;
   document.getElementById('app').classList.remove('visible');
   document.getElementById('loginWrap').style.display = 'flex';
