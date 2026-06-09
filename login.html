@@ -39,7 +39,7 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background: #0c1e3c; color:
 <div class="login-wrap">
   <div class="login-card">
     <div class="login-brand">
-      <img src="logosma.png" alt="Logo SMA" style="height:52px;width:auto;object-fit:contain;">
+      <img src="https://raw.githubusercontent.com/kurikulumsma/image/main/logo.png" alt="Logo SMA" style="height:52px;width:auto;object-fit:contain;">
     </div>
     <div class="login-title">Selamat datang</div>
     <div class="login-sub">Manajemen kegiatan Direktorat Sekolah Menengah Atas</div>
@@ -71,8 +71,8 @@ window.onload = () => {
 };
 
 function redirectByRole(role) {
-  // Semua role masuk ke admin.html, sidebar dan konten disesuaikan di sana
-  window.location.href = 'admin.html';
+  // Semua role masuk ke kegiatan.html
+  window.location.href = 'kegiatan.html';
 }
 
 async function sha256(message) {

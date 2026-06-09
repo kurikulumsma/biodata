@@ -4,167 +4,314 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Database Peserta – Admin Panel</title>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
 :root {
-  --blue: #1A5FB4; --blue-dark: #0D4A96; --blue-mid: #2563EB; --blue-light: #EEF4FF; --blue-faint: #F5F8FF;
-  --red: #C0392B; --red-light: #FEF2F2;
-  --green: #16A34A; --green-light: #F0FDF4;
-  --amber: #B45309; --amber-light: #FFFBEB;
-  --gray-bg: #F1F3F7; --gray-border: #E2E5ED; --gray-text: #6B7280; --gray-mid: #9CA3AF;
-  --text: #111827; --text-soft: #374151; --white: #FFFFFF;
-  --sidebar-w: 230px; --radius: 8px; --radius-lg: 12px;
-  --shadow-sm: 0 1px 3px rgba(0,0,0,0.07); --shadow: 0 4px 16px rgba(0,0,0,0.08);
+  --primary:        #0057D9;
+  --primary-hover:  #0047B8;
+  --primary-light:  #EEF4FF;
+  --primary-faint:  #F5F9FF;
+  --sb-bg:          #0057D9;
+  --success:        #22C55E;
+  --success-bg:     #EAFBF1;
+  --success-text:   #1D9B52;
+  --warning:        #F59E0B;
+  --warning-bg:     #FFF7E6;
+  --warning-text:   #D48806;
+  --danger:         #EF4444;
+  --danger-bg:      #FFF1F1;
+  --danger-text:    #C0392B;
+  --bg:             #F4F7FB;
+  --surface:        #FFFFFF;
+  --border:         #E6ECF5;
+  --border-mid:     #D4DCE8;
+  --text:           #1A1F36;
+  --text-soft:      #4B5568;
+  --text-muted:     #6B7280;
+  --text-faint:     #9CA3AF;
+  --sidebar-w:      252px;
+  --topbar-h:       64px;
+  --r-sm:  8px;
+  --r-md:  12px;
+  --r-lg:  16px;
+  --r-xl:  20px;
+  --r-2xl: 24px;
+  --shadow-xs: 0 1px 4px rgba(20,20,40,0.04);
+  --shadow-sm: 0 4px 18px rgba(20,20,40,0.06);
+  --shadow-md: 0 8px 28px rgba(20,20,40,0.08);
+  --shadow-lg: 0 16px 48px rgba(20,20,40,0.12);
 }
-body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--gray-bg); color: var(--text); min-height: 100vh; font-size: 14px; visibility: hidden; }
 
+body {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  background: var(--bg); color: var(--text);
+  min-height: 100vh; font-size: 13px;
+  line-height: 1.5; visibility: hidden;
+}
 
-/* ─── APP SHELL ─── */
+/* ── APP SHELL ── */
 .app { display: none; min-height: 100vh; }
 .app.visible { display: flex; }
 
-/* ─── SIDEBAR OVERLAY (mobile) ─── */
+/* ── SIDEBAR OVERLAY ── */
 .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 99; }
 .sidebar-overlay.show { display: block; }
 
-/* ─── SIDEBAR ─── */
+/* ── SIDEBAR ── */
 .sidebar {
-  width: var(--sidebar-w); background: var(--white); border-right: 1px solid var(--gray-border);
-  display: flex; flex-direction: column; min-height: 100vh;
-  position: fixed; top: 0; left: 0; z-index: 100;
-  transition: transform 0.25s cubic-bezier(0.4,0,0.2,1);
+  width: var(--sidebar-w);
+  background: var(--sb-bg);
+  background-image:
+    radial-gradient(circle at 10% 85%, rgba(255,255,255,0.07) 0%, transparent 60%),
+    radial-gradient(circle at 85% 20%, rgba(255,255,255,0.05) 0%, transparent 55%);
+  border-radius: 0 40px 40px 0;
+  display: flex; flex-direction: column;
+  height: 100%; min-height: 100vh;
+  position: fixed; top: 0; left: 0; bottom: 0; z-index: 100;
+  transition: transform 0.28s cubic-bezier(0.4,0,0.2,1);
+  box-shadow: 4px 0 32px rgba(0,87,217,0.18);
 }
-.sidebar-brand { padding: 14px 16px 12px; border-bottom: 1px solid var(--gray-border); display: flex; align-items: center; gap: 10px; }
-.sidebar-close-btn { display: none; width: 28px; height: 28px; border: none; background: none; cursor: pointer; border-radius: 6px; align-items: center; justify-content: center; flex-shrink: 0; }
-.sidebar-close-btn svg { width: 16px; height: 16px; stroke: var(--gray-text); fill: none; stroke-width: 2; stroke-linecap: round; }
-.sidebar-close-btn:hover { background: var(--gray-bg); }
-.sidebar-section { padding: 16px 12px 8px; }
-.sidebar-section-label { font-size: 10.5px; font-weight: 700; letter-spacing: 0.08em; color: var(--gray-mid); text-transform: uppercase; padding: 0 8px; margin-bottom: 6px; }
-.nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: var(--radius); cursor: pointer; font-size: 13.5px; font-weight: 600; color: var(--text-soft); transition: all 0.15s; margin-bottom: 2px; border: none; background: none; width: 100%; text-align: left; font-family: inherit; text-decoration: none; }
+.sidebar-brand {
+  padding: 22px 20px 18px;
+  display: flex; align-items: center; gap: 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.12);
+  margin-bottom: 8px;
+}
+.sidebar-logo {
+  height: 40px; width: auto; object-fit: contain;
+  flex-shrink: 0;
+}
+.sidebar-close-btn {
+  display: none; width: 28px; height: 28px;
+  border: none; background: rgba(255,255,255,0.1);
+  cursor: pointer; border-radius: 8px;
+  align-items: center; justify-content: center; flex-shrink: 0;
+  transition: background 0.15s;
+}
+.sidebar-close-btn:hover { background: rgba(255,255,255,0.2); }
+.sidebar-close-btn svg { width: 14px; height: 14px; stroke: white; fill: none; stroke-width: 2.5; stroke-linecap: round; }
+
+.sidebar-nav { padding: 6px 12px; flex: 1; }
+.sidebar-section-label {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.1em;
+  color: rgba(255,255,255,0.4); text-transform: uppercase;
+  padding: 0 12px; margin: 4px 0 8px;
+}
+.nav-item {
+  display: flex; align-items: center; gap: 14px;
+  height: 44px; padding: 0 14px; border-radius: 16px;
+  cursor: pointer; font-size: 13.5px; font-weight: 600;
+  color: rgba(255,255,255,0.85);
+  transition: all 0.18s ease; margin-bottom: 4px;
+  border: none; background: transparent; width: 100%;
+  text-align: left; font-family: inherit; text-decoration: none;
+}
 a.nav-item { display: flex; }
-.nav-item svg { width: 17px; height: 17px; flex-shrink: 0; opacity: 0.6; transition: opacity 0.15s; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-.nav-item:hover { background: var(--blue-faint); color: var(--blue); }
+.nav-item svg {
+  width: 20px; height: 20px; flex-shrink: 0;
+  stroke: currentColor; fill: none; stroke-width: 2;
+  stroke-linecap: round; stroke-linejoin: round;
+  opacity: 0.75; transition: opacity 0.15s;
+}
+.nav-item:hover { background: rgba(255,255,255,0.1); color: #FFFFFF; }
 .nav-item:hover svg { opacity: 1; }
-.nav-item.active { background: var(--blue-light); color: var(--blue); }
-.nav-item.active svg { opacity: 1; }
-.sidebar-footer { margin-top: auto; padding: 14px 12px; border-top: 1px solid var(--gray-border); }
-.user-card { display: flex; align-items: center; gap: 10px; padding: 10px 10px; border-radius: var(--radius); background: var(--gray-bg); }
-.user-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--blue-light); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-.user-avatar svg { width: 16px; height: 16px; stroke: var(--blue); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.nav-item.active { background: #FFFFFF; color: var(--primary); box-shadow: 0 8px 24px rgba(0,0,0,0.12); }
+.nav-item.active svg { opacity: 1; stroke: var(--primary); }
+
+.sidebar-footer { padding: 12px; }
+.user-card {
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.14);
+  border-radius: 20px; padding: 16px 18px;
+  display: flex; align-items: center; gap: 12px;
+}
+.user-avatar {
+  width: 38px; height: 38px; border-radius: 12px;
+  background: rgba(255,255,255,0.18);
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.user-avatar svg { width: 18px; height: 18px; stroke: #FFFFFF; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .user-info { flex: 1; min-width: 0; }
-.user-name { font-size: 12.5px; font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.user-role { font-size: 11px; color: var(--gray-text); font-weight: 500; }
-.btn-logout-icon { width: 28px; height: 28px; border: none; background: none; cursor: pointer; display: flex; align-items: center; justify-content: center; border-radius: 6px; transition: background 0.15s; flex-shrink: 0; }
-.btn-logout-icon:hover { background: #FEE2E2; }
-.btn-logout-icon svg { width: 15px; height: 15px; stroke: var(--gray-text); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-.btn-logout-icon:hover svg { stroke: var(--red); }
+.user-name { font-size: 13px; font-weight: 700; color: #FFFFFF; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.user-role { font-size: 11px; font-weight: 500; color: rgba(255,255,255,0.55); margin-top: 1px; }
+.btn-logout-icon {
+  width: 34px; height: 34px; border: none;
+  background: rgba(255,255,255,0.1); cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 10px; transition: background 0.15s; flex-shrink: 0;
+}
+.btn-logout-icon:hover { background: rgba(239,68,68,0.25); }
+.btn-logout-icon svg { width: 16px; height: 16px; stroke: rgba(255,255,255,0.7); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.btn-logout-icon:hover svg { stroke: #FECACA; }
 
-/* ─── MAIN CONTENT ─── */
+/* ── CONTENT ── */
 .content { margin-left: var(--sidebar-w); flex: 1; min-height: 100vh; display: flex; flex-direction: column; min-width: 0; }
-.topbar { background: var(--white); border-bottom: 1px solid var(--gray-border); padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 50; gap: 12px; }
-.topbar-left { display: flex; align-items: center; gap: 12px; }
-.topbar-title { font-size: 16px; font-weight: 800; color: var(--text); white-space: nowrap; }
+
+/* ── TOPBAR ── */
+.topbar {
+  background: var(--surface); border-bottom: 1px solid var(--border);
+  height: var(--topbar-h); padding: 0 24px;
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 50; gap: 16px;
+}
+.topbar-left { display: flex; align-items: center; gap: 14px; }
+.topbar-title { font-size: 16px; font-weight: 800; color: var(--text); letter-spacing: -0.02em; }
 .topbar-right { display: flex; align-items: center; gap: 12px; }
-.hamburger { display: none; width: 36px; height: 36px; border: none; background: none; cursor: pointer; border-radius: var(--radius); align-items: center; justify-content: center; flex-shrink: 0; }
-.hamburger:hover { background: var(--gray-bg); }
+.hamburger {
+  display: none; width: 38px; height: 38px;
+  border: none; background: none; cursor: pointer;
+  border-radius: var(--r-md); align-items: center; justify-content: center; flex-shrink: 0;
+}
+.hamburger:hover { background: var(--bg); }
 .hamburger svg { width: 20px; height: 20px; stroke: var(--text); fill: none; stroke-width: 2; stroke-linecap: round; }
-.role-badge { font-size: 11.5px; font-weight: 700; padding: 4px 12px; border-radius: 20px; letter-spacing: 0.03em; white-space: nowrap; }
-.role-badge.administrator { background: #EEF4FF; color: var(--blue); border: 1px solid #C5D8F5; }
-.role-badge.operator { background: var(--green-light); color: var(--green); border: 1px solid #BBF7D0; }
-.role-badge.keuangan { background: #FFF7ED; color: #C2410C; border: 1px solid #FED7AA; }
-.page { padding: 24px 20px 64px; }
+.user-pill {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--primary-light); border-radius: 999px;
+  padding: 8px 18px 8px 12px; cursor: default;
+}
+.user-pill-avatar {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: var(--primary);
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.user-pill-avatar svg { width: 14px; height: 14px; stroke: white; fill: none; stroke-width: 2; stroke-linecap: round; }
+.user-pill-label { font-size: 12.5px; font-weight: 700; color: var(--primary); }
+.btn-logout-mobile {
+  display: none; height: 36px; padding: 0 14px;
+  background: none; border: 1.5px solid var(--border);
+  border-radius: var(--r-md); font-family: inherit;
+  font-size: 12.5px; font-weight: 700; color: var(--text-soft);
+  cursor: pointer; align-items: center; gap: 6px;
+  transition: all 0.15s; white-space: nowrap;
+}
+.btn-logout-mobile:hover { background: var(--danger-bg); border-color: #FECACA; color: var(--danger); }
 
-/* ─── FILTER BAR ─── */
+/* ── PAGE ── */
+.page { padding: 22px 22px 48px; }
+
+/* ── FILTER BAR ── */
 .filter-bar { display: flex; gap: 10px; margin-bottom: 14px; align-items: center; flex-wrap: wrap; }
+.search-wrap { position: relative; }
+.search-wrap input {
+  height: 40px; border: 1.5px solid var(--border);
+  border-radius: var(--r-md); padding: 0 14px 0 38px;
+  font-family: inherit; font-size: 13px;
+  background: var(--surface); color: var(--text);
+  transition: border-color 0.15s; outline: none; min-width: 240px;
+}
+.search-wrap input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(0,87,217,0.08); }
+.search-wrap svg {
+  position: absolute; left: 11px; top: 50%; transform: translateY(-50%);
+  width: 15px; height: 15px; stroke: var(--text-faint);
+  fill: none; stroke-width: 2; stroke-linecap: round; pointer-events: none;
+}
+.badge-count {
+  background: var(--primary-light); color: var(--primary);
+  font-size: 11.5px; font-weight: 700; padding: 3px 11px;
+  border-radius: 999px; white-space: nowrap;
+}
 .filter-bar-right { margin-left: auto; display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
-.btn-unduh-excel { height: 38px; padding: 0 14px; background: var(--white); border: 1.5px solid var(--gray-border); border-radius: var(--radius); font-family: inherit; font-size: 13px; font-weight: 600; color: var(--green); cursor: pointer; display: flex; align-items: center; gap: 7px; transition: all 0.15s; white-space: nowrap; }
-.btn-unduh-excel:hover { background: var(--green-light); border-color: #86EFAC; }
-.btn-unduh-excel svg { width: 16px; height: 16px; stroke: var(--green); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
-.badge-count { background: var(--blue-light); color: var(--blue); font-size: 11px; font-weight: 700; padding: 2px 9px; border-radius: 20px; white-space: nowrap; }
+.btn-unduh-excel {
+  height: 38px; padding: 0 16px;
+  background: var(--surface); border: 1.5px solid var(--border);
+  border-radius: var(--r-md); font-family: inherit;
+  font-size: 13px; font-weight: 600; color: var(--success-text);
+  cursor: pointer; display: flex; align-items: center; gap: 7px;
+  transition: all 0.15s; white-space: nowrap;
+}
+.btn-unduh-excel:hover { background: var(--success-bg); border-color: #86EFAC; }
+.btn-unduh-excel svg { width: 15px; height: 15px; stroke: var(--success-text); fill: none; stroke-width: 2; stroke-linecap: round; flex-shrink: 0; }
 
-/* ─── SYNC BADGE (timestamp) ─── */
-.sync-badge { display: inline-flex; align-items: center; gap: 4px; background: var(--blue-light); border: 1px solid #C5D8F5; border-radius: 6px; padding: 3px 8px; font-size: 11.5px; font-weight: 600; color: var(--blue); white-space: nowrap; }
-.sync-badge svg { width: 11px; height: 11px; stroke: var(--blue); fill: none; stroke-width: 2; stroke-linecap: round; flex-shrink: 0; }
-
-/* ─── PAGINATION ─── */
-.pagination-wrap { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 16px; background: var(--white); border-top: 1px solid var(--gray-border); border-radius: 0 0 var(--radius-lg) var(--radius-lg); flex-wrap: wrap; }
-.pagination-info { font-size: 12.5px; color: var(--gray-text); white-space: nowrap; }
+/* ── PAGINATION ── */
+.pagination-wrap {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; padding: 12px 16px;
+  background: var(--surface); border-top: 1px solid var(--border);
+  border-radius: 0 0 var(--r-lg) var(--r-lg); flex-wrap: wrap;
+}
+.pagination-info { font-size: 12.5px; color: var(--text-muted); white-space: nowrap; }
 .pagination-nav { display: flex; align-items: center; gap: 4px; }
-.pg-btn { height: 32px; min-width: 32px; padding: 0 8px; border: 1.5px solid var(--gray-border); background: var(--white); border-radius: 6px; font-family: inherit; font-size: 12.5px; font-weight: 600; color: var(--text-soft); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px; transition: all 0.15s; white-space: nowrap; }
-.pg-btn:hover:not(:disabled) { border-color: var(--blue); color: var(--blue); background: var(--blue-light); }
+.pg-btn {
+  height: 32px; min-width: 32px; padding: 0 8px;
+  border: 1.5px solid var(--border); background: var(--surface);
+  border-radius: 8px; font-family: inherit; font-size: 12.5px;
+  font-weight: 600; color: var(--text-soft); cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  gap: 4px; transition: all 0.15s; white-space: nowrap;
+}
+.pg-btn:hover:not(:disabled) { border-color: var(--primary); color: var(--primary); background: var(--primary-light); }
 .pg-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-.pg-btn.active { background: var(--blue); border-color: var(--blue); color: white; }
-.pg-btn svg { width: 13px; height: 13px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.pg-btn.active { background: var(--primary); border-color: var(--primary); color: white; }
+.pg-btn svg { width: 13px; height: 13px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; }
 
-/* ─── TABLE ─── */
-.table-outer { overflow-x: auto; border-radius: var(--radius-lg); border: 1px solid var(--gray-border); box-shadow: var(--shadow-sm); }
-table { width: 100%; border-collapse: collapse; background: var(--white); font-size: 13px; }
-thead tr { background: #F8FAFC; border-bottom: 1.5px solid var(--gray-border); }
-thead th { padding: 0; text-align: left; font-size: 11.5px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--gray-text); white-space: nowrap; position: relative; user-select: none; }
+/* ── TABLE ── */
+.table-outer { overflow-x: auto; border-radius: var(--r-lg); border: 1px solid var(--border); box-shadow: var(--shadow-xs); }
+table { width: 100%; border-collapse: collapse; background: var(--surface); font-size: 13px; }
+thead tr { background: #F8FAFC; border-bottom: 1.5px solid var(--border); }
+thead th { padding: 0; text-align: left; font-size: 11.5px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--text-muted); white-space: nowrap; position: relative; user-select: none; }
 thead th:first-child .th-inner { padding-left: 18px; }
 .th-inner { display: flex; align-items: center; gap: 4px; padding: 10px 12px; }
-tbody tr { border-bottom: 1px solid #F1F3F7; transition: background 0.1s; }
+tbody tr { border-bottom: 1px solid #F1F3F7; transition: background 0.1s; cursor: pointer; }
 tbody tr:last-child { border-bottom: none; }
-tbody tr:hover { background: var(--blue-faint); cursor: pointer; }
+tbody tr:hover { background: var(--primary-faint); }
 tbody td { padding: 10px 12px; color: var(--text-soft); vertical-align: middle; white-space: nowrap; }
 tbody td:first-child { padding-left: 18px; font-weight: 600; color: var(--text); }
-.td-empty, .td-loading { padding: 40px; text-align: center; color: var(--gray-text); font-size: 13.5px; white-space: normal; }
-.td-ts { font-size: 11.5px; color: var(--gray-mid); white-space: nowrap; }
+.td-empty, .td-loading { padding: 40px; text-align: center; color: var(--text-muted); font-size: 13.5px; white-space: normal; }
+.td-ts { font-size: 11.5px; color: var(--text-faint); white-space: nowrap; }
 .td-truncate { max-width: 160px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: default; position: relative; }
 .td-truncate[title]:hover::after {
-  content: attr(title);
-  position: absolute; left: 0; top: calc(100% + 4px); z-index: 999;
+  content: attr(title); position: absolute; left: 0; top: calc(100% + 4px); z-index: 999;
   background: #1e293b; color: white; font-size: 12px; line-height: 1.5;
   padding: 6px 10px; border-radius: 6px; white-space: pre-wrap; word-break: break-word;
-  max-width: 320px; min-width: 120px; box-shadow: 0 4px 16px rgba(0,0,0,0.2); pointer-events: none;
+  max-width: 320px; min-width: 120px; box-shadow: var(--shadow-md); pointer-events: none;
 }
-
-/* ─── ACTION BUTTONS ─── */
 .td-actions { display: flex; gap: 2px; align-items: center; }
-.icon-btn { width: 30px; height: 30px; border: none; background: none; cursor: pointer; border-radius: 6px; display: flex; align-items: center; justify-content: center; transition: background 0.15s; }
-.icon-btn:hover { background: #FEE2E2; }
-.icon-btn svg { width: 15px; height: 15px; stroke: var(--gray-mid); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-.icon-btn:hover svg { stroke: var(--red); }
-.icon-btn-info { width: 30px; height: 30px; border: none; background: none; cursor: pointer; border-radius: 6px; display: flex; align-items: center; justify-content: center; transition: background 0.15s; }
-.icon-btn-info:hover { background: var(--blue-light); }
-.icon-btn-info svg { width: 15px; height: 15px; stroke: var(--gray-mid); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-.icon-btn-info:hover svg { stroke: var(--blue); }
-.icon-btn-riwayat { width: 30px; height: 30px; border: none; background: none; cursor: pointer; border-radius: 6px; display: flex; align-items: center; justify-content: center; transition: background 0.15s; }
-.icon-btn-riwayat:hover { background: var(--amber-light); }
-.icon-btn-riwayat svg { width: 15px; height: 15px; stroke: var(--gray-mid); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-.icon-btn-riwayat:hover svg { stroke: var(--amber); }
+.icon-btn {
+  width: 30px; height: 30px; border: none; background: none; cursor: pointer;
+  border-radius: 6px; display: flex; align-items: center; justify-content: center; transition: background 0.15s;
+}
+.icon-btn:hover { background: var(--danger-bg); }
+.icon-btn svg { width: 15px; height: 15px; stroke: var(--text-faint); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.icon-btn:hover svg { stroke: var(--danger); }
+.sync-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: var(--primary-light); border: 1px solid #C5D8F5;
+  border-radius: 6px; padding: 3px 8px;
+  font-size: 11.5px; font-weight: 600; color: var(--primary); white-space: nowrap;
+}
+.sync-badge svg { width: 11px; height: 11px; stroke: var(--primary); fill: none; stroke-width: 2; stroke-linecap: round; flex-shrink: 0; }
 
-/* ─── MODAL PESERTA (unified detail + riwayat) ─── */
+/* ── MODAL PESERTA (unified detail + riwayat) ── */
 .modal-peserta-overlay {
-  position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 200;
+  position: fixed; inset: 0; background: rgba(0,0,0,0.35); z-index: 200;
   display: none; align-items: center; justify-content: center; padding: 20px;
-  backdrop-filter: blur(3px);
+  backdrop-filter: blur(4px);
 }
 .modal-peserta-overlay.show { display: flex; }
 .modal-peserta {
-  background: var(--white); border-radius: 20px; width: 100%; max-width: 560px;
+  background: var(--surface); border-radius: 20px; width: 100%; max-width: 540px;
   max-height: 88vh; overflow: hidden; display: flex; flex-direction: column;
-  box-shadow: 0 24px 64px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.06);
+  box-shadow: var(--shadow-lg);
   animation: modalIn 0.2s cubic-bezier(0.34,1.56,0.64,1);
 }
 @keyframes modalIn {
   from { opacity: 0; transform: translateY(12px) scale(0.97); }
   to   { opacity: 1; transform: translateY(0) scale(1); }
 }
-
-/* hero header */
 .mp-header {
-  background: linear-gradient(135deg, var(--blue) 0%, #2563EB 100%);
-  padding: 20px 22px 0; flex-shrink: 0; position: relative;
+  background: linear-gradient(135deg, var(--primary) 0%, #2563EB 100%);
+  padding: 20px 22px 0; flex-shrink: 0;
 }
 .mp-header-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
 .mp-avatar {
   width: 44px; height: 44px; border-radius: 12px;
-  background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  background: rgba(255,255,255,0.2);
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
 }
-.mp-avatar svg { width: 22px; height: 22px; stroke: white; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.mp-avatar svg { width: 22px; height: 22px; stroke: white; fill: none; stroke-width: 2; stroke-linecap: round; }
 .mp-title-wrap { flex: 1; min-width: 0; }
 .mp-nama { font-size: 15px; font-weight: 800; color: white; line-height: 1.3; word-break: break-word; }
 .mp-sub { font-size: 12px; color: rgba(255,255,255,0.75); margin-top: 3px; font-weight: 500; }
@@ -175,20 +322,17 @@ tbody td:first-child { padding-left: 18px; font-weight: 600; color: var(--text);
 }
 .mp-close:hover { background: rgba(255,255,255,0.3); }
 .mp-close svg { width: 16px; height: 16px; stroke: white; fill: none; stroke-width: 2.5; stroke-linecap: round; }
-
-/* tab bar inside header */
 .mp-tabs { display: flex; gap: 2px; }
 .mp-tab {
   padding: 9px 16px 10px; border: none; background: none; cursor: pointer;
-  font-family: inherit; font-size: 12.5px; font-weight: 700; color: rgba(255,255,255,0.65);
-  border-radius: 10px 10px 0 0; transition: all 0.15s; display: flex; align-items: center; gap: 6px;
+  font-family: inherit; font-size: 12.5px; font-weight: 700;
+  color: rgba(255,255,255,0.65); border-radius: 10px 10px 0 0;
+  transition: all 0.15s; display: flex; align-items: center; gap: 6px;
 }
-.mp-tab svg { width: 13px; height: 13px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; opacity: 0.8; }
+.mp-tab svg { width: 13px; height: 13px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; opacity: 0.8; }
 .mp-tab:hover { color: rgba(255,255,255,0.9); background: rgba(255,255,255,0.1); }
-.mp-tab.active { color: var(--blue); background: var(--white); }
+.mp-tab.active { color: var(--primary); background: var(--surface); }
 .mp-tab.active svg { opacity: 1; }
-
-/* tab panels */
 .mp-body { overflow-y: auto; flex: 1; }
 .mp-panel { display: none; }
 .mp-panel.active { display: block; }
@@ -197,129 +341,147 @@ tbody td:first-child { padding-left: 18px; font-weight: 600; color: var(--text);
 .mp-detail-grid { padding: 6px 0; }
 .detail-group { padding: 0 22px; }
 .detail-group-label {
-  font-size: 10px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase;
-  color: var(--gray-mid); padding: 14px 0 6px;
+  font-size: 10px; font-weight: 800; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--text-faint); padding: 14px 0 6px;
 }
 .detail-row-new {
   display: grid; grid-template-columns: 148px 1fr; gap: 8px;
   padding: 8px 0; border-bottom: 1px solid #F1F3F7; align-items: start;
 }
 .detail-row-new:last-child { border-bottom: none; }
-.detail-label-new { font-size: 11.5px; font-weight: 600; color: var(--gray-text); padding-top: 1px; }
+.detail-label-new { font-size: 11.5px; font-weight: 600; color: var(--text-muted); padding-top: 1px; }
 .detail-value-new { font-size: 13px; font-weight: 500; color: var(--text); line-height: 1.5; word-break: break-word; }
-.detail-value-new.empty { color: var(--gray-mid); font-style: italic; }
-.detail-section-divider { height: 1px; background: var(--gray-border); margin: 4px 22px; }
+.detail-value-new.empty { color: var(--text-faint); font-style: italic; }
+.detail-section-divider { height: 1px; background: var(--border); margin: 4px 22px; }
 
 /* riwayat panel */
 .mp-riwayat-wrap { padding: 16px 22px; }
 .riwayat-timeline { position: relative; }
 .riwayat-timeline::before {
   content: ''; position: absolute; left: 11px; top: 6px; bottom: 6px;
-  width: 2px; background: var(--gray-border); border-radius: 2px;
+  width: 2px; background: var(--border); border-radius: 2px;
 }
-.riwayat-item {
-  display: flex; align-items: flex-start; gap: 12px;
-  padding: 10px 0; position: relative;
-}
-.riwayat-item:last-child { }
+.riwayat-item { display: flex; align-items: flex-start; gap: 12px; padding: 10px 0; position: relative; }
 .riwayat-dot-wrap { width: 24px; height: 24px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; position: relative; z-index: 1; }
-.riwayat-dot {
-  width: 10px; height: 10px; border-radius: 50%; background: var(--blue);
-  border: 2px solid white; box-shadow: 0 0 0 2px var(--blue);
-}
+.riwayat-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--primary); border: 2px solid white; box-shadow: 0 0 0 2px var(--primary); }
 .riwayat-card {
-  flex: 1; background: var(--blue-faint); border: 1px solid #DBEAFE;
+  flex: 1; background: var(--primary-faint); border: 1px solid #DBEAFE;
   border-radius: 10px; padding: 10px 14px; min-width: 0;
 }
 .riwayat-nama { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
 .riwayat-meta { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
-.riwayat-lokasi { font-size: 11.5px; color: var(--gray-text); display: flex; align-items: center; gap: 4px; }
-.riwayat-lokasi svg { width: 11px; height: 11px; stroke: var(--gray-mid); fill: none; stroke-width: 2; flex-shrink: 0; }
-.riwayat-tgl { font-size: 11px; color: var(--gray-mid); background: var(--white); border: 1px solid var(--gray-border); border-radius: 4px; padding: 1px 7px; font-weight: 600; }
+.riwayat-lokasi { font-size: 11.5px; color: var(--text-muted); display: flex; align-items: center; gap: 4px; }
+.riwayat-lokasi svg { width: 11px; height: 11px; stroke: var(--text-faint); fill: none; stroke-width: 2; flex-shrink: 0; }
+.riwayat-tgl { font-size: 11px; color: var(--text-muted); background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 1px 7px; font-weight: 600; }
+
 .mp-footer {
-  padding: 12px 22px; border-top: 1px solid var(--gray-border); flex-shrink: 0;
-  display: flex; justify-content: flex-end;
+  padding: 12px 22px; border-top: 1px solid var(--border); flex-shrink: 0;
+  display: flex; justify-content: space-between; align-items: center; gap: 10px;
 }
-.btn-secondary { height: 36px; background: var(--white); color: var(--text-soft); border: 1.5px solid var(--gray-border); border-radius: var(--radius); font-family: inherit; font-size: 13px; font-weight: 600; cursor: pointer; padding: 0 18px; transition: all 0.15s; }
+.btn-secondary {
+  height: 36px; background: var(--surface); color: var(--text-soft);
+  border: 1.5px solid var(--border); border-radius: var(--r-md);
+  font-family: inherit; font-size: 13px; font-weight: 600; cursor: pointer; padding: 0 18px;
+  transition: all 0.15s;
+}
 .btn-secondary:hover { border-color: #9CA3AF; }
-.loading-state { text-align: center; padding: 32px; color: var(--gray-text); font-size: 13.5px; }
+.btn-hapus-modal {
+  height: 36px; padding: 0 16px;
+  background: var(--danger-bg); border: 1.5px solid #FECACA;
+  border-radius: var(--r-md); font-family: inherit;
+  font-size: 13px; font-weight: 600; color: var(--danger);
+  cursor: pointer; display: flex; align-items: center; gap: 7px;
+  transition: all 0.15s;
+}
+.btn-hapus-modal:hover { background: #FEE2E2; }
+.btn-hapus-modal svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; }
 
-/* ─── MODAL RIWAYAT (legacy — hidden, kept for compat) ─── */
-.modal-riwayat-overlay { display: none !important; }
-/* ─── MODAL DETAIL (legacy — hidden, kept for compat) ─── */
-.modal-detail-overlay { display: none !important; }
-
-/* ─── CONFIRM ─── */
+/* ── CONFIRM ── */
 .confirm-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 300; display: none; align-items: center; justify-content: center; padding: 20px; }
 .confirm-overlay.show { display: flex; }
-.confirm-box { background: var(--white); border-radius: 14px; width: 100%; max-width: 380px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.2); }
-.confirm-box-header { padding: 22px 24px 14px; }
-.confirm-icon { width: 44px; height: 44px; border-radius: 12px; background: var(--red-light); display: flex; align-items: center; justify-content: center; margin-bottom: 14px; }
-.confirm-icon svg { width: 22px; height: 22px; stroke: var(--red); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-.confirm-title { font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
-.confirm-msg { font-size: 13px; color: var(--gray-text); line-height: 1.6; }
-.confirm-footer { padding: 14px 24px 20px; display: flex; gap: 10px; justify-content: flex-end; }
-.btn-confirm-cancel { height: 38px; background: var(--white); color: var(--text-soft); border: 1.5px solid var(--gray-border); border-radius: var(--radius); font-family: inherit; font-size: 13.5px; font-weight: 600; cursor: pointer; padding: 0 18px; }
+.confirm-box { background: var(--surface); border-radius: 18px; width: 100%; max-width: 380px; overflow: hidden; box-shadow: var(--shadow-lg); }
+.confirm-box-header { padding: 24px 26px 14px; }
+.confirm-icon { width: 46px; height: 46px; border-radius: 14px; background: var(--danger-bg); display: flex; align-items: center; justify-content: center; margin-bottom: 14px; }
+.confirm-icon svg { width: 22px; height: 22px; stroke: var(--danger); fill: none; stroke-width: 2; stroke-linecap: round; }
+.confirm-title { font-size: 15px; font-weight: 800; color: var(--text); margin-bottom: 6px; }
+.confirm-msg { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
+.confirm-footer { padding: 14px 26px 22px; display: flex; gap: 10px; justify-content: flex-end; }
+.btn-confirm-cancel { height: 40px; background: var(--surface); color: var(--text-soft); border: 1.5px solid var(--border); border-radius: var(--r-md); font-family: inherit; font-size: 13.5px; font-weight: 600; cursor: pointer; padding: 0 18px; }
 .btn-confirm-cancel:hover { border-color: #9CA3AF; }
-.btn-confirm-ok { height: 38px; background: var(--red); color: white; border: none; border-radius: var(--radius); font-family: inherit; font-size: 13.5px; font-weight: 700; cursor: pointer; padding: 0 18px; }
-.btn-confirm-ok:hover { background: #A93226; }
+.btn-confirm-ok { height: 40px; background: var(--danger); color: white; border: none; border-radius: var(--r-md); font-family: inherit; font-size: 13.5px; font-weight: 700; cursor: pointer; padding: 0 18px; }
+.btn-confirm-ok:hover { background: #C0392B; }
 
-/* ─── TOAST ─── */
-.toast { position: fixed; bottom: 24px; right: 24px; background: #1e293b; color: white; padding: 12px 20px; border-radius: 10px; font-size: 13.5px; font-weight: 500; opacity: 0; transform: translateY(8px); transition: all 0.25s; pointer-events: none; z-index: 999; max-width: 320px; }
+/* ── TOAST ── */
+.toast { position: fixed; bottom: 28px; right: 28px; background: #1e293b; color: white; padding: 13px 22px; border-radius: var(--r-lg); font-size: 13.5px; font-weight: 500; opacity: 0; transform: translateY(10px); transition: all 0.25s; pointer-events: none; z-index: 999; max-width: 320px; box-shadow: var(--shadow-lg); }
 .toast.show { opacity: 1; transform: translateY(0); }
-.toast.success { background: var(--green); }
-.toast.error { background: var(--red); }
+.toast.success { background: var(--success); }
+.toast.error { background: var(--danger); }
 
-/* ─── LOGOUT MOBILE ─── */
-.btn-logout-mobile { display: none; height: 34px; padding: 0 12px; background: none; border: 1.5px solid var(--gray-border); border-radius: var(--radius); font-family: inherit; font-size: 12.5px; font-weight: 700; color: var(--text-soft); cursor: pointer; align-items: center; gap: 6px; transition: all 0.15s; white-space: nowrap; }
-.btn-logout-mobile:hover { background: #FEE2E2; border-color: #FECACA; color: var(--red); }
+.loading-state { text-align: center; padding: 36px; color: var(--text-muted); font-size: 13.5px; }
 
-/* ─── RESPONSIVE ─── */
+/* ── SKELETON ── */
+@keyframes shimmer {
+  0%   { background-position: -600px 0; }
+  100% { background-position:  600px 0; }
+}
+.skeleton {
+  background: linear-gradient(90deg, #EEF2F7 25%, #E2E8F0 50%, #EEF2F7 75%);
+  background-size: 600px 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+  border-radius: 6px;
+}
+.sk-row td { padding: 12px; }
+.sk-row:hover { background: transparent !important; cursor: default; }
+
+/* ── RESPONSIVE ── */
 @media (max-width: 768px) {
   .sidebar { transform: translateX(-100%); }
-  .sidebar.open { transform: translateX(0); box-shadow: 4px 0 20px rgba(0,0,0,0.15); }
+  .sidebar.open { transform: translateX(0); box-shadow: 4px 0 32px rgba(0,87,217,0.2); }
   .sidebar-close-btn { display: flex; }
   .hamburger { display: flex; }
   .content { margin-left: 0; }
-  .topbar { padding: 12px 16px; }
-  .page { padding: 16px 14px 64px; }
+  .topbar { padding: 0 16px; }
+  .page { padding: 16px 14px 48px; }
   .toast { bottom: 16px; right: 16px; left: 16px; max-width: none; text-align: center; }
   .btn-logout-mobile { display: flex; }
+  .user-pill { display: none; }
 }
 @media (max-width: 480px) {
-  .role-badge { display: none; }
+  .filter-bar { flex-direction: column; align-items: flex-start; }
+  .search-wrap input { min-width: 100%; }
+  .filter-bar-right { margin-left: 0; }
 }
 </style>
 </head>
 <body>
 
-<!-- ─── APP ─── -->
 <div class="app" id="app">
 
   <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
 
+  <!-- SIDEBAR -->
   <nav class="sidebar" id="sidebar">
     <div class="sidebar-brand">
-      <img src="logosma.png" alt="Logo SMA" style="height:36px;width:auto;object-fit:contain;flex:1;min-width:0;">
+      <img src="https://raw.githubusercontent.com/kurikulumsma/image/main/logo.png" alt="Logo SMA" class="sidebar-logo">
       <button class="sidebar-close-btn" onclick="closeSidebar()">
         <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
     </div>
 
-    <div class="sidebar-section">
-      <div class="sidebar-section-label">Menu</div>
+    <div class="sidebar-nav">
+      <div class="sidebar-section-label">Menu Utama</div>
 
-      <a class="nav-item" href="admin.html">
+      <a class="nav-item" id="navKegiatan" href="kegiatan.html">
         <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
         Kegiatan
       </a>
 
-      <a class="nav-item active" href="datapeserta.html">
+      <a class="nav-item active" id="navPeserta" href="datapeserta.html">
         <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
         Database Peserta
       </a>
 
-      <a class="nav-item" href="kontak.html">
+      <a class="nav-item" id="navKontak" href="kontak.html">
         <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
         Cari Kontak
       </a>
@@ -346,6 +508,7 @@ tbody td:first-child { padding-left: 18px; font-weight: 600; color: var(--text);
     </div>
   </nav>
 
+  <!-- CONTENT -->
   <div class="content">
     <div class="topbar">
       <div class="topbar-left">
@@ -355,9 +518,8 @@ tbody td:first-child { padding-left: 18px; font-weight: 600; color: var(--text);
         <div class="topbar-title">Database Peserta</div>
       </div>
       <div class="topbar-right">
-        <span class="role-badge" id="roleBadge">-</span>
         <button class="btn-logout-mobile" onclick="doLogout()">
-          <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          <svg viewBox="0 0 24 24" style="width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
           Keluar
         </button>
       </div>
@@ -365,9 +527,12 @@ tbody td:first-child { padding-left: 18px; font-weight: 600; color: var(--text);
 
     <div class="page">
       <div class="filter-bar">
-        <input type="text" id="searchPeserta" placeholder="Cari nama peserta..." oninput="applyTableFilters()" style="height:38px;border:1.5px solid var(--gray-border);border-radius:var(--radius);padding:0 13px;font-family:inherit;font-size:13px;background:var(--white);min-width:260px;color:var(--text);transition:border-color 0.15s;outline:none;" onfocus="this.style.borderColor='var(--blue)'" onblur="this.style.borderColor='var(--gray-border)'">
+        <div class="search-wrap">
+          <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" id="searchPeserta" placeholder="Cari nama peserta..." oninput="applyTableFilters()" autocomplete="off">
+        </div>
         <span class="badge-count" id="badgePeserta">0</span>
-        <div class="filter-bar-right" id="filterBarRight">
+        <div class="filter-bar-right" id="filterBarRight" style="display:none;">
           <button class="btn-unduh-excel" onclick="unduhExcel()">
             <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
             Unduh Excel
@@ -384,7 +549,6 @@ tbody td:first-child { padding-left: 18px; font-weight: 600; color: var(--text);
             <tr><td colspan="16" class="td-loading">Memuat data...</td></tr>
           </tbody>
         </table>
-        <!-- Pagination bawah di dalam table-outer, scroll horizontal ikut tabel -->
         <div class="pagination-wrap" id="paginationWrap" style="display:none; position:sticky; left:0; min-width:100%; width:max-content;">
           <span class="pagination-info" id="paginationInfo">—</span>
           <div class="pagination-nav" id="paginationNav"></div>
@@ -394,7 +558,7 @@ tbody td:first-child { padding-left: 18px; font-weight: 600; color: var(--text);
   </div>
 </div>
 
-<!-- ─── MODAL PESERTA (unified detail + riwayat) ─── -->
+<!-- MODAL PESERTA -->
 <div class="modal-peserta-overlay" id="modalPesertaOverlay" onclick="if(event.target===this)closePesertaModal()">
   <div class="modal-peserta">
     <div class="mp-header">
@@ -434,12 +598,16 @@ tbody td:first-child { padding-left: 18px; font-weight: 600; color: var(--text);
       </div>
     </div>
     <div class="mp-footer">
+      <button class="btn-hapus-modal" id="btnHapusModal" onclick="hapusPesertaDariModal()" style="display:none;">
+        <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+        Hapus Peserta
+      </button>
       <button class="btn-secondary" onclick="closePesertaModal()">Tutup</button>
     </div>
   </div>
 </div>
 
-<!-- ─── CONFIRM ─── -->
+<!-- CONFIRM -->
 <div class="confirm-overlay" id="confirmOverlay">
   <div class="confirm-box">
     <div class="confirm-box-header">
@@ -458,90 +626,28 @@ tbody td:first-child { padding-left: 18px; font-weight: 600; color: var(--text);
 
 <div class="toast" id="toast"></div>
 
+<script src="config.js"></script>
+<script src="sidebar.js"></script>
 <script>
-// ─── CONFIG ───
-const SUPABASE_URL = 'https://lusytejskqevwyyffeue.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx1c3l0ZWpza3Fldnd5eWZmZXVlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYxMzUyODksImV4cCI6MjA5MTcxMTI4OX0.LKCfdnlB8TQTeB7NuZ1DXwSkCI9DK3WlD4xk-jzUTPU';
-
 // ─── STATE ───
-let currentUser = null;
 let allPeserta = [];
 let filteredPeserta = [];
 let currentPage = 1;
-let perPage = 20;
+const perPage = 20;
+let _currentPesertaId = null;
+let _currentPesertaNama = null;
 
-// ─── SUPABASE HELPER ───
-const sb = (path, opts = {}) => fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
-  headers: {
-    'apikey': SUPABASE_KEY,
-    'Authorization': `Bearer ${SUPABASE_KEY}`,
-    'Content-Type': 'application/json',
-    'Prefer': opts.prefer || 'return=representation',
-    ...(opts.headers || {})
-  },
-  ...opts
-});
-
-// ─── SHA-256 ───
-async function sha256(message) {
-  const msgBuffer = new TextEncoder().encode(message);
-  const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-}
-
-// ─── INIT ───
-window.onload = () => {
-  const saved = localStorage.getItem('adminUser');
-  if (saved) {
-    try {
-      currentUser = JSON.parse(saved);
-      // sembunyikan kontak untuk keuangan
-      const navKontak = document.querySelector('a.nav-item[href="kontak.html"]');
-      if (navKontak) navKontak.style.display = currentUser.role === 'keuangan' ? 'none' : 'flex';
-      showApp();
-    } catch { localStorage.clear(); window.location.href = 'login.html'; }
-  } else {
-    window.location.href = 'login.html';
-  }
-  document.body.style.visibility = 'visible';
-};
-
-
-
-function doLogout() {
-  localStorage.clear();
-  window.location.href = 'login.html';
-}
-
-function showApp() {
-  
-  document.getElementById('app').classList.add('visible');
-  document.getElementById('sidebarUserName').textContent = currentUser.nama_lengkap || currentUser.username;
-  const roleLabels = { administrator: 'Administrator', operator: 'Operator', keuangan: 'Keuangan' };
-  document.getElementById('sidebarUserRole').textContent = roleLabels[currentUser.role] || currentUser.role;
-  const rb = document.getElementById('roleBadge');
-  rb.textContent = roleLabels[currentUser.role] || currentUser.role;
-  rb.className = 'role-badge ' + currentUser.role;
-  document.getElementById('navPengaturan').style.display = currentUser.role === 'administrator' ? 'flex' : 'none';
+// ─── onAppReady — dipanggil auth.js setelah sesi valid ───
+function onAppReady(user) {
+  // navPengaturan, navKontak, pillRoleLabel sudah diisi sidebar.js
+  const isAdmin = user.role === 'administrator';
   const filterBarRight = document.getElementById('filterBarRight');
-  if (filterBarRight) filterBarRight.style.display = currentUser.role === 'administrator' ? 'flex' : 'none';
+  if (filterBarRight) filterBarRight.style.display = isAdmin ? 'flex' : 'none';
+
   loadPeserta();
 }
 
-// ─── SIDEBAR MOBILE ───
-function openSidebar() {
-  document.getElementById('sidebar').classList.add('open');
-  document.getElementById('sidebarOverlay').classList.add('show');
-  document.body.style.overflow = 'hidden';
-}
-function closeSidebar() {
-  document.getElementById('sidebar').classList.remove('open');
-  document.getElementById('sidebarOverlay').classList.remove('show');
-  document.body.style.overflow = '';
-}
-
-// ─── KOLOM TABEL ───
+// ─── LOAD & RENDER ───
 const TABLE_COLS = [
   { key: 'created_at',    label: 'Update Terakhir' },
   { key: 'nama',          label: 'Nama Lengkap' },
@@ -561,23 +667,48 @@ const TABLE_COLS = [
 
 function renderTableHeader() {
   const tr = document.getElementById('pesertaTableHead');
-  tr.innerHTML = TABLE_COLS.map(col => `
-    <th><div class="th-inner"><span>${col.label}</span></div></th>
-  `).join('') + '<th style="width:44px"></th>';
+  tr.innerHTML = TABLE_COLS.map(col =>
+    `<th><div class="th-inner"><span>${col.label}</span></div></th>`
+  ).join('') + '<th style="width:44px"></th>';
 }
 
-// ─── LOAD & RENDER PESERTA ───
+function _skeletonRows(n = 8) {
+  const cols = 15; // TABLE_COLS.length + 1 aksi
+  return Array.from({length: n}, (_, i) => `
+    <tr class="sk-row">
+      <td><span class="skeleton" style="display:inline-block;height:20px;width:72px;border-radius:5px;"></span></td>
+      <td><span class="skeleton" style="display:inline-block;height:14px;width:${100 + (i%3)*40}px;"></span></td>
+      <td><span class="skeleton" style="display:inline-block;height:14px;width:80px;"></span></td>
+      <td><span class="skeleton" style="display:inline-block;height:14px;width:60px;"></span></td>
+      <td><span class="skeleton" style="display:inline-block;height:14px;width:100px;"></span></td>
+      <td><span class="skeleton" style="display:inline-block;height:14px;width:90px;"></span></td>
+      <td><span class="skeleton" style="display:inline-block;height:14px;width:120px;"></span></td>
+      <td><span class="skeleton" style="display:inline-block;height:14px;width:90px;"></span></td>
+      <td><span class="skeleton" style="display:inline-block;height:14px;width:80px;"></span></td>
+      <td><span class="skeleton" style="display:inline-block;height:14px;width:100px;"></span></td>
+      <td><span class="skeleton" style="display:inline-block;height:14px;width:70px;"></span></td>
+      <td><span class="skeleton" style="display:inline-block;height:14px;width:80px;"></span></td>
+      <td><span class="skeleton" style="display:inline-block;height:14px;width:110px;"></span></td>
+      <td><span class="skeleton" style="display:inline-block;height:14px;width:90px;"></span></td>
+      <td></td>
+    </tr>
+  `).join('');
+}
+
 async function loadPeserta() {
   const tbody = document.getElementById('pesertaTbody');
-  tbody.innerHTML = '<tr><td colspan="16" class="td-loading">Memuat data...</td></tr>';
+  renderTableHeader();
+  tbody.innerHTML = _skeletonRows(8);
   try {
     const res = await sb('peserta?order=created_at.desc');
+    if (!res.ok) throw new Error('HTTP ' + res.status);
     const data = await res.json();
     allPeserta = data;
     renderTableHeader();
     applyTableFilters();
-  } catch {
-    tbody.innerHTML = '<tr><td colspan="16" class="td-loading">Gagal memuat data peserta.</td></tr>';
+  } catch(e) {
+    tbody.innerHTML = `<tr><td colspan="16" class="td-loading">Gagal memuat data peserta.</td></tr>`;
+    console.error(e);
   }
 }
 
@@ -589,66 +720,39 @@ function applyTableFilters() {
   renderPeserta(filteredPeserta);
 }
 
-function unduhExcel() {
-  if (!filteredPeserta.length) { showToast('Tidak ada data untuk diunduh.', 'error'); return; }
-  const HEADERS = ['No','Update Terakhir','Nama Lengkap','NIP','Pangkat/Golongan','NIK','Mata Pelajaran','Instansi/Unit Kerja','Jabatan','No. WhatsApp','Email','Provinsi','Kabupaten/Kota','Alamat Instansi','Telepon Instansi'];
-  const rows = filteredPeserta.map((p, i) => [
-    i+1,
-    formatTs(p.created_at), p.nama||'', p.nip||'', p.golongan||'', p.nik||'',
-    p.mapel||'', p.instansi||'', p.jabatan||'', p.wa||'', p.email||'',
-    p.provinsi||'', p.kabkota||'', p.alamat||'', p.telp_instansi||''
-  ]);
-
-  const wb = XLSX.utils.book_new();
-  const ws = XLSX.utils.aoa_to_sheet([HEADERS, ...rows]);
-  // Set lebar kolom otomatis berdasarkan konten
-  const colWidths = HEADERS.map((h, ci) => {
-    const maxLen = Math.max(h.length, ...rows.map(r => String(r[ci]||'').length));
-    return { wch: Math.min(maxLen + 2, 50) };
-  });
-  ws['!cols'] = colWidths;
-  XLSX.utils.book_append_sheet(wb, ws, 'Database Peserta');
-  XLSX.writeFile(wb, 'Database Peserta.xlsx');
-  showToast('File Excel berhasil diunduh.', 'success');
-}
-
-function goToPage(page) {
-  const totalPages = Math.ceil(filteredPeserta.length / perPage);
-  if (page < 1 || page > totalPages) return;
-  currentPage = page;
-  renderPeserta(filteredPeserta);
-  document.getElementById('pesertaTableOuter').scrollIntoView({ behavior: 'smooth', block: 'start' });
-}
-
 function formatTs(ts) {
   if (!ts) return '-';
   try {
     const d = new Date(ts);
-    const pad = n => String(n).padStart(2, '0');
+    const pad = n => String(n).padStart(2,'0');
     return `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()}`;
   } catch { return ts; }
+}
+
+function escHtml(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
 
 function renderPeserta(items) {
   const tbody = document.getElementById('pesertaTbody');
   if (!items.length) {
-    tbody.innerHTML = `<tr><td colspan="16" class="td-empty">Belum ada peserta terdaftar.</td></tr>`;
+    tbody.innerHTML = '<tr><td colspan="16" class="td-empty">Belum ada peserta terdaftar.</td></tr>';
     document.getElementById('paginationWrap').style.display = 'none';
     return;
   }
   const totalPages = Math.ceil(items.length / perPage);
   if (currentPage > totalPages) currentPage = totalPages;
   const start = (currentPage - 1) * perPage;
-  const end = start + perPage;
-  const pageItems = items.slice(start, end);
-
+  const pageItems = items.slice(start, start + perPage);
   const isAdmin = currentUser && currentUser.role === 'administrator';
+
   function tdTrunc(val, maxW) {
     const v = val || '-';
     return `<td class="td-truncate" style="max-width:${maxW}px" title="${escHtml(v)}">${escHtml(v)}</td>`;
   }
+
   tbody.innerHTML = pageItems.map(item => `
-    <tr onclick='openPesertaModal(${JSON.stringify(item)})' style="cursor:pointer">
+    <tr onclick='openPesertaModal(${JSON.stringify(item)})'>
       <td style="white-space:nowrap;">
         <span class="sync-badge">
           <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
@@ -670,7 +774,7 @@ function renderPeserta(items) {
       ${tdTrunc(item.telp_instansi, 120)}
       <td>
         <div class="td-actions">
-          ${isAdmin ? `<button class="icon-btn" onclick="event.stopPropagation();hapusPeserta(${item.id}, \`${escHtml(item.nama || '')}\`)" title="Hapus peserta">
+          ${isAdmin ? `<button class="icon-btn" title="Hapus peserta" onclick="event.stopPropagation();hapusPeserta(${item.id}, \`${escHtml(item.nama || '')}\`)">
             <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
           </button>` : ''}
         </div>
@@ -682,57 +786,50 @@ function renderPeserta(items) {
 }
 
 function renderPagination(total, totalPages) {
-  const paginationWrap = document.getElementById('paginationWrap');
-  const paginationInfo = document.getElementById('paginationInfo');
-  const paginationNav = document.getElementById('paginationNav');
+  const wrap = document.getElementById('paginationWrap');
+  if (totalPages <= 1) { wrap.style.display = 'none'; return; }
+  wrap.style.display = 'flex';
+  document.getElementById('paginationInfo').textContent = `Halaman ${currentPage} dari ${totalPages.toLocaleString('id')}`;
 
-  if (totalPages <= 1) {
-    paginationWrap.style.display = 'none';
-    return;
-  }
-  paginationWrap.style.display = 'flex';
-  paginationInfo.textContent = `Halaman ${currentPage} dari ${totalPages.toLocaleString('id')}`;
-
-  let nav = '';
-  nav += `<button class="pg-btn" ${currentPage===1?'disabled':''} onclick="goToPage(${currentPage-1})">
+  let nav = `<button class="pg-btn" ${currentPage===1?'disabled':''} onclick="goToPage(${currentPage-1})">
     <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
   </button>`;
-
-  const pages = getPageRange(currentPage, totalPages);
-  pages.forEach(p => {
-    if (p === '...') {
-      nav += `<span style="display:flex;align-items:center;padding:0 4px;color:var(--gray-mid);font-size:13px;">…</span>`;
-    } else {
-      nav += `<button class="pg-btn${p===currentPage?' active':''}" onclick="goToPage(${p})">${p}</button>`;
-    }
+  getPageRange(currentPage, totalPages).forEach(p => {
+    nav += p === '...'
+      ? `<span style="display:flex;align-items:center;padding:0 4px;color:var(--text-faint);font-size:13px;">…</span>`
+      : `<button class="pg-btn${p===currentPage?' active':''}" onclick="goToPage(${p})">${p}</button>`;
   });
-
   nav += `<button class="pg-btn" ${currentPage===totalPages?'disabled':''} onclick="goToPage(${currentPage+1})">
     <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
   </button>`;
-
-  paginationNav.innerHTML = nav;
+  document.getElementById('paginationNav').innerHTML = nav;
 }
 
 function getPageRange(current, total) {
   if (total <= 7) return Array.from({length: total}, (_,i) => i+1);
-  const result = [];
+  const r = [];
   if (current <= 4) {
-    for (let i = 1; i <= 5; i++) result.push(i);
-    result.push('...'); result.push(total);
+    for (let i=1;i<=5;i++) r.push(i); r.push('...'); r.push(total);
   } else if (current >= total - 3) {
-    result.push(1); result.push('...');
-    for (let i = total-4; i <= total; i++) result.push(i);
+    r.push(1); r.push('...');
+    for (let i=total-4;i<=total;i++) r.push(i);
   } else {
-    result.push(1); result.push('...');
-    result.push(current-1); result.push(current); result.push(current+1);
-    result.push('...'); result.push(total);
+    r.push(1); r.push('...');
+    r.push(current-1); r.push(current); r.push(current+1);
+    r.push('...'); r.push(total);
   }
-  return result;
+  return r;
 }
 
-function updatePaginationUI() {} // deprecated, kept for safety
+function goToPage(page) {
+  const totalPages = Math.ceil(filteredPeserta.length / perPage);
+  if (page < 1 || page > totalPages) return;
+  currentPage = page;
+  renderPeserta(filteredPeserta);
+  document.getElementById('pesertaTableOuter').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
 
+// ─── HAPUS ───
 async function hapusPeserta(id, nama) {
   const ok = await showConfirm('Hapus Peserta', `Hapus data peserta "<strong>${escHtml(nama)}</strong>"? Tindakan ini tidak bisa dibatalkan.`);
   if (!ok) return;
@@ -743,10 +840,31 @@ async function hapusPeserta(id, nama) {
   } catch { showToast('Gagal terhubung ke Supabase.', 'error'); }
 }
 
-// ─── MODAL PESERTA UNIFIED ───
-let _currentPesertaId = null;
-let _currentPesertaNama = null;
+async function hapusPesertaDariModal() {
+  if (!_currentPesertaId) return;
+  const id = _currentPesertaId, nama = _currentPesertaNama;
+  closePesertaModal();
+  await hapusPeserta(id, nama);
+}
 
+// ─── UNDUH EXCEL ───
+function unduhExcel() {
+  if (!filteredPeserta.length) { showToast('Tidak ada data untuk diunduh.', 'error'); return; }
+  const HEADERS = ['No','Update Terakhir','Nama Lengkap','NIP','Pangkat/Golongan','NIK','Mata Pelajaran','Instansi/Unit Kerja','Jabatan','No. WhatsApp','Email','Provinsi','Kabupaten/Kota','Alamat Instansi','Telepon Instansi'];
+  const rows = filteredPeserta.map((p,i) => [
+    i+1, formatTs(p.created_at), p.nama||'', p.nip||'', p.golongan||'', p.nik||'',
+    p.mapel||'', p.instansi||'', p.jabatan||'', p.wa||'', p.email||'',
+    p.provinsi||'', p.kabkota||'', p.alamat||'', p.telp_instansi||''
+  ]);
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.aoa_to_sheet([HEADERS, ...rows]);
+  ws['!cols'] = HEADERS.map((h,ci) => ({ wch: Math.min(Math.max(h.length, ...rows.map(r=>String(r[ci]||'').length)) + 2, 50) }));
+  XLSX.utils.book_append_sheet(wb, ws, 'Database Peserta');
+  XLSX.writeFile(wb, 'Database Peserta.xlsx');
+  showToast('File Excel berhasil diunduh.', 'success');
+}
+
+// ─── MODAL PESERTA ───
 function closePesertaModal() {
   document.getElementById('modalPesertaOverlay').classList.remove('show');
 }
@@ -756,58 +874,48 @@ function switchTab(tab) {
   document.getElementById('panelRiwayat').classList.toggle('active', tab === 'riwayat');
   document.getElementById('tabBtnDetail').classList.toggle('active', tab === 'detail');
   document.getElementById('tabBtnRiwayat').classList.toggle('active', tab === 'riwayat');
-  if (tab === 'riwayat' && _currentPesertaId) {
-    loadRiwayatIntoModal(_currentPesertaId);
-  }
+  if (tab === 'riwayat' && _currentPesertaId) loadRiwayatIntoModal(_currentPesertaId);
 }
 
 function openPesertaModal(p) {
-  _currentPesertaId = p.id;
+  _currentPesertaId   = p.id;
   _currentPesertaNama = p.nama || '—';
 
-  // Header
   document.getElementById('mpNama').textContent = p.nama || '—';
-  const sub = [p.jabatan, p.instansi].filter(Boolean).join(' · ');
-  document.getElementById('mpSub').textContent = sub || 'Peserta';
+  document.getElementById('mpSub').textContent  = [p.jabatan, p.instansi].filter(Boolean).join(' · ') || 'Peserta';
 
-  // Reset ke tab detail
+  // Tombol hapus hanya admin
+  const isAdmin = currentUser && currentUser.role === 'administrator';
+  document.getElementById('btnHapusModal').style.display = isAdmin ? 'flex' : 'none';
+
   switchTab('detail');
 
-  // Isi detail grid
   const GROUPS = [
     { label: 'Identitas', fields: [
-      ['Nama Lengkap', p.nama],
-      ['NIP', p.nip],
-      ['Pangkat / Golongan', p.golongan],
-      ['NIK', p.nik],
+      ['Nama Lengkap', p.nama], ['NIP', p.nip],
+      ['Pangkat / Golongan', p.golongan], ['NIK', p.nik],
     ]},
     { label: 'Tugas & Instansi', fields: [
-      ['Mata Pelajaran', p.mapel],
-      ['Jabatan', p.jabatan],
-      ['Instansi / Unit Kerja', p.instansi],
-      ['Alamat Instansi', p.alamat],
+      ['Mata Pelajaran', p.mapel], ['Jabatan', p.jabatan],
+      ['Instansi / Unit Kerja', p.instansi], ['Alamat Instansi', p.alamat],
       ['Telepon Instansi', p.telp_instansi],
     ]},
     { label: 'Kontak Pribadi', fields: [
-      ['No. WhatsApp', p.wa],
-      ['Email', p.email],
+      ['No. WhatsApp', p.wa], ['Email', p.email],
     ]},
     { label: 'Wilayah', fields: [
-      ['Provinsi', p.provinsi],
-      ['Kabupaten / Kota', p.kabkota],
+      ['Provinsi', p.provinsi], ['Kabupaten / Kota', p.kabkota],
     ]},
   ];
 
   let html = '';
   GROUPS.forEach((g, gi) => {
     if (gi > 0) html += `<div class="detail-section-divider"></div>`;
-    html += `<div class="detail-group">
-      <div class="detail-group-label">${g.label}</div>`;
+    html += `<div class="detail-group"><div class="detail-group-label">${g.label}</div>`;
     g.fields.forEach(([label, val]) => {
-      const empty = !val;
       html += `<div class="detail-row-new">
         <div class="detail-label-new">${label}</div>
-        <div class="detail-value-new${empty ? ' empty' : ''}">${escHtml(val || '—')}</div>
+        <div class="detail-value-new${!val ? ' empty' : ''}">${escHtml(val || '—')}</div>
       </div>`;
     });
     html += `</div>`;
@@ -825,7 +933,7 @@ async function loadRiwayatIntoModal(pesertaId) {
     const res = await sb(`kegiatan_peserta?peserta_id=eq.${pesertaId}&select=created_at,kegiatan(nama_kegiatan,lokasi)&order=created_at.desc`);
     const data = await res.json();
     if (!data.length) {
-      body.innerHTML = '<p style="font-size:13px;color:var(--gray-text);text-align:center;padding:32px 0;">Peserta belum terdaftar di kegiatan manapun.</p>';
+      body.innerHTML = '<p style="font-size:13px;color:var(--text-muted);text-align:center;padding:32px 0;">Peserta belum terdaftar di kegiatan manapun.</p>';
       return;
     }
     body.innerHTML = data.map(row => {
@@ -849,12 +957,6 @@ async function loadRiwayatIntoModal(pesertaId) {
   }
 }
 
-// ─── LEGACY STUBS (aman jika ada referensi lain) ───
-function tutupDetailPesertaModal() { closePesertaModal(); }
-function showDetailPeserta(p) { openPesertaModal(p); }
-function closeRiwayatKegiatan() { closePesertaModal(); }
-async function showRiwayatKegiatan(id, nama) { /* tidak dipakai lagi */ }
-
 // ─── UTILITIES ───
 let confirmResolve = () => {};
 function showConfirm(title, msg) {
@@ -862,24 +964,15 @@ function showConfirm(title, msg) {
     document.getElementById('confirmTitle').textContent = title;
     document.getElementById('confirmMsg').innerHTML = msg;
     document.getElementById('confirmOverlay').classList.add('show');
-    confirmResolve = (val) => {
-      document.getElementById('confirmOverlay').classList.remove('show');
-      resolve(val);
-    };
+    confirmResolve = val => { document.getElementById('confirmOverlay').classList.remove('show'); resolve(val); };
   });
 }
-
 function showToast(msg, type = '') {
   const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className = `toast show ${type}`;
+  t.textContent = msg; t.className = `toast show ${type}`;
   setTimeout(() => t.className = 'toast', 3000);
 }
-
-function escHtml(str) {
-  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
-}
-
 </script>
+<script src="auth.js"></script>
 </body>
 </html>
