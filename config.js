@@ -1,6 +1,7 @@
 // ─── CONFIG ───
 const SUPABASE_URL = 'https://lusytejskqevwyyffeue.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx1c3l0ZWpza3Fldnd5eWZmZXVlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYxMzUyODksImV4cCI6MjA5MTcxMTI4OX0.LKCfdnlB8TQTeB7NuZ1DXwSkCI9DK3WlD4xk-jzUTPU';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbwG64xdlwUwjkIhoKaX4oOPq5GzETsVHIU4IHseXJMfpVaWAKK0H6XIfcuLw_SQe2_w/exec';
 
 const DESIGN_MODE = false;
 

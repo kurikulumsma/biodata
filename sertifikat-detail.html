@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sertifikat – Admin Panel</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --primary:        #0057D9;
+  --primary-hover:  #0047B8;
+  --primary-light:  #EEF4FF;
+  --primary-faint:  #F5F9FF;
+  --sb-bg:          #0057D9;
+  --sb-bg-deep:     #0047B8;
+  --sb-bg-mid:      #0A66FF;
+  --success:        #22C55E;
+  --success-bg:     #EAFBF1;
+  --success-text:   #1D9B52;
+  --warning:        #F59E0B;
+  --warning-bg:     #FFF7E6;
+  --warning-text:   #D48806;
+  --danger:         #EF4444;
+  --danger-bg:      #FFF1F1;
+  --danger-text:    #C0392B;
+  --bg:             #F4F7FB;
+  --surface:        #FFFFFF;
+  --border:         #E6ECF5;
+  --border-mid:     #D4DCE8;
+  --text:           #1A1F36;
+  --text-soft:      #4B5568;
+  --text-muted:     #6B7280;
+  --text-faint:     #9CA3AF;
+  --sidebar-w:      252px;
+  --topbar-h:       64px;
+  --r-sm:  8px; --r-md: 12px; --r-lg: 16px; --r-xl: 20px; --r-2xl: 24px;
+  --shadow-xs:  0 1px 4px rgba(20,20,40,0.04);
+  --shadow-sm:  0 4px 18px rgba(20,20,40,0.06);
+  --shadow-md:  0 8px 28px rgba(20,20,40,0.08);
+  --shadow-lg:  0 16px 48px rgba(20,20,40,0.12);
+}
+
+body {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  background: var(--bg); color: var(--text);
+  min-height: 100vh; font-size: 13px; line-height: 1.5;
+  visibility: hidden;
+}
+
+/* APP SHELL */
+.app { display: none; min-height: 100vh; }
+.app.visible { display: flex; }
+.sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 99; }
+.sidebar-overlay.show { display: block; }
+
+/* SIDEBAR */
+.sidebar {
+  width: var(--sidebar-w); background: var(--sb-bg);
+  background-image:
+    radial-gradient(circle at 10% 85%, rgba(255,255,255,0.07) 0%, transparent 60%),
+    radial-gradient(circle at 85% 20%, rgba(255,255,255,0.05) 0%, transparent 55%);
+  border-radius: 0 30px 30px 0;
+  display: flex; flex-direction: column; height: 100%; min-height: 100vh;
+  position: fixed; top: 0; left: 0; bottom: 0; z-index: 100;
+  transition: transform 0.28s cubic-bezier(0.4,0,0.2,1);
+  box-shadow: 4px 0 32px rgba(0,87,217,0.18);
+}
+.sidebar-brand {
+  padding: 22px 20px 18px; display: flex; align-items: center; gap: 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.12); margin-bottom: 8px;
+}
+.sidebar-logo { height: 40px; width: auto; object-fit: contain; flex-shrink: 0; }
+.sidebar-close-btn {
+  display: none; width: 28px; height: 28px; border: none;
+  background: rgba(255,255,255,0.1); cursor: pointer; border-radius: 8px;
+  align-items: center; justify-content: center; flex-shrink: 0; margin-left: auto;
+  transition: background 0.15s;
+}
+.sidebar-close-btn:hover { background: rgba(255,255,255,0.2); }
+.sidebar-close-btn svg { width: 14px; height: 14px; stroke: white; fill: none; stroke-width: 2.5; stroke-linecap: round; }
+.sidebar-nav { padding: 6px 12px; flex: 1; }
+.sidebar-section-label {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.1em;
+  color: rgba(255,255,255,0.4); text-transform: uppercase;
+  padding: 0 12px; margin: 4px 0 8px;
+}
+.nav-item {
+  display: flex; align-items: center; gap: 14px; height: 44px; padding: 0 14px;
+  border-radius: 16px; cursor: pointer; font-size: 13.5px; font-weight: 600;
+  color: rgba(255,255,255,0.85); transition: all 0.18s ease; margin-bottom: 4px;
+  border: none; background: transparent; width: 100%; text-align: left;
+  font-family: inherit; text-decoration: none; position: relative; overflow: hidden;
+}
+.nav-item svg {
+  width: 20px; height: 20px; flex-shrink: 0; stroke: currentColor; fill: none;
+  stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; opacity: 0.75; transition: opacity 0.15s;
+}
+.nav-item:hover { background: rgba(255,255,255,0.1); color: #FFFFFF; }
+.nav-item:hover svg { opacity: 1; }
+.nav-item.active { background: #FFFFFF; color: var(--primary); box-shadow: 0 8px 24px rgba(0,0,0,0.12); }
+.nav-item.active svg { opacity: 1; stroke: var(--primary); }
+.sidebar-footer { padding: 12px; }
+.user-card {
+  background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.14);
+  border-radius: 20px; padding: 16px 18px; display: flex; align-items: center; gap: 12px;
+}
+.user-avatar {
+  width: 38px; height: 38px; border-radius: 12px; background: rgba(255,255,255,0.18);
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.user-avatar svg { width: 18px; height: 18px; stroke: #FFFFFF; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.user-info { flex: 1; min-width: 0; }
+.user-name { font-size: 13px; font-weight: 700; color: #FFF; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.user-role { font-size: 11px; font-weight: 500; color: rgba(255,255,255,0.55); margin-top: 1px; }
+.btn-logout-icon {
+  width: 34px; height: 34px; border: none; background: rgba(255,255,255,0.1); cursor: pointer;
+  display: flex; align-items: center; justify-content: center; border-radius: 10px;
+  transition: background 0.15s; flex-shrink: 0;
+}
+.btn-logout-icon:hover { background: rgba(239,68,68,0.25); }
+.btn-logout-icon svg { width: 16px; height: 16px; stroke: rgba(255,255,255,0.7); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.btn-logout-icon:hover svg { stroke: #FECACA; }
+
+/* LAYOUT */
+.content { margin-left: var(--sidebar-w); flex: 1; min-height: 100vh; display: flex; flex-direction: column; min-width: 0; }
+.main-area { flex: 1; min-width: 0; padding: 22px 28px 64px; max-width: 1180px; }
+
+/* TOPBAR */
+.topbar {
+  background: var(--surface); border-bottom: 1px solid var(--border); height: var(--topbar-h);
+  padding: 0 24px; display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 50; gap: 16px;
+}
+.topbar-left { display: flex; align-items: center; gap: 14px; }
+.topbar-title { font-size: 16px; font-weight: 800; color: var(--text); letter-spacing: -0.02em; }
+.hamburger { display: none; width: 38px; height: 38px; border: none; background: none; cursor: pointer; border-radius: var(--r-md); align-items: center; justify-content: center; flex-shrink: 0; }
+.hamburger:hover { background: var(--bg); }
+.hamburger svg { width: 20px; height: 20px; stroke: var(--text); fill: none; stroke-width: 2; stroke-linecap: round; }
+.topbar-right { display: flex; align-items: center; gap: 12px; }
+.user-pill { display: none; align-items: center; gap: 10px; background: var(--primary-light); border-radius: 999px; padding: 8px 18px 8px 12px; }
+.user-pill-avatar { width: 28px; height: 28px; border-radius: 50%; background: var(--primary); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.user-pill-avatar svg { width: 14px; height: 14px; stroke: white; fill: none; stroke-width: 2; stroke-linecap: round; }
+.user-pill-label { font-size: 12.5px; font-weight: 700; color: var(--primary); }
+.btn-logout-mobile { display: none; height: 36px; padding: 0 14px; background: none; border: 1.5px solid var(--border); border-radius: var(--r-md); font-family: inherit; font-size: 12.5px; font-weight: 700; color: var(--text-soft); cursor: pointer; align-items: center; gap: 6px; transition: all 0.15s; white-space: nowrap; }
+.btn-logout-mobile:hover { background: var(--danger-bg); border-color: #FECACA; color: var(--danger); }
+
+/* PAGE */
+.section-page { display: none; }
+.section-page.active { display: block; }
+
+/* MODE TABS */
+.mode-tabs { display: inline-flex; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 5px; gap: 4px; margin-bottom: 24px; box-shadow: var(--shadow-xs); }
+.mode-tab {
+  height: 38px; padding: 0 18px; border: none; background: none; cursor: pointer;
+  border-radius: 10px; font-family: inherit; font-size: 13px; font-weight: 700; color: var(--text-muted);
+  display: flex; align-items: center; gap: 8px; transition: all 0.15s; white-space: nowrap;
+}
+.mode-tab svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.mode-tab.active { background: var(--primary); color: white; box-shadow: 0 6px 16px rgba(0,87,217,0.22); }
+.mode-tab:not(.active):hover { background: var(--bg); color: var(--text); }
+
+/* STEP CARD */
+.step-card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-2xl);
+  box-shadow: var(--shadow-sm); margin-bottom: 20px; overflow: visible;
+}
+.step-head { padding: 18px 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; }
+.step-num {
+  width: 28px; height: 28px; border-radius: 9px; background: var(--primary-light); color: var(--primary);
+  display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; flex-shrink: 0;
+}
+.step-title { font-size: 14px; font-weight: 800; color: var(--text); letter-spacing: -0.01em; }
+.step-sub { font-size: 12px; font-weight: 500; color: var(--text-muted); margin-top: 1px; }
+.step-body { padding: 22px 24px; }
+
+/* FIELDS */
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.field { margin-bottom: 16px; }
+.field:last-child { margin-bottom: 0; }
+.field label { display: block; font-size: 11.5px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-soft); margin-bottom: 7px; }
+.field input, .field textarea, .field select {
+  width: 100%; height: 44px; border: 1.5px solid var(--border); border-radius: var(--r-md); padding: 0 14px;
+  font-family: inherit; font-size: 13.5px; background: #FAFBFD; color: var(--text);
+  transition: border-color 0.15s, box-shadow 0.15s; outline: none;
+}
+.field textarea { height: auto; padding: 12px 14px; min-height: 88px; resize: vertical; line-height: 1.6; }
+.field input:focus, .field textarea:focus, .field select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(0,87,217,0.1); background: white; }
+.field-hint { font-size: 11.5px; color: var(--text-muted); margin-top: 6px; line-height: 1.5; }
+.field-hint code { background: var(--primary-light); color: var(--primary); padding: 1px 6px; border-radius: 5px; font-family: 'SF Mono', Menlo, monospace; font-size: 11px; font-weight: 600; }
+
+/* BUTTONS */
+.btn-primary {
+  height: 44px; background: var(--primary); color: white; border: none; border-radius: var(--r-md);
+  font-family: inherit; font-size: 13.5px; font-weight: 700; cursor: pointer; padding: 0 22px;
+  transition: background 0.15s, box-shadow 0.15s, transform 0.1s; display: inline-flex; align-items: center; gap: 8px;
+  white-space: nowrap; box-shadow: 0 6px 18px rgba(0,87,217,0.22);
+}
+.btn-primary:hover { background: var(--primary-hover); box-shadow: 0 8px 22px rgba(0,87,217,0.28); transform: translateY(-1px); }
+.btn-primary:active { transform: translateY(0); }
+.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+.btn-primary svg { width: 16px; height: 16px; stroke: white; fill: none; stroke-width: 2.5; stroke-linecap: round; flex-shrink: 0; }
+.btn-secondary { height: 44px; background: var(--surface); color: var(--text-soft); border: 1.5px solid var(--border); border-radius: var(--r-md); font-family: inherit; font-size: 13.5px; font-weight: 600; cursor: pointer; padding: 0 20px; transition: all 0.15s; display: inline-flex; align-items: center; gap: 8px; }
+.btn-secondary:hover { border-color: #9CA3AF; color: var(--text); }
+.btn-secondary svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2.2; stroke-linecap: round; }
+.btn-sm { height: 36px; padding: 0 14px; border-radius: 12px; font-family: inherit; font-size: 12.5px; font-weight: 600; cursor: pointer; border: 1.5px solid; transition: all 0.15s; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+.btn-sm svg { width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.btn-sm.edit { border-color: var(--border-mid); color: var(--text-soft); background: var(--surface); }
+.btn-sm.edit:hover { border-color: #9CA3AF; background: var(--bg); }
+.btn-sm.activate { border-color: #86EFAC; color: var(--success-text); background: var(--success-bg); }
+.btn-sm.activate:hover { background: #DCFCE7; }
+.btn-sm.danger { border-color: #FECACA; color: var(--danger); background: var(--danger-bg); }
+.btn-sm.danger:hover { background: #FEE2E2; }
+.btn-sm.ghost { border-color: var(--border); color: var(--primary); background: var(--primary-light); }
+.btn-sm.ghost:hover { background: #DDE9FB; }
+
+/* TOOLBAR for recipient table */
+.rcp-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+.rcp-toolbar-left { display: flex; align-items: center; gap: 10px; }
+.rcp-title { font-size: 13.5px; font-weight: 800; color: var(--text); }
+.badge-count { background: var(--primary-light); color: var(--primary); font-size: 12px; font-weight: 700; padding: 3px 11px; border-radius: 999px; }
+.rcp-toolbar-right { display: flex; align-items: center; gap: 8px; }
+
+/* TABLE */
+.table-outer { overflow-x: auto; border-radius: var(--r-lg); border: 1px solid var(--border); box-shadow: var(--shadow-xs); }
+table { width: 100%; border-collapse: collapse; background: var(--surface); font-size: 13px; }
+thead tr { background: #F8FAFC; border-bottom: 1.5px solid var(--border); }
+thead th { padding: 10px 12px; text-align: left; font-size: 11.5px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--text-muted); white-space: nowrap; }
+thead th:first-child { padding-left: 18px; }
+tbody tr { border-bottom: 1px solid #F1F3F7; transition: background 0.1s; }
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: var(--primary-faint); }
+tbody td { padding: 9px 12px; color: var(--text-soft); vertical-align: middle; white-space: nowrap; }
+tbody td:first-child { padding-left: 18px; font-weight: 700; color: var(--text-faint); }
+.td-nama { font-weight: 700; color: var(--text); }
+.td-truncate { max-width: 170px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.td-empty, .td-loading { padding: 44px; text-align: center; color: var(--text-muted); font-size: 13.5px; white-space: normal; }
+
+/* peran select inside table */
+.peran-select { height: 32px; border: 1.5px solid var(--border); border-radius: 8px; padding: 0 8px; font-family: inherit; font-size: 12px; font-weight: 600; background: var(--surface); color: var(--text); cursor: pointer; outline: none; transition: border-color 0.15s; }
+.peran-select:focus { border-color: var(--primary); }
+.peran-select.peserta { color: var(--primary); }
+.peran-select.fasilitator { color: var(--warning-text); }
+.peran-select.narasumber { color: #7C3AED; }
+
+/* status badge */
+.st-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 999px; white-space: nowrap; }
+.st-badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.st-badge.belum { background: #F3F4F6; color: #9CA3AF; }
+.st-badge.sudah { background: var(--success-bg); color: var(--success-text); }
+.st-badge.proses { background: var(--warning-bg); color: var(--warning-text); }
+.st-badge.gagal { background: var(--danger-bg); color: var(--danger-text); }
+.st-badge.na { background: transparent; color: var(--text-faint); }
+.st-badge.na::before { display: none; }
+
+.icon-btn { width: 30px; height: 30px; border: none; background: none; cursor: pointer; border-radius: 7px; display: flex; align-items: center; justify-content: center; transition: background 0.15s; }
+.icon-btn:hover { background: var(--danger-bg); }
+.icon-btn svg { width: 15px; height: 15px; stroke: var(--text-faint); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.icon-btn:hover svg { stroke: var(--danger); }
+
+/* EMAIL PANEL */
+.email-toggle-row { display: flex; align-items: center; gap: 14px; padding: 4px 0 0; }
+.toggle-track { display: inline-flex; align-items: center; width: 44px; height: 24px; border-radius: 99px; background: #D1D5DB; position: relative; flex-shrink: 0; transition: background 0.2s; cursor: pointer; border: none; padding: 0; }
+.toggle-track.on { background: var(--primary); }
+.toggle-thumb { position: absolute; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: white; transition: left 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.25); }
+.toggle-track.on .toggle-thumb { left: 23px; }
+.toggle-label { font-size: 13px; font-weight: 700; color: var(--text); }
+.toggle-sub { font-size: 11.5px; color: var(--text-muted); margin-top: 1px; }
+.email-config { margin-top: 20px; padding-top: 20px; border-top: 1px dashed var(--border); }
+.email-config.hidden { display: none; }
+
+/* PROGRESSIVE DISCLOSURE */
+.step-hidden { display: none; }
+
+/* SEARCH penerima */
+.rcp-search { position: relative; display: flex; align-items: center; }
+.rcp-search input { height: 38px; border: 1.5px solid var(--border); border-radius: var(--r-md); padding: 0 14px 0 36px; font-family: inherit; font-size: 12.5px; background: var(--surface); color: var(--text); transition: border-color 0.15s; outline: none; width: 240px; }
+.rcp-search input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(0,87,217,0.08); }
+.rcp-search svg { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; stroke: var(--text-faint); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; pointer-events: none; }
+
+/* OVERRIDE TEMPLATE per peran */
+.tpl-override { margin-top: 18px; padding-top: 18px; border-top: 1px dashed var(--border); }
+.tpl-override-note { font-size: 12px; color: var(--text-soft); background: var(--primary-faint); border: 1px solid #DDE9FB; border-radius: var(--r-md); padding: 11px 14px; line-height: 1.6; display: flex; gap: 9px; }
+.tpl-override-note svg { width: 15px; height: 15px; stroke: var(--primary); fill: none; stroke-width: 2; stroke-linecap: round; flex-shrink: 0; margin-top: 1px; }
+.ov-row { display: flex; align-items: center; gap: 14px; padding: 8px 0 4px; }
+.ov-link { margin: 6px 0 10px; }
+.ov-link.hidden { display: none; }
+.ov-badge { font-size: 11px; font-weight: 700; padding: 2px 9px; border-radius: 999px; }
+.ov-badge.narasumber { background: #F3E8FF; color: #7C3AED; }
+.ov-badge.fasilitator { background: var(--warning-bg); color: var(--warning-text); }
+
+/* PROCESS / PROGRESS */
+.process-bar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.progress-wrap { margin-top: 18px; display: none; }
+.progress-wrap.show { display: block; }
+.progress-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.progress-label { font-size: 12.5px; font-weight: 700; color: var(--text); }
+.progress-count { font-size: 12.5px; font-weight: 700; color: var(--primary); }
+.progress-track { height: 10px; border-radius: 99px; background: var(--bg); overflow: hidden; border: 1px solid var(--border); }
+.progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--primary), var(--sb-bg-mid)); border-radius: 99px; transition: width 0.3s ease; }
+.progress-fill.done { background: linear-gradient(90deg, var(--success), #16A34A); }
+.progress-note { font-size: 11.5px; color: var(--text-muted); margin-top: 8px; line-height: 1.5; }
+.progress-note.warn { color: var(--warning-text); font-weight: 600; }
+
+.callout { background: var(--primary-faint); border: 1px solid #DDE9FB; border-radius: var(--r-md); padding: 12px 14px; font-size: 12px; color: var(--text-soft); line-height: 1.6; display: flex; gap: 10px; }
+.callout svg { width: 16px; height: 16px; stroke: var(--primary); fill: none; stroke-width: 2; stroke-linecap: round; flex-shrink: 0; margin-top: 1px; }
+
+/* stub manual */
+.stub-box { text-align: center; padding: 56px 24px; }
+.stub-icon { width: 56px; height: 56px; border-radius: 16px; background: var(--primary-light); display: inline-flex; align-items: center; justify-content: center; margin-bottom: 16px; }
+.stub-icon svg { width: 26px; height: 26px; stroke: var(--primary); fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.stub-title { font-size: 15px; font-weight: 800; color: var(--text); margin-bottom: 6px; }
+.stub-sub { font-size: 13px; color: var(--text-muted); max-width: 420px; margin: 0 auto 18px; line-height: 1.6; }
+
+.loading-state { padding: 40px; text-align: center; color: var(--text-muted); font-size: 13.5px; }
+
+/* TOAST */
+.toast { position: fixed; bottom: 28px; right: 28px; background: #1e293b; color: white; padding: 13px 22px; border-radius: var(--r-lg); font-size: 13.5px; font-weight: 500; opacity: 0; transform: translateY(10px); transition: all 0.25s; pointer-events: none; z-index: 999; max-width: 320px; box-shadow: var(--shadow-lg); }
+.toast.show { opacity: 1; transform: translateY(0); }
+.toast.success { background: var(--success); }
+.toast.error { background: var(--danger); }
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .sidebar { transform: translateX(-100%); }
+  .sidebar.open { transform: translateX(0); box-shadow: 4px 0 32px rgba(0,87,217,0.2); }
+  .sidebar-close-btn { display: flex; }
+  .hamburger { display: flex; }
+  .content { margin-left: 0; }
+  .topbar { padding: 0 16px; }
+  .main-area { padding: 16px 14px 64px; }
+  .form-row { grid-template-columns: 1fr; }
+  .btn-logout-mobile { display: flex; }
+  .toast { bottom: 16px; right: 16px; left: 16px; max-width: none; text-align: center; }
+}
+/* PROYEK HEADER (detail) */
+.back-link { display:inline-flex; align-items:center; gap:7px; font-size:12.5px; font-weight:700; color:var(--text-muted); text-decoration:none; margin-bottom:14px; transition:color .15s; }
+.back-link:hover { color:var(--primary); }
+.back-link svg { width:15px; height:15px; stroke:currentColor; fill:none; stroke-width:2.2; stroke-linecap:round; stroke-linejoin:round; }
+.proyek-header { background:var(--surface); border:1px solid var(--border); border-radius:var(--r-2xl); box-shadow:var(--shadow-sm); padding:20px 24px; margin-bottom:20px; display:flex; align-items:center; justify-content:space-between; gap:16px; }
+.proyek-header-title { font-size:17px; font-weight:800; color:var(--text); letter-spacing:-.02em; }
+.proyek-header-keg { font-size:12.5px; color:var(--text-muted); margin-top:4px; }
+.status-badge { font-size:11px; font-weight:700; padding:5px 12px; border-radius:999px; white-space:nowrap; flex-shrink:0; }
+.status-badge.draft { background:#F3F4F6; color:#6B7280; }
+.status-badge.proses { background:var(--warning-bg); color:var(--warning-text); }
+.status-badge.selesai { background:var(--success-bg); color:var(--success-text); }
+/* HASIL */
+.hasil-actions { margin-top:18px; padding-top:18px; border-top:1px dashed var(--border); display:flex; gap:10px; flex-wrap:wrap; }
+.pdf-link { display:inline-flex; align-items:center; gap:5px; font-size:12px; font-weight:700; color:var(--primary); text-decoration:none; padding:4px 10px; border-radius:8px; background:var(--primary-light); transition:background .15s; }
+.pdf-link:hover { background:#DDE9FB; }
+.pdf-link svg { width:12px; height:12px; stroke:currentColor; fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+/* PAGINATION */
+.pagination-wrap { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:14px 4px 0; flex-wrap:wrap; }
+.pagination-info { font-size:12.5px; color:var(--text-muted); white-space:nowrap; }
+.pagination-nav { display:flex; align-items:center; gap:4px; }
+.pg-btn { height:32px; min-width:32px; padding:0 8px; border:1.5px solid var(--border); background:var(--surface); border-radius:8px; font-family:inherit; font-size:12.5px; font-weight:600; color:var(--text-soft); cursor:pointer; display:flex; align-items:center; justify-content:center; gap:4px; transition:all .15s; }
+.pg-btn:hover:not(:disabled) { border-color:var(--primary); color:var(--primary); background:var(--primary-light); }
+.pg-btn:disabled { opacity:.4; cursor:not-allowed; }
+.pg-btn.active { background:var(--primary); border-color:var(--primary); color:white; }
+.pg-btn svg { width:13px; height:13px; stroke:currentColor; fill:none; stroke-width:2; stroke-linecap:round; }
+/* CEK placeholder */
+.input-cek-row { display:flex; gap:8px; align-items:stretch; }
+.input-cek-row input { flex:1; }
+.btn-cek { height:44px; padding:0 16px; border:1.5px solid var(--border); background:var(--surface); border-radius:var(--r-md); font-family:inherit; font-size:13px; font-weight:700; color:var(--text-soft); cursor:pointer; display:inline-flex; align-items:center; gap:6px; white-space:nowrap; transition:all .15s; }
+.btn-cek:hover { border-color:var(--primary); color:var(--primary); background:var(--primary-light); }
+.btn-cek svg { width:15px; height:15px; stroke:currentColor; fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+.cek-result { margin-top:10px; display:flex; flex-wrap:wrap; gap:6px; }
+.ph-pill { font-size:11px; font-weight:700; padding:3px 9px; border-radius:999px; font-family:'SF Mono',Menlo,monospace; }
+.ph-pill.ada { background:var(--success-bg); color:var(--success-text); }
+.ph-pill.tidak { background:#F3F4F6; color:var(--text-faint); }
+/* MODAL TAMBAH PESERTA */
+.modal-overlay { position:fixed; inset:0; background:rgba(15,23,42,0.45); display:none; align-items:center; justify-content:center; z-index:200; padding:20px; }
+.modal-overlay.show { display:flex; }
+.modal { background:var(--surface); border-radius:var(--r-xl); box-shadow:var(--shadow-lg); width:100%; max-width:480px; max-height:90vh; display:flex; flex-direction:column; }
+.modal-header { padding:20px 24px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+.modal-header h3 { font-size:16px; font-weight:800; color:var(--text); }
+.modal-close { width:32px; height:32px; border:none; background:var(--bg); border-radius:9px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+.modal-close:hover { background:#E5E9F0; }
+.modal-close svg { width:15px; height:15px; stroke:var(--text-soft); fill:none; stroke-width:2.2; stroke-linecap:round; }
+.modal-body { padding:22px 24px; overflow-y:auto; }
+.modal-footer { padding:16px 24px; border-top:1px solid var(--border); display:flex; justify-content:flex-end; gap:10px; }
+.mini-tabs { display:inline-flex; background:var(--bg); border-radius:12px; padding:4px; gap:4px; margin-bottom:18px; }
+.mini-tab { height:34px; padding:0 16px; border:none; background:none; cursor:pointer; border-radius:9px; font-family:inherit; font-size:12.5px; font-weight:700; color:var(--text-muted); transition:all .15s; }
+.mini-tab.active { background:var(--surface); color:var(--primary); box-shadow:var(--shadow-xs); }
+.search-results { margin-top:14px; max-height:280px; overflow-y:auto; display:flex; flex-direction:column; gap:6px; }
+.sr-hint { font-size:12.5px; color:var(--text-muted); text-align:center; padding:24px 0; }
+.sr-row { display:flex; align-items:center; gap:12px; padding:10px 12px; border:1px solid var(--border); border-radius:var(--r-md); }
+.sr-info { flex:1; min-width:0; }
+.sr-name { font-size:13px; font-weight:700; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.sr-sub { font-size:11.5px; color:var(--text-muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top:1px; }
+.sr-add { height:32px; padding:0 12px; border:1.5px solid var(--primary); background:var(--primary-light); color:var(--primary); border-radius:9px; font-family:inherit; font-size:12px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:5px; white-space:nowrap; flex-shrink:0; transition:all .15s; }
+.sr-add:hover { background:var(--primary); color:white; }
+.sr-add svg { width:13px; height:13px; stroke:currentColor; fill:none; stroke-width:2.4; stroke-linecap:round; }
+.sr-added { font-size:11.5px; font-weight:700; color:var(--success-text); flex-shrink:0; }
+</style>
+</head>
+<body>
+
+<div class="app" id="app">
+
+  <!-- Sidebar overlay (mobile) -->
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar && closeSidebar()"></div>
+
+  <!-- SIDEBAR -->
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <img src="https://raw.githubusercontent.com/kurikulumsma/image/main/logo.png" alt="Logo SMA" class="sidebar-logo">
+      <button class="sidebar-close-btn" onclick="closeSidebar && closeSidebar()">
+        <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="sidebar-nav">
+      <div class="sidebar-section-label">Menu Utama</div>
+      <a class="nav-item" id="navKegiatan" href="kegiatan.html">
+        <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Kegiatan
+      </a>
+      <a class="nav-item" id="navPeserta" href="datapeserta.html">
+        <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Database Peserta
+      </a>
+      <a class="nav-item" id="navSertifikat" href="sertifikat.html">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>
+        Sertifikat
+      </a>
+      <a class="nav-item" id="navKontak" href="kontak.html">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        Cari Kontak
+      </a>
+      <a class="nav-item" id="navPengaturan" href="pengaturan.html" style="display:none">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        Pengaturan
+      </a>
+    </div>
+    <div class="sidebar-footer">
+      <div class="user-card">
+        <div class="user-avatar">
+          <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </div>
+        <div class="user-info">
+          <div class="user-name" id="sidebarUserName">-</div>
+          <div class="user-role" id="sidebarUserRole">-</div>
+        </div>
+        <button class="btn-logout-icon" onclick="doLogout && doLogout()" title="Keluar">
+          <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- MAIN -->
+  <div class="content">
+    <div class="topbar">
+      <div class="topbar-left">
+        <button class="hamburger" id="hamburgerBtn" onclick="openSidebar && openSidebar()">
+          <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        <div class="topbar-title" id="topbarTitle">Sertifikat</div>
+      </div>
+      <div class="topbar-right">
+        <div class="user-pill" id="userPill">
+          <div class="user-pill-avatar"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+          <span class="user-pill-label" id="pillRoleLabel">-</span>
+        </div>
+        <button class="btn-logout-mobile" onclick="doLogout && doLogout()">
+          <svg viewBox="0 0 24 24" style="width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          Keluar
+        </button>
+      </div>
+    </div>
+
+    <div class="main-area">
+      <div class="section-page active" id="page-sertifikat">
+
+        <!-- HEADER PROYEK -->
+        <a href="sertifikat.html" class="back-link">
+          <svg viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+          Daftar Proyek
+        </a>
+        <div class="proyek-header">
+          <div class="proyek-header-main">
+            <div class="proyek-header-title" id="phNama">Memuat…</div>
+            <div class="proyek-header-keg" id="phKegiatan">—</div>
+          </div>
+          <span class="status-badge draft" id="phStatus">Draft</span>
+        </div>
+
+        <div id="modeKegiatan">
+
+          <!-- STEP 2: daftar penerima -->
+          <div class="step-card step-hidden" id="step2">
+            <div class="step-head">
+              <div class="step-num">1</div>
+              <div>
+                <div class="step-title">Daftar Penerima</div>
+                <div class="step-sub">Atur peran tiap orang. Narasumber & fasilitator otomatis naik ke atas.</div>
+              </div>
+            </div>
+            <div class="step-body">
+              <div class="rcp-toolbar">
+                <div class="rcp-toolbar-left">
+                  <span class="rcp-title">Penerima</span>
+                  <span class="badge-count" id="rcpCount">0</span>
+                </div>
+                <div class="rcp-toolbar-right">
+                  <div class="rcp-search">
+                    <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    <input type="text" id="rcpSearch" placeholder="Cari nama penerima…" oninput="filterPenerima()" autocomplete="off">
+                  </div>
+                  <button class="btn-sm ghost" onclick="tambahPenerima()">
+                    <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    Tambah Penerima
+                  </button>
+                </div>
+              </div>
+              <div class="table-outer">
+                <table>
+                  <thead>
+                    <tr>
+                      <th style="width:42px">No</th>
+                      <th>Nama</th>
+                      <th>Instansi</th>
+                      <th>Provinsi</th>
+                      <th>Kab/Kota</th>
+                      <th>Email</th>
+                      <th style="width:140px">Peran</th>
+                      <th style="width:90px">PDF</th>
+                      <th style="width:110px">Email</th>
+                      <th style="width:80px">Sertifikat</th>
+                      <th style="width:44px"></th>
+                    </tr>
+                  </thead>
+                  <tbody id="rcpTbody">
+                    <tr><td colspan="11" class="td-empty">Memuat penerima…</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="pagination-wrap" id="paginationWrap" style="display:none;">
+                <span class="pagination-info" id="paginationInfo">—</span>
+                <div class="pagination-nav" id="paginationNav"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- STEP 3: template & folder -->
+          <div class="step-card step-hidden" id="step3">
+            <div class="step-head">
+              <div class="step-num">2</div>
+              <div>
+                <div class="step-title">Template & Folder Tujuan</div>
+                <div class="step-sub">Tentukan folder hasil PDF, lalu template Google Slides-nya</div>
+              </div>
+            </div>
+            <div class="step-body">
+              <div class="field">
+                <label>Folder Google Drive (Tujuan PDF)</label>
+                <input type="text" id="inputDrive" placeholder="https://drive.google.com/drive/folders/..." oninput="onDriveInput()">
+                <div class="field-hint">Pastikan folder sudah dibagikan ke akun pengirim (akun yang menjalankan Apps Script).</div>
+              </div>
+              <div class="field" style="margin-bottom:0;">
+                <label>Template Default — Google Slides</label>
+                <div class="input-cek-row">
+                  <input type="text" id="inputSlideDefault" placeholder="https://docs.google.com/presentation/d/..." oninput="onDefaultTplInput()">
+                  <button class="btn-cek" onclick="cekPlaceholder()">
+                    <svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                    Cek
+                  </button>
+                </div>
+                <div class="field-hint">Dipakai untuk semua peran. Di Slides tulis placeholder: <code>{{nama}}</code> <code>{{instansi}}</code> <code>{{provinsi}}</code> <code>{{kabupaten_kota}}</code> <code>{{peran}}</code></div>
+                <div class="cek-result" id="cekResult" style="display:none;"></div>
+              </div>
+              <!-- Override per peran (hanya muncul kalau peran-nya ada di daftar) -->
+              <div class="tpl-override" id="overrideArea"></div>
+            </div>
+          </div>
+
+          <!-- STEP 4: email + proses -->
+          <!-- STEP 3: PROSES (buat PDF) -->
+          <div class="step-card step-hidden" id="step4">
+            <div class="step-head">
+              <div class="step-num">3</div>
+              <div>
+                <div class="step-title">Proses — Buat PDF</div>
+                <div class="step-sub">Generate PDF dari template. Setelah semua jadi, baru atur pengiriman.</div>
+              </div>
+            </div>
+            <div class="step-body">
+              <div class="process-bar">
+                <button class="btn-primary" id="btnGenerate" onclick="prosesGenerate()">
+                  <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                  Buat PDF Sertifikat
+                </button>
+                <button class="btn-secondary" id="btnSampel" onclick="lihatSampel()">
+                  <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                  Lihat Sampel
+                </button>
+              </div>
+
+              <!-- progress generate -->
+              <div class="progress-wrap" id="progressWrap">
+                <div class="progress-head">
+                  <span class="progress-label" id="progressLabel">Membuat PDF…</span>
+                  <span class="progress-count" id="progressCount">0 / 0</span>
+                </div>
+                <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+                <div class="progress-note" id="progressNote"></div>
+              </div>
+
+              <!-- hasil -->
+              <div class="hasil-actions" id="hasilActions" style="display:none;">
+                <button class="btn-secondary" onclick="bukaFolder()">
+                  <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                  Buka Folder Drive
+                </button>
+                <button class="btn-secondary" onclick="buatRekap()">
+                  <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+                  Buat Rekap Google Sheet
+                </button>
+              </div>
+
+              <div class="callout" style="margin-top:18px;">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                <span>Pembuatan PDF berjalan bertahap (per batch) karena Apps Script punya batas waktu eksekusi.</span>
+              </div>
+
+              <!-- toggle email: muncul setelah PDF jadi -->
+              <div class="email-toggle-row" id="emailToggleRow" style="display:none; margin-top:20px; padding-top:18px; border-top:1px dashed var(--border);">
+                <button class="toggle-track" id="emailToggle" onclick="toggleEmail()"><span class="toggle-thumb"></span></button>
+                <div>
+                  <div class="toggle-label">Kirim sertifikat via email?</div>
+                  <div class="toggle-sub">Kalau dimatikan, PDF cukup tersimpan di folder Drive.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- STEP 4: KIRIM EMAIL -->
+          <div class="step-card step-hidden" id="step5">
+            <div class="step-head">
+              <div class="step-num">4</div>
+              <div>
+                <div class="step-title">Kirim Email</div>
+                <div class="step-sub">Atur isi email, lalu kirim sertifikat ke penerima</div>
+              </div>
+            </div>
+            <div class="step-body">
+              <div class="field">
+                <label>Subjek Email</label>
+                <input type="text" id="emailSubject" placeholder="Sertifikat Kegiatan {{kegiatan}}">
+              </div>
+              <div class="field">
+                <label>Isi Pesan</label>
+                <textarea id="emailBody" placeholder="Yth. {{nama}},&#10;&#10;Terlampir sertifikat Anda sebagai {{peran}}...">Yth. {{nama}},
+
+Terima kasih atas partisipasi Anda sebagai {{peran}}. Sertifikat terlampir pada email ini.
+
+Hormat kami,
+Direktorat SMA</textarea>
+                <div class="field-hint">Bisa pakai placeholder yang sama: <code>{{nama}}</code> <code>{{peran}}</code> <code>{{instansi}}</code></div>
+              </div>
+
+              <div class="process-bar" style="margin-top:4px;">
+                <button class="btn-primary" id="btnSend" onclick="prosesKirim()">
+                  <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                  Kirim Email
+                </button>
+              </div>
+
+              <!-- progress kirim -->
+              <div class="progress-wrap" id="progressWrapK">
+                <div class="progress-head">
+                  <span class="progress-label" id="progressLabelK">Mengirim email…</span>
+                  <span class="progress-count" id="progressCountK">0 / 0</span>
+                </div>
+                <div class="progress-track"><div class="progress-fill" id="progressFillK"></div></div>
+                <div class="progress-note" id="progressNoteK"></div>
+              </div>
+
+              <div class="callout" style="margin-top:18px;">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                <span>Pengiriman email dibatasi <strong>±500/hari</strong> — kalau penerima lebih banyak, sisanya bisa dikirim ulang besok lewat tombol <strong>Kirim Email</strong>.</span>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /modeKegiatan -->
+
+      </div><!-- /page -->
+    </div><!-- /main-area -->
+  </div><!-- /content -->
+</div><!-- /app -->
+
+<!-- MODAL TAMBAH PESERTA -->
+<div class="modal-overlay" id="tambahPesertaOverlay">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Tambah Peserta</h3>
+      <button class="modal-close" onclick="closeTambahPeserta()"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <div class="mini-tabs">
+        <button class="mini-tab active" id="mtDb" onclick="setTambahMode('db')">Dari Database</button>
+        <button class="mini-tab" id="mtManual" onclick="setTambahMode('manual')">Input Manual</button>
+      </div>
+
+      <div id="modeDb">
+        <div class="rcp-search" style="width:100%;">
+          <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" id="searchPeserta" placeholder="Cari nama atau NIK…" oninput="cariPeserta()" autocomplete="off" style="width:100%;">
+        </div>
+        <div class="search-results" id="searchResults">
+          <div class="sr-hint">Ketik minimal 2 huruf untuk mencari nama atau NIK.</div>
+        </div>
+      </div>
+
+      <div id="modeManualForm" style="display:none;">
+        <div class="field"><label>Nama *</label><input type="text" id="mNama" autocomplete="off"></div>
+        <div class="field"><label>Instansi</label><input type="text" id="mInstansi" autocomplete="off"></div>
+        <div class="form-row">
+          <div class="field"><label>Provinsi</label><input type="text" id="mProvinsi" autocomplete="off"></div>
+          <div class="field"><label>Kabupaten/Kota</label><input type="text" id="mKabkota" autocomplete="off"></div>
+        </div>
+        <div class="field"><label>Email</label><input type="text" id="mEmail" autocomplete="off"></div>
+        <div class="field" style="margin-bottom:0;">
+          <label>Peran</label>
+          <select id="mPeran">
+            <option value="peserta">Peserta</option>
+            <option value="fasilitator">Fasilitator</option>
+            <option value="narasumber">Narasumber</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeTambahPeserta()">Tutup</button>
+      <button class="btn-primary" id="btnSimpanManual" onclick="simpanManual()" style="display:none;">
+        <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Tambah
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="config.js"></script>
+<script src="sidebar.js"></script>
+<script src="lokasi.js"></script>
+<script src="sertifikat-detail.js"></script>
+<script>
+// onAppReady dipanggil oleh auth.js setelah sesi tervalidasi (pola sama spt kegiatan.html)
+function onAppReady(user) {
+  document.getElementById('page-sertifikat').classList.add('active');
+  if (typeof setTopbarTitle === 'function') setTopbarTitle('Sertifikat');
+  initSertifikat(user);
+}
+</script>
+<script src="auth.js"></script>
+</body>
+</html>

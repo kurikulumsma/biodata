@@ -26,6 +26,8 @@ function _currentPageId() {
   const map = {
     'kegiatan.html':    'Kegiatan',
     'datapeserta.html': 'Peserta',
+    'sertifikat.html':  'Sertifikat',
+    'sertifikat-detail.html': 'Sertifikat',
     'kontak.html':      'Kontak',
     'pengaturan.html':  'Pengaturan',
   };
