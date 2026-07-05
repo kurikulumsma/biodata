@@ -446,6 +446,26 @@ tbody td:first-child { padding-left: 18px; font-weight: 700; color: var(--text-f
 .save-indicator.saved  { color:var(--success-text); }
 .save-indicator.error  { color:#EF4444; }
 
+/* kuota card */
+.kuota-card { display:flex; align-items:center; gap:14px; padding:14px 16px; background:linear-gradient(135deg, #EFF6FF 0%, #F0F9FF 100%); border:1px solid #BFDBFE; border-radius:var(--r-md); margin-bottom:16px; }
+.kuota-icon { width:40px; height:40px; border-radius:10px; background:var(--primary); color:white; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.kuota-icon svg { width:20px; height:20px; }
+.kuota-body { flex:1; min-width:0; }
+.kuota-label { font-size:11px; font-weight:700; color:var(--primary); text-transform:uppercase; letter-spacing:.04em; margin-bottom:2px; }
+.kuota-value { font-size:20px; font-weight:800; color:var(--text); line-height:1.2; letter-spacing:-0.01em; }
+.kuota-unit { font-size:12px; font-weight:600; color:var(--text-soft); text-transform:lowercase; letter-spacing:0; }
+.kuota-meta { display:flex; flex-direction:column; align-items:flex-end; gap:6px; flex-shrink:0; }
+.kuota-meta-text { font-size:10.5px; color:var(--text-faint); font-weight:500; text-align:right; max-width:140px; line-height:1.4; }
+.kuota-refresh { width:28px; height:28px; border-radius:8px; background:white; border:1px solid var(--border); color:var(--text-soft); display:flex; align-items:center; justify-content:center; cursor:pointer; transition:all .15s; }
+.kuota-refresh:hover { color:var(--primary); border-color:var(--primary); }
+.kuota-refresh svg { width:14px; height:14px; }
+.kuota-refresh.spinning svg { animation:spin .8s linear infinite; transform-origin:center; }
+@media (max-width:520px){
+  .kuota-card { flex-wrap:wrap; }
+  .kuota-meta { width:100%; flex-direction:row; justify-content:space-between; align-items:center; }
+  .kuota-meta-text { text-align:left; max-width:none; }
+}
+
 /* field check icon kanan */
 .field-label-row { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:6px; }
 .field-label-row label { margin:0; }
@@ -463,7 +483,12 @@ tbody td:first-child { padding-left: 18px; font-weight: 700; color: var(--text-f
 .progress-fill.done::after { display:none; }
 
 /* skeleton loading — match layout asli */
-.skeleton-bar { border-radius:8px; background:linear-gradient(90deg,#E8EBF0 25%,#F3F5F8 50%,#E8EBF0 75%); background-size:200% 100%; animation:shimmer 1.4s infinite; }
+.skeleton-bar { border-radius:8px; background:linear-gradient(90deg,#E5E7EB 0%,#F3F4F6 30%,#F9FAFB 50%,#F3F4F6 70%,#E5E7EB 100%); background-size:400% 100%; animation:skeletonShine 1.6s ease-in-out infinite; }
+@keyframes skeletonShine { 0% { background-position: 100% 0; } 100% { background-position: -100% 0; } }
+.skel-status { padding:14px 18px; background:var(--primary-light); border:1px solid #BFDBFE; border-radius:12px; margin-bottom:20px; }
+.skel-status-head { display:flex; align-items:center; gap:10px; font-size:12.5px; font-weight:600; color:var(--primary); margin-bottom:10px; }
+.skel-progress-track { height:6px; background:rgba(59,130,246,0.15); border-radius:999px; overflow:hidden; }
+.skel-progress-fill { height:100%; background:var(--primary); border-radius:999px; width:0%; transition:width .4s ease; box-shadow:0 0 8px rgba(59,130,246,0.5); }
 #skeletonOverlay { animation:fadeIn .2s; }
 .sk-backlink { height:16px; width:120px; margin-bottom:20px; }
 .sk-header { background:var(--surface); border:1px solid var(--border); border-radius:var(--r-2xl); box-shadow:var(--shadow-sm); padding:20px 24px; margin-bottom:20px; display:flex; align-items:center; justify-content:space-between; }
@@ -598,8 +623,33 @@ tbody td:first-child { padding-left: 18px; font-weight: 700; color: var(--text-f
 .save-indicator.saved  { color:var(--success-text); }
 .save-indicator.error  { color:#EF4444; }
 
+/* kuota card */
+.kuota-card { display:flex; align-items:center; gap:14px; padding:14px 16px; background:linear-gradient(135deg, #EFF6FF 0%, #F0F9FF 100%); border:1px solid #BFDBFE; border-radius:var(--r-md); margin-bottom:16px; }
+.kuota-icon { width:40px; height:40px; border-radius:10px; background:var(--primary); color:white; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.kuota-icon svg { width:20px; height:20px; }
+.kuota-body { flex:1; min-width:0; }
+.kuota-label { font-size:11px; font-weight:700; color:var(--primary); text-transform:uppercase; letter-spacing:.04em; margin-bottom:2px; }
+.kuota-value { font-size:20px; font-weight:800; color:var(--text); line-height:1.2; letter-spacing:-0.01em; }
+.kuota-unit { font-size:12px; font-weight:600; color:var(--text-soft); text-transform:lowercase; letter-spacing:0; }
+.kuota-meta { display:flex; flex-direction:column; align-items:flex-end; gap:6px; flex-shrink:0; }
+.kuota-meta-text { font-size:10.5px; color:var(--text-faint); font-weight:500; text-align:right; max-width:140px; line-height:1.4; }
+.kuota-refresh { width:28px; height:28px; border-radius:8px; background:white; border:1px solid var(--border); color:var(--text-soft); display:flex; align-items:center; justify-content:center; cursor:pointer; transition:all .15s; }
+.kuota-refresh:hover { color:var(--primary); border-color:var(--primary); }
+.kuota-refresh svg { width:14px; height:14px; }
+.kuota-refresh.spinning svg { animation:spin .8s linear infinite; transform-origin:center; }
+@media (max-width:520px){
+  .kuota-card { flex-wrap:wrap; }
+  .kuota-meta { width:100%; flex-direction:row; justify-content:space-between; align-items:center; }
+  .kuota-meta-text { text-align:left; max-width:none; }
+}
+
 /* skeleton */
-.skeleton-bar { border-radius:8px; background:linear-gradient(90deg,#E8EBF0 25%,#F3F5F8 50%,#E8EBF0 75%); background-size:200% 100%; animation:shimmer 1.4s infinite; }
+.skeleton-bar { border-radius:8px; background:linear-gradient(90deg,#E5E7EB 0%,#F3F4F6 30%,#F9FAFB 50%,#F3F4F6 70%,#E5E7EB 100%); background-size:400% 100%; animation:skeletonShine 1.6s ease-in-out infinite; }
+@keyframes skeletonShine { 0% { background-position: 100% 0; } 100% { background-position: -100% 0; } }
+.skel-status { padding:14px 18px; background:var(--primary-light); border:1px solid #BFDBFE; border-radius:12px; margin-bottom:20px; }
+.skel-status-head { display:flex; align-items:center; gap:10px; font-size:12.5px; font-weight:600; color:var(--primary); margin-bottom:10px; }
+.skel-progress-track { height:6px; background:rgba(59,130,246,0.15); border-radius:999px; overflow:hidden; }
+.skel-progress-fill { height:100%; background:var(--primary); border-radius:999px; width:0%; transition:width .4s ease; box-shadow:0 0 8px rgba(59,130,246,0.5); }
 #skeletonOverlay { animation:fadeIn .2s; }
 .sk-backlink { height:16px; width:120px; margin-bottom:20px; }
 .sk-header { background:var(--surface); border:1px solid var(--border); border-radius:var(--r-2xl); padding:20px 24px; margin-bottom:16px; display:flex; align-items:center; justify-content:space-between; }
@@ -709,6 +759,14 @@ tbody td:first-child { padding-left: 18px; font-weight: 700; color: var(--text-f
       <div class="section-page active" id="page-sertifikat">
         <!-- skeleton -->
         <div id="skeletonOverlay" style="display:none;">
+          <div class="skel-status">
+            <div class="skel-status-head">
+              <span class="spin-svg" style="width:14px;height:14px;display:inline-flex"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="var(--primary)" stroke-width="2.5" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg></span>
+              <span id="skelStatusText" style="flex:1">Memuat…</span>
+              <span id="skelPercent" style="font-weight:800;color:var(--primary)">0%</span>
+            </div>
+            <div class="skel-progress-track"><div class="skel-progress-fill" id="skelProgress"></div></div>
+          </div>
           <div class="skeleton-bar sk-backlink"></div>
           <div class="sk-header">
             <div><div class="skeleton-bar sk-header-title"></div><div class="skeleton-bar sk-header-sub"></div></div>
@@ -822,26 +880,29 @@ tbody td:first-child { padding-left: 18px; font-weight: 700; color: var(--text-f
                 </div>
               </div>
               <div class="email-card-body">
-                <div class="field">
-                  <label>Subjek Email</label>
-                  <input type="text" id="emailSubject" placeholder="Sertifikat Anda" oninput="autoSave()">
+                <!-- kuota card -->
+                <div class="kuota-card">
+                  <div class="kuota-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                  </div>
+                  <div class="kuota-body">
+                    <div class="kuota-label">Sisa Kuota Email Hari Ini</div>
+                    <div class="kuota-value"><span id="kuotaSisa">—</span> <span class="kuota-unit">email</span></div>
+                  </div>
+                  <div class="kuota-meta">
+                    <div class="kuota-meta-text">Reset otomatis pukul 00:00 waktu Google</div>
+                    <button class="kuota-refresh" onclick="fetchKuota()" title="Refresh kuota">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><polyline points="21 3 21 8 16 8"/></svg>
+                    </button>
+                  </div>
                 </div>
-                <div class="field">
-                  <label>Isi Pesan</label>
-                  <textarea id="emailBody" placeholder="Yth. {{nama}}, ..." oninput="autoSave()">Yth. {{nama}},
 
-Terlampir sertifikat Anda. Terima kasih.
-
-Hormat kami,
-Direktorat SMA</textarea>
-                  <div class="field-hint">Bisa pakai placeholder: <span id="emailPhHint"></span></div>
-                </div>
                 <div class="dash-actions" style="margin-bottom:0;">
                   <button class="btn-primary" id="btnSend" onclick="prosesKirim()">
                     <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
                     Kirim ke yang belum
                   </button>
-                  <span class="field-hint" style="margin:0;">Hanya kirim ke peserta yang punya PDF &amp; belum dikirim. Batas ±500/hari.</span>
+                  <span class="field-hint" style="margin:0;">Kirim ke peserta yang punya PDF &amp; belum dikirim.</span>
                 </div>
                 <div class="progress-wrap" id="progressWrapK" style="margin-top:16px;">
                   <div class="progress-head">
@@ -935,6 +996,7 @@ Direktorat SMA</textarea>
             </div>
           </div>
         </div>
+
 
       </div><!-- /page -->
     </div><!-- /main-area -->
@@ -1061,9 +1123,17 @@ function renderMapping(d){
 
   CEK.emailDetected=!!d.emailName&&headCanon.some(h=>h.canon===d.emailName);
   CEK.placeholders=d.placeholders;
-  $('emailPhHint').innerHTML=d.placeholders.map(ph=>`<code>{{${ph.name}}}</code>`).join(' ');
+  // (emailPhHint removed — template fixed)
   // restore saved mapping
-  if(window._savedMapping){ Object.entries(window._savedMapping).forEach(([k,v])=>{const s=$('map_'+k); if(s) s.value=v||'';}); window._savedMapping=null; }
+  // restore mapping dari Supabase kalau ada
+  if(window._savedMapping){
+    Object.entries(window._savedMapping).forEach(([k,v])=>{
+      const s=$('map_'+k); if(s) s.value=v||'';
+    });
+    window._savedMapping=null;
+  }
+  // pastikan mapping saat ini tersinkron ke Supabase (kalau ada perubahan headers)
+  autoSave();
   // toggle email state
   updateCfgEmailToggle();
 }
@@ -1088,8 +1158,6 @@ async function simpanProyek(){
     judul_sertifikat:$('inJudul').value.trim()||null,
     kegiatan_nama:$('inTab').value.trim()||null,
     mapping_config:Object.keys(map).length?JSON.stringify(map):null,
-    email_subject:$('emailSubject').value.trim()||null,
-    email_body:$('emailBody').value.trim()||null,
     email_aktif:EMAIL_AKTIF
   };
   try{ await sbFetch(`sertifikat_proyek?id=eq.${PROYEK_ID}`,{method:'PATCH',prefer:'return=minimal',body:JSON.stringify(payload)}); setSaveInd('saved'); setTimeout(()=>setSaveInd(''),2200); }
@@ -1130,6 +1198,8 @@ async function muatTabel(){
     // kolom email di tabel
     $('thEmail').style.display=d.emailColAda?'':'none';
     $('thEmailStatus').style.display=d.emailColAda?'':'none';
+    // fetch kuota kalau kolom email ada
+    if(d.emailColAda) fetchKuota();
   }catch(e){ toast('Gagal muat tabel: '+e.message,'error'); }
   finally{ if(btnR){ btnR.disabled=false; btnR.classList.remove('spinning'); } }
 }
@@ -1251,6 +1321,26 @@ function updateCfgEmailToggle(){
   }
   syncEmailCard();
 }
+
+/* ---- KUOTA EMAIL ---- */
+async function fetchKuota(){
+  const btn=document.querySelector('.kuota-refresh');
+  if(btn) btn.classList.add('spinning');
+  try{
+    const d=await callGAS('getKuota',{});
+    console.log('[kuota] response:', d);
+    if(d&&typeof d.sisa==='number'){
+      $('kuotaSisa').textContent = d.sisa.toLocaleString('id-ID');
+    } else {
+      $('kuotaSisa').textContent='?';
+      console.warn('[kuota] sisa tidak berupa angka:', d);
+    }
+  }catch(e){
+    console.error('[kuota] fetch gagal:', e.message);
+    $('kuotaSisa').textContent='!';
+  }finally{ if(btn) btn.classList.remove('spinning'); }
+}
+
 async function prosesKirim(){
   const btn=$('btnSend'); btn.disabled=true;
   $('progressWrapK').classList.add('show'); $('progressFillK').classList.remove('done');
@@ -1259,7 +1349,7 @@ async function prosesKirim(){
     while(true){
       batchNum++;
       $('progressLabelK').textContent='Mengirim — Batch '+batchNum;
-      const d=await callGAS('kirim',{sheetUrl:$('inSheet').value.trim(),tab:$('inTab').value.trim(),subject:$('emailSubject').value||'Sertifikat Anda',body:$('emailBody').value||'Terlampir sertifikat Anda.',startIndex,batchSize:20});
+      const d=await callGAS('kirim',{sheetUrl:$('inSheet').value.trim(),tab:$('inTab').value.trim(),judulSertifikat:$('inJudul').value.trim(),startIndex,batchSize:20});
       total=d.total; startIndex=d.endIndex;
       const pct=total?Math.round(startIndex/total*100):100;
       $('progressFillK').style.width=pct+'%';
@@ -1272,6 +1362,7 @@ async function prosesKirim(){
     if(total===0) $('progressNoteK').textContent='Tidak ada yang perlu dikirim (semua sudah / belum ada PDF).';
     toast('Email selesai dikirim!','success');
     await muatTabel();
+    await fetchKuota();
   }catch(err){ toast('Error kirim: '+err.message,'error'); $('progressNoteK').textContent='⚠ Gagal di batch '+batchNum+'.'; }
   btn.disabled=false;
 }
@@ -1284,11 +1375,18 @@ function refreshDashboardVisibility(){
 }
 
 /* ============ LOAD ============ */
+function setSkelStatus(text, percent){
+  const el=$('skelStatusText'); if(el) el.textContent=text;
+  const bar=$('skelProgress'); if(bar && typeof percent==='number') bar.style.width=percent+'%';
+  const pct=$('skelPercent'); if(pct && typeof percent==='number') pct.textContent=percent+'%';
+}
+
 async function loadProyek(){
   const params=new URLSearchParams(window.location.search);
   PROYEK_ID=params.get('id');
   if(!PROYEK_ID) return;
   try{
+    setSkelStatus('Memuat data proyek dari Supabase…', 15);
     const res=await sbFetch(`sertifikat_proyek?id=eq.${PROYEK_ID}&select=*`);
     const [p]=await res.json();
     if(!p) return;
@@ -1300,15 +1398,14 @@ async function loadProyek(){
     if(p.template_default) $('inSlide').value=p.template_default;
     if(p.drive_folder_url) $('inFolder').value=p.drive_folder_url;
     if(p.judul_sertifikat) $('inJudul').value=p.judul_sertifikat;
-    if(p.email_subject) $('emailSubject').value=p.email_subject;
-    if(p.email_body) $('emailBody').value=p.email_body;
     EMAIL_AKTIF = !!p.email_aktif;
     if(p.mapping_config){ try{ window._savedMapping=JSON.parse(p.mapping_config); }catch(e){} }
-    if(p.sheet_url) await loadTabs(p.sheet_url);
+    if(p.sheet_url){ setSkelStatus('Mendeteksi tab Sheet…', 35); await loadTabs(p.sheet_url); }
     if(p.kegiatan_nama) $('inTab').value=p.kegiatan_nama;
     updateAllDots(); onCfgInput();
     // kalau sumber lengkap → cek + muat tabel
     if(p.sheet_url&&p.template_default){
+      setSkelStatus('Membaca placeholder Slides & header Sheet…', 55);
       await cekPlaceholder();
     }
   }catch(e){ console.warn('load proyek:',e.message); }
@@ -1323,7 +1420,9 @@ async function initManual(){
   refreshDashboardVisibility();
   // muat tabel kalau sumber lengkap
   if($('inSheet').value.trim()&&$('inFolder').value.trim()&&CEK){
+    setSkelStatus('Memuat data peserta dari Sheet…', 85);
     await muatTabel();
+    setSkelStatus('Menyiapkan tampilan…', 100);
   }
   $('skeletonOverlay').style.display='none';
   $('dashboard').style.display='block';
