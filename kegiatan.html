@@ -286,6 +286,35 @@ a.nav-item { display: flex; }
 }
 
 /* ─────────────────────────────────────────────
+   GREETING BAR
+───────────────────────────────────────────── */
+.greeting-bar {
+  padding: 24px 22px 0;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  animation: greetingIn 0.5s cubic-bezier(0.16,1,0.3,1);
+}
+.greeting-icon {
+  width: 26px; height: 26px; flex-shrink: 0;
+  stroke: var(--primary); fill: none;
+  stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round;
+}
+.greeting-text {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  color: var(--text);
+  line-height: 1.3;
+}
+.greeting-name { color: var(--primary); }
+@keyframes greetingIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ─────────────────────────────────────────────
    TOPBAR
 ───────────────────────────────────────────── */
 .topbar {
@@ -1145,6 +1174,8 @@ tbody td:first-child { padding-left: 18px; font-weight: 600; color: var(--text);
 .tr-clickable { cursor: pointer; transition: background 0.1s; }
 .tr-clickable:hover { background: var(--primary-faint) !important; }
 .tr-clickable:hover td:first-child .icon-btn-print svg { stroke: var(--success-text); }
+#detailPesertaTbody td { padding-top: 13px; padding-bottom: 13px; }
+#detailPesertaTbody td.td-ts { font-size: 12px; }
 .badge-printed {
   font-size: 10.5px; font-weight: 700; padding: 2px 7px; border-radius: 20px;
   background: var(--success-bg); color: var(--success-text); border: 1px solid #BBF7D0;
@@ -1240,31 +1271,44 @@ tbody td:first-child { padding-left: 18px; font-weight: 600; color: var(--text);
   box-shadow: var(--shadow-lg);
 }
 .modal-detail-header {
-  padding: 20px 24px 16px; border-bottom: 1px solid var(--border);
-  display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
+  background: linear-gradient(135deg, var(--primary) 0%, #2563EB 100%);
+  padding: 20px 22px; flex-shrink: 0;
+  display: flex; align-items: flex-start; gap: 12px;
 }
-.modal-detail-header h3 { font-size: 14px; font-weight: 800; color: var(--text); }
+.md-avatar {
+  width: 44px; height: 44px; border-radius: 12px;
+  background: rgba(255,255,255,0.2);
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.md-avatar svg { width: 22px; height: 22px; stroke: white; fill: none; stroke-width: 2; stroke-linecap: round; }
+.md-title-wrap { flex: 1; min-width: 0; }
+.md-nama { font-size: 15px; font-weight: 800; color: white; line-height: 1.3; word-break: break-word; }
+.md-sub { font-size: 12px; color: rgba(255,255,255,0.78); margin-top: 3px; font-weight: 500; word-break: break-word; }
 .modal-detail-close {
-  width: 32px; height: 32px; border: none; background: none; cursor: pointer;
+  width: 32px; height: 32px; border: none; background: rgba(255,255,255,0.15); cursor: pointer;
   border-radius: 8px; display: flex; align-items: center; justify-content: center;
-  transition: background 0.15s;
+  flex-shrink: 0; transition: background 0.15s;
 }
-.modal-detail-close:hover { background: var(--bg); }
+.modal-detail-close:hover { background: rgba(255,255,255,0.3); }
 .modal-detail-close svg {
-  width: 16px; height: 16px; stroke: var(--text-muted);
-  fill: none; stroke-width: 2; stroke-linecap: round;
+  width: 16px; height: 16px; stroke: white;
+  fill: none; stroke-width: 2.5; stroke-linecap: round;
 }
-.modal-detail-body { padding: 18px 24px; overflow-y: auto; }
-.detail-row {
-  display: flex; gap: 10px; padding: 8px 0;
-  border-bottom: 1px solid #F1F3F7; font-size: 13px;
+.modal-detail-body { padding: 6px 0 10px; overflow-y: auto; }
+.detail-group { padding: 0 22px; }
+.detail-group-label {
+  font-size: 10px; font-weight: 800; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--text-faint); padding: 14px 0 6px;
 }
-.detail-row:last-child { border-bottom: none; }
-.detail-label {
-  width: 180px; flex-shrink: 0; font-size: 11.5px; font-weight: 700;
-  color: var(--text-muted); text-transform: uppercase;
-  letter-spacing: 0.03em; padding-top: 1px;
+.detail-row-new {
+  display: grid; grid-template-columns: 148px 1fr; gap: 8px;
+  padding: 8px 0; border-bottom: 1px solid #F1F3F7; align-items: start;
 }
+.detail-row-new:last-child { border-bottom: none; }
+.detail-label-new { font-size: 11.5px; font-weight: 600; color: var(--text-muted); padding-top: 1px; }
+.detail-value-new { font-size: 13px; font-weight: 500; color: var(--text); line-height: 1.5; word-break: break-word; }
+.detail-value-new.empty { color: var(--text-faint); font-style: italic; }
+.detail-section-divider { height: 1px; background: var(--border); margin: 4px 22px; }
 .detail-value { flex: 1; color: var(--text); font-weight: 500; line-height: 1.5; word-break: break-word; }
 .detail-value input {
   width: 100%; height: 34px; border: 1.5px solid var(--border);
@@ -1437,6 +1481,7 @@ tbody td:first-child { padding-left: 18px; font-weight: 600; color: var(--text);
 @media (max-width: 1100px) {
   .right-panel { display: none; }
   .main-area { padding: 24px 24px 64px; }
+  .greeting-bar { padding: 24px 24px 0; }
 }
 @media (max-width: 768px) {
   .sidebar { transform: translateX(-100%); }
@@ -1445,8 +1490,19 @@ tbody td:first-child { padding-left: 18px; font-weight: 600; color: var(--text);
   .hamburger { display: flex; }
   .content { margin-left: 0; }
   .topbar { padding: 0 16px; }
-  .topbar-title { font-size: 16px; }
+  .topbar-left { flex: 1; min-width: 0; }
+  .topbar-title {
+    font-size: 16px;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .topbar-right { flex-shrink: 0; }
   .main-area { padding: 16px 14px 64px; }
+  .greeting-bar { padding: 18px 16px 0; }
+  .greeting-icon { width: 22px; height: 22px; }
+  .greeting-text { font-size: 18px; }
   .form-row { grid-template-columns: 1fr; }
   .kegiatan-item {
     flex-direction: column;
@@ -1485,6 +1541,8 @@ tbody td:first-child { padding-left: 18px; font-weight: 600; color: var(--text);
     flex-wrap: wrap;
     gap: 6px;
   }
+  .kegiatan-toggle-btn .btn-txt { display: none; }
+  .kegiatan-toggle-btn { padding: 0 12px; gap: 0; }
   .toast { bottom: 16px; right: 16px; left: 16px; max-width: none; text-align: center; }
   .btn-logout-mobile { display: flex; }
 }
@@ -1579,6 +1637,12 @@ tbody td:first-child { padding-left: 18px; font-weight: 600; color: var(--text);
           Keluar
         </button>
       </div>
+    </div>
+
+    <!-- GREETING -->
+    <div class="greeting-bar" id="greetingBar">
+      <svg class="greeting-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+      <div class="greeting-text" id="greetingText"></div>
     </div>
 
     <!-- 3-COLUMN BODY -->
@@ -1778,7 +1842,13 @@ tbody td:first-child { padding-left: 18px; font-weight: 600; color: var(--text);
 <div class="modal-detail-overlay" id="modalDetailOverlay" onclick="if(event.target===this)tutupDetailPesertaModal()">
   <div class="modal-detail">
     <div class="modal-detail-header">
-      <h3 id="modalDetailNama">Detail Peserta</h3>
+      <div class="md-avatar">
+        <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </div>
+      <div class="md-title-wrap">
+        <div class="md-nama" id="modalDetailNama">Detail Peserta</div>
+        <div class="md-sub" id="modalDetailSub">Peserta</div>
+      </div>
       <button class="modal-detail-close" onclick="tutupDetailPesertaModal()">
         <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
@@ -1909,10 +1979,36 @@ tbody td:first-child { padding-left: 18px; font-weight: 600; color: var(--text);
 <script src="lokasi.js"></script>
 <script src="kegiatan.js"></script>
 <script>
+// ─── SAPAAN (greeting) ───
+// Diambil acak tiap kali halaman di-refresh. {name} → nama lengkap user.
+const GREETINGS = [
+  'Selamat datang kembali, {name}.',
+  'Senang bertemu lagi, {name}.',
+  'Apa yang ingin Anda kerjakan hari ini, {name}?',
+  'Ada yang bisa diselesaikan hari ini, {name}?',
+  'Siap melanjutkan pekerjaan hari ini, {name}?',
+  'Mari mulai hari yang produktif, {name}.',
+  'Selamat datang. Semoga harimu menyenangkan.',
+  'Semoga pekerjaan hari ini berjalan lancar.',
+  'Semoga harimu penuh ide baru.',
+  'Selamat berkarya, {name}.'
+];
+
+function renderGreeting(user) {
+  const el = document.getElementById('greetingText');
+  if (!el) return;
+  const nama = ((user && (user.nama_lengkap || user.username)) || '').trim();
+  const safe = nama.replace(/[&<>"]/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c]));
+  const tpl = GREETINGS[Math.floor(Math.random() * GREETINGS.length)];
+  el.innerHTML = tpl.replace('{name}', `<span class="greeting-name">${safe}</span>`);
+}
+
 // onAppReady didefinisikan SEBELUM auth.js agar sudah tersedia saat window.onload jalan
 function onAppReady(user) {
   // Tampilkan section utama
   document.getElementById('page-kegiatan').classList.add('active');
+
+  renderGreeting(user);
 
   setTopbarTitle('Kegiatan');
   const isKeuangan = user.role === 'keuangan';

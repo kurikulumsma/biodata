@@ -260,6 +260,8 @@ a.nav-item { display: flex; }
 .btn-sm.deactivate:hover { background: #FEF3C7; }
 .btn-sm.reset-pw { border-color: #C5D8F5; color: var(--primary); background: var(--primary-light); }
 .btn-sm.reset-pw:hover { background: #DCE9FF; }
+.btn-sm.edit { border-color: var(--border-mid); color: var(--text-soft); background: var(--surface); }
+.btn-sm.edit:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-light); }
 
 /* ── SECTION HEADER ── */
 .section-header { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
@@ -622,6 +624,43 @@ a.nav-item { display: flex; }
   </div>
 </div>
 
+<!-- MODAL EDIT AKUN -->
+<div class="modal-overlay" id="editAkunOverlay" onclick="if(event.target===this)closeEditAkun()">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Edit Akun</h3>
+      <button class="modal-close" onclick="closeEditAkun()">
+        <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="field">
+        <label>Nama Lengkap <span style="color:var(--danger)">*</span></label>
+        <input type="text" id="editNama" placeholder="Nama lengkap">
+      </div>
+      <div class="field">
+        <label>Username <span style="color:var(--danger)">*</span></label>
+        <input type="text" id="editUsername" placeholder="Tanpa spasi" autocomplete="off">
+      </div>
+      <div class="field">
+        <label>Role <span style="color:var(--danger)">*</span></label>
+        <select id="editRole">
+          <option value="operator">Operator</option>
+          <option value="administrator">Administrator</option>
+          <option value="keuangan">Keuangan</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeEditAkun()">Batal</button>
+      <button class="btn-primary" id="btnDoEditAkun" onclick="doEditAkun()">
+        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        Simpan Perubahan
+      </button>
+    </div>
+  </div>
+</div>
+
 <!-- CONFIRM -->
 <div class="confirm-overlay" id="confirmOverlay">
   <div class="confirm-box">
@@ -647,6 +686,8 @@ a.nav-item { display: flex; }
 // ─── STATE ───
 let _importData = null;
 let _resetPassTargetId = null;
+let _editAkunTargetId = null;
+let _akunData = [];
 
 // ─── onAppReady (dipanggil oleh auth.js setelah sesi valid) ───
 function onAppReady(user) {
@@ -785,6 +826,7 @@ async function loadAkun() {
   try {
     const res = await sb('admin_users?order=created_at.asc&select=id,username,nama_lengkap,role,aktif');
     const data = await res.json();
+    _akunData = data;
     renderAkun(data);
   } catch {
     list.innerHTML = '<div class="loading-state">Gagal memuat data.</div>';
@@ -814,6 +856,10 @@ function renderAkun(items) {
           ? `<button class="btn-sm deactivate" onclick="toggleAkun(${item.id}, false)">Nonaktifkan</button>`
           : `<button class="btn-sm activate" onclick="toggleAkun(${item.id}, true)">Aktifkan</button>`
         }
+        <button class="btn-sm edit" onclick="editAkun(${item.id})">
+          <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          Edit
+        </button>
         <button class="btn-sm reset-pw" onclick="resetPassword(${item.id}, \`${escHtml(item.username)}\`)">
           <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
           Reset Password
@@ -905,6 +951,64 @@ async function doResetPassword() {
     const res = await sb(`admin_users?id=eq.${_resetPassTargetId}`, { method: 'PATCH', body: JSON.stringify({ password_hash: hash }) });
     if (res.ok) { showToast('Password berhasil direset!', 'success'); closeResetPass(); }
     else showToast('Gagal reset password.', 'error');
+  } catch { showToast('Gagal terhubung ke Supabase.', 'error'); }
+  finally { btn.disabled = false; }
+}
+
+// ─── EDIT AKUN ───
+function editAkun(id) {
+  const item = _akunData.find(x => x.id === id);
+  if (!item) return;
+  _editAkunTargetId = id;
+  document.getElementById('editNama').value = item.nama_lengkap || '';
+  document.getElementById('editUsername').value = item.username || '';
+  document.getElementById('editRole').value = item.role || 'operator';
+  document.getElementById('editAkunOverlay').classList.add('show');
+}
+function closeEditAkun() {
+  document.getElementById('editAkunOverlay').classList.remove('show');
+  _editAkunTargetId = null;
+}
+async function doEditAkun() {
+  const nama     = document.getElementById('editNama').value.trim();
+  const username = document.getElementById('editUsername').value.trim();
+  const role     = document.getElementById('editRole').value;
+  if (!nama || !username) { showToast('Nama dan username wajib diisi.', 'error'); return; }
+  if (/\s/.test(username)) { showToast('Username tidak boleh mengandung spasi.', 'error'); return; }
+
+  // Cegah admin mengunci dirinya sendiri keluar dari panel
+  const isSelf = _editAkunTargetId === _currentUserId();
+  if (isSelf && role !== 'administrator') {
+    showToast('Role akun sendiri tidak bisa diubah dari Administrator.', 'error');
+    return;
+  }
+
+  const btn = document.getElementById('btnDoEditAkun');
+  btn.disabled = true;
+  try {
+    const res = await sb(`admin_users?id=eq.${_editAkunTargetId}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ nama_lengkap: nama, username, role })
+    });
+    if (res.ok) {
+      showToast('Akun berhasil diperbarui!', 'success');
+      // Kalau yang diedit akun sendiri, sinkronkan localStorage + sidebar
+      if (isSelf) {
+        try {
+          const u = JSON.parse(localStorage.getItem('adminUser')) || {};
+          u.nama_lengkap = nama; u.username = username; u.role = role;
+          localStorage.setItem('adminUser', JSON.stringify(u));
+          const sn = document.getElementById('sidebarUserName');
+          if (sn) sn.textContent = nama;
+        } catch {}
+      }
+      closeEditAkun();
+      loadAkun();
+    } else {
+      const err = await res.json().catch(() => ({}));
+      if (err.code === '23505') showToast('Username sudah digunakan.', 'error');
+      else showToast('Gagal: ' + (err.message || 'Unknown error'), 'error');
+    }
   } catch { showToast('Gagal terhubung ke Supabase.', 'error'); }
   finally { btn.disabled = false; }
 }

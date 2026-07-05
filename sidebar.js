@@ -58,3 +58,23 @@ function closeSidebar() {
   document.getElementById('sidebarOverlay')?.classList.remove('show');
   document.body.style.overflow = '';
 }
+
+// Keuangan hanya boleh lihat menu Kegiatan & Database Peserta
+(function () {
+  function hideMenuKeuangan() {
+    try {
+      var u = JSON.parse(localStorage.getItem('adminUser') || '{}');
+      if (u.role === 'keuangan') {
+        ['navSertifikat', 'navKontak'].forEach(function (id) {
+          var el = document.getElementById(id);
+          if (el) el.style.display = 'none';
+        });
+      }
+    } catch (e) {}
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', hideMenuKeuangan);
+  } else {
+    hideMenuKeuangan();
+  }
+})();

@@ -165,12 +165,12 @@ function renderKegiatan(items) {
       <div class="kegiatan-actions">
         <button class="btn-sm btn-lihat-peserta" onclick="lihatPesertaKegiatan(${item.id}, \`${escHtml(item.nama_kegiatan)}\`, \`${escHtml(item.lokasi)}\`)">
           <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-          Lihat Peserta
+          <span class="btn-txt">Lihat Peserta</span>
         </button>
         ${!isKeuangan ? `
         <button class="btn-sm kegiatan-toggle-btn ${item.aktif ? 'deactivate' : 'activate'}" onclick="toggleKegiatan(${item.id}, ${!item.aktif})" title="${item.aktif ? 'Nonaktifkan' : 'Aktifkan'}">
           <span class="toggle-track ${item.aktif ? 'on' : 'off'}"><span class="toggle-thumb"></span></span>
-          ${item.aktif ? 'Aktif' : 'Nonaktif'}
+          <span class="btn-txt">${item.aktif ? 'Aktif' : 'Nonaktif'}</span>
         </button>
         <button class="btn-sm edit icon-only" onclick="openEditKegiatan(${item.id}, \`${escHtml(item.nama_kegiatan)}\`)" title="Edit kegiatan">
           <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
@@ -409,6 +409,7 @@ async function lihatPesertaKegiatan(kegiatanId, namaKegiatan, lokasi) {
   const addForm = document.getElementById('addFormCard');
   if (addForm) addForm.style.display = 'none';
   document.getElementById('rightPanel').style.display = 'none';
+  const _gb1 = document.getElementById('greetingBar'); if (_gb1) _gb1.style.display = 'none';
   const panel = document.getElementById('detailPesertaPanel');
   panel.classList.add('active');
   document.getElementById('detailPesertaTbody').innerHTML = '<tr><td colspan="6" class="td-loading">Memuat data...</td></tr>';
@@ -593,19 +594,39 @@ function showDetailPeserta(p) {
   _editPesertaId = p.id || null;
   _modalCurrentPeserta = p;
 
-  const LABELS = [
-    ['nama','Nama Lengkap'],['nip','NIP'],['golongan','Pangkat/Golongan'],
-    ['nik','NIK'],['mapel','Mata Pelajaran'],['instansi','Instansi/Unit Kerja'],
-    ['jabatan','Jabatan'],['wa','No. WhatsApp'],['provinsi','Provinsi'],
-    ['kabkota','Kabupaten/Kota'],['alamat','Alamat Instansi'],['telp_instansi','Telepon Instansi']
+  const GROUPS = [
+    { label: 'Identitas', fields: [
+      ['Nama Lengkap', p.nama], ['NIP', p.nip],
+      ['Pangkat / Golongan', p.golongan], ['NIK', p.nik],
+    ]},
+    { label: 'Tugas & Instansi', fields: [
+      ['Mata Pelajaran', p.mapel], ['Jabatan', p.jabatan],
+      ['Instansi / Unit Kerja', p.instansi], ['Alamat Instansi', p.alamat],
+      ['Telepon Instansi', p.telp_instansi],
+    ]},
+    { label: 'Kontak Pribadi', fields: [
+      ['No. WhatsApp', p.wa],
+    ]},
+    { label: 'Wilayah', fields: [
+      ['Provinsi', p.provinsi], ['Kabupaten / Kota', p.kabkota],
+    ]},
   ];
-  const rows = LABELS.map(([k,l]) => `
-    <div class="detail-row">
-      <div class="detail-label">${l}</div>
-      <div class="detail-value">${escHtml(p[k] || '-')}</div>
-    </div>`).join('');
+  let rows = '';
+  GROUPS.forEach((g, gi) => {
+    if (gi > 0) rows += `<div class="detail-section-divider"></div>`;
+    rows += `<div class="detail-group"><div class="detail-group-label">${g.label}</div>`;
+    g.fields.forEach(([label, val]) => {
+      rows += `<div class="detail-row-new">
+        <div class="detail-label-new">${label}</div>
+        <div class="detail-value-new${!val ? ' empty' : ''}">${escHtml(val || '—')}</div>
+      </div>`;
+    });
+    rows += `</div>`;
+  });
 
   document.getElementById('modalDetailNama').textContent = p.nama || 'Detail Peserta';
+  const subEl = document.getElementById('modalDetailSub');
+  if (subEl) subEl.textContent = [p.jabatan, p.instansi].filter(Boolean).join(' · ') || 'Peserta';
   document.getElementById('modalDetailBody').innerHTML = rows;
 
   // Tampilkan tombol hapus hanya untuk admin
@@ -689,6 +710,7 @@ function tutupDetailPeserta() {
   document.getElementById('kegiatanList').style.display = '';
   document.getElementById('kegiatanToolbar').style.display = '';
   document.getElementById('rightPanel').style.display = '';
+  const _gb2 = document.getElementById('greetingBar'); if (_gb2) _gb2.style.display = '';
   const isKeuangan = currentUser && currentUser.role === 'keuangan';
   const addForm = document.getElementById('addFormCard');
   if (addForm) addForm.style.display = isKeuangan ? 'none' : '';
