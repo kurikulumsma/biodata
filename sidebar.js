@@ -28,6 +28,7 @@ function _currentPageId() {
     'datapeserta.html': 'Peserta',
     'sertifikat.html':  'Sertifikat',
     'sertifikat-detail.html': 'Sertifikat',
+    'sertifikat-manual.html': 'Sertifikat',
     'kontak.html':      'Kontak',
     'pengaturan.html':  'Pengaturan',
   };
