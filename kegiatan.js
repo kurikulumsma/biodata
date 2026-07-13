@@ -6,6 +6,7 @@
 let allKegiatan = [];
 let allPeserta = [];
 let allDetailPeserta = [];
+let _autoNonaktifDone = false; // hanya jalan sekali per session
 
 // ─── KEGIATAN ───
 function _skeletonCards(n = 4) {
@@ -52,8 +53,11 @@ async function loadKegiatan() {
     const searchEl = document.getElementById('searchKegiatan');
     if (searchEl) searchEl.value = '';
 
-    // Auto-nonaktifkan kegiatan yang tanggal tutupnya sudah lewat
-    await autoNonaktifKegiatan(data);
+    // Auto-nonaktifkan kegiatan yang tanggal tutupnya sudah lewat (hanya sekali per session)
+    if (!_autoNonaktifDone) {
+      await autoNonaktifKegiatan(data);
+      _autoNonaktifDone = true;
+    }
 
     renderKegiatan(allKegiatan);
     updateRightPanel(allKegiatan);
