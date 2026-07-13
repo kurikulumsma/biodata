@@ -49,6 +49,14 @@ async function loadKegiatan() {
       list.innerHTML = '<div class="loading-state">Respons tidak valid dari server.</div>';
       return;
     }
+    data.sort((a, b) => {
+      const ta = parseTanggalKegiatan(a.nama_kegiatan).tglBuka;
+      const tb = parseTanggalKegiatan(b.nama_kegiatan).tglBuka;
+      if (!ta && !tb) return 0;
+      if (!ta) return 1;
+      if (!tb) return -1;
+      return tb - ta;
+    });
     allKegiatan = data;
     const searchEl = document.getElementById('searchKegiatan');
     if (searchEl) searchEl.value = '';
@@ -464,7 +472,11 @@ function renderDetailPeserta(rows) {
 
 function filterDetailPeserta() {
   const q = (document.getElementById('searchDetailPeserta').value || '').trim().toLowerCase();
-  const filtered = q ? allDetailPeserta.filter(row => (row.peserta?.nama || '').toLowerCase().includes(q)) : allDetailPeserta;
+  const filtered = q ? allDetailPeserta.filter(row => {
+    const nama = (row.peserta?.nama || '').toLowerCase();
+    const instansi = (row.peserta?.instansi || '').toLowerCase();
+    return nama.includes(q) || instansi.includes(q);
+  }) : allDetailPeserta;
   renderDetailPeserta(filtered);
 }
 
