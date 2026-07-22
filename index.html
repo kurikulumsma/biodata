@@ -13,7 +13,7 @@
     --blue: #2563eb;
     --blue-dark: #1e40af;
     --cyan: #06b6d4;
-    --yellow: #06b6d4;
+    --yellow: #facc15;
     --blue-light: #EFF6FF;
     --blue-border: #BFDBFE;
     --red: #DC2626;
@@ -120,7 +120,8 @@
   .section-header h2 { font-size: 15.5px; font-weight: 700; color: var(--blue); letter-spacing: -0.1px; }
 
   /* ── FIELDS ── */
-  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  .field-row:last-child { margin-bottom: 0; }
   @media (max-width: 560px) {
     .field-row { grid-template-columns: 1fr; }
     .card-body { padding: 20px 18px 24px; }
@@ -129,6 +130,10 @@
 
   .field { margin-bottom: 16px; }
   .field:last-child { margin-bottom: 0; }
+  /* Field di dalam field-row tidak boleh nambah margin sendiri —
+     jarak antar field dalam satu row sudah diatur oleh gap grid di atas,
+     supaya tidak dobel pas field-row-nya jadi 1 kolom di mobile. */
+  .field-row > .field { margin-bottom: 0; }
 
   .field label { display: block; font-size: 14px; font-weight: 600; color: #334155; margin-bottom: 7px; margin-top: 7px; }
   .field label .req { color: var(--red); margin-left: 2px; }
@@ -384,6 +389,62 @@
   /* ── CONDITIONAL FIELD VISIBILITY (unsur peserta / status kepegawaian) ── */
   .field-hidden { display: none !important; }
   .field-row.row-single { grid-template-columns: 1fr; }
+
+  /* ── MULTI-SELECT TAG INPUT (Mata Pelajaran) ──
+     Tag terpilih tampil lepas (tanpa kotak pembungkus) di atas; input
+     pencarian di bawahnya selalu 100% lebar, styling disamakan dengan
+     input field lain di form ini — tidak digabung jadi satu kotak lagi. */
+  .tag-select-tags { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 9px; }
+  .tag-select-tags:empty { display: none; margin-bottom: 0; }
+  .tag-chip {
+    display: inline-flex; align-items: center; gap: 5px;
+    background: var(--blue-light); border: 1px solid var(--blue-border);
+    color: var(--blue-dark); font-size: 12.5px; font-weight: 600;
+    padding: 6px 7px 6px 12px; border-radius: 999px;
+    white-space: nowrap;
+  }
+  .tag-chip-remove {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 17px; height: 17px; border-radius: 50%; flex-shrink: 0;
+    border: none; background: rgba(37,99,235,0.15); color: var(--blue-dark);
+    font-size: 12px; line-height: 1; cursor: pointer; padding: 0;
+    transition: background 0.15s, color 0.15s;
+  }
+  .tag-chip-remove:hover { background: var(--blue); color: white; }
+
+  .tag-select-wrap { position: relative; }
+  .tag-select-search {
+    width: 100%; height: 46px;
+    border: 1.5px solid var(--slate-border); border-radius: var(--radius);
+    padding: 0 15px;
+    font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; color: var(--text);
+    background: var(--slate-50); outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+    -webkit-appearance: none; appearance: none;
+    box-shadow: none;
+  }
+  .tag-select-search::placeholder { color: #94A3B8; }
+  .tag-select-search:focus {
+    border-color: var(--cyan);
+    box-shadow: 0 0 0 3px rgba(6,182,212,0.18);
+    background: var(--white);
+  }
+  .tag-select-dropdown {
+    display: none; position: absolute; left: 0; right: 0; top: calc(100% + 6px);
+    background: var(--white); border: 1.5px solid var(--slate-border); border-radius: var(--radius);
+    box-shadow: 0 12px 28px -10px rgba(15,23,42,0.25);
+    max-height: 240px; overflow-y: auto; z-index: 60; padding: 6px;
+  }
+  .tag-select-dropdown.show { display: block; }
+  .tag-select-dropdown-item {
+    padding: 9px 12px; border-radius: 8px; font-size: 13.5px; color: var(--text);
+    cursor: pointer; transition: background 0.12s;
+  }
+  .tag-select-dropdown-item:hover { background: var(--blue-light); color: var(--blue); }
+  .tag-select-empty { padding: 12px; text-align: center; font-size: 13px; color: var(--gray-text); }
+  @media (max-width: 560px) {
+    .tag-select-search { font-size: 16px; }
+  }
 </style>
 </head>
 <body>
@@ -400,6 +461,10 @@
 
 <div class="container">
   <div class="hero">
+    <span class="hero-badge">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+      Formulir Biodata
+    </span>
     <h1>Biodata Kegiatan Tim Kerja<br>Pembelajaran dan Penilaian Tahun 2026</h1>
     <p>Isi formulir dengan data yang benar. Data akan digunakan untuk keperluan administrasi kegiatan.</p>
   </div>
@@ -539,9 +604,14 @@
           <div class="label-wrap">
             <label>Mata Pelajaran yang Diampu <span class="req">*</span></label>
             <button type="button" class="info-btn" onclick="toggleTooltip(this)" aria-label="Info"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg></button>
-            <div class="tooltip-box">Isi mata pelajaran yang Anda ampu, contoh: Matematika, Bahasa Indonesia. Jika bukan guru atau tidak ada, isi ( - ).</div>
+            <div class="tooltip-box">Isi satu atau lebih mata pelajaran yang Anda ampu. Klik untuk memilih dari daftar. Jika bukan guru atau tidak ada, boleh dikosongkan.</div>
           </div>
-          <input type="text" id="mapel" placeholder="Jika bukan guru, isi ( - )">
+          <div class="tag-select-tags" id="mapel_tags"></div>
+          <div class="tag-select-wrap" id="mapel_tagselect">
+            <input type="text" id="mapel_search" class="tag-select-search" placeholder="Ketik atau pilih mata pelajaran..." autocomplete="off">
+            <div class="tag-select-dropdown" id="mapel_dropdown"></div>
+          </div>
+          <input type="text" id="mapel" style="display:none" aria-hidden="true">
         </div>
         <div class="field">
           <div class="label-wrap">
@@ -763,6 +833,101 @@ const LABEL_INSTANSI = {
 // yang kondisional, sekarang seluruh sisa formulir ikut digerbang oleh Unsur Peserta dulu)
 const GATE1_IDS = ['field_nama', 'row_nip_nik', 'row_mapel_jabatan', 'row_wa_email', 'card_instansi', 'card_wilayah', 'card_pernyataan'];
 
+// ── MATA PELAJARAN — MULTI-SELECT TAG INPUT ──────────────────────
+const MAPEL_LIST = [
+  'Akidah Akhlak','Al-Qur\'an Hadis','Antropologi','Bahasa Arab','Bahasa Asing',
+  'Bahasa Indonesia','Bahasa Indonesia Tingkat Lanjut','Bahasa Inggris','Bahasa Inggris Tingkat Lanjut',
+  'Biologi','Ekonomi','Energi dan Pertambangan','Fikih','Fisika','Geografi',
+  'Ilmu Pengetahuan Alam (IPA)','Ilmu Pengetahuan Sosial (IPS)','Informatika','Kimia',
+  'Koding dan Kecerdasan Artifisial','Matematika','Matematika Tingkat Lanjut','Muatan Lokal',
+  'Pendidikan Agama Buddha dan Budi Pekerti','Pendidikan Agama Hindu dan Budi Pekerti',
+  'Pendidikan Agama Islam dan Budi Pekerti','Pendidikan Agama Katolik dan Budi Pekerti',
+  'Pendidikan Agama Khonghucu dan Budi Pekerti','Pendidikan Agama Kristen dan Budi Pekerti',
+  'Pendidikan Jasmani, Olahraga, dan Kesehatan (PJOK)','Pendidikan Pancasila','Prakarya','Sejarah',
+  'Sejarah Kebudayaan Islam','Sejarah Tingkat Lanjut','Seni Musik','Seni Rupa','Seni Tari','Seni Teater',
+  'Sosiologi','Teknologi Konstruksi dan Bangunan','Teknologi Manufaktur dan Rekayasa'
+];
+
+let mapelSelected = [];
+
+function escapeHtmlMapel(str) {
+  const d = document.createElement('div');
+  d.textContent = str;
+  return d.innerHTML;
+}
+
+function renderMapelTags() {
+  const tagsEl = document.getElementById('mapel_tags');
+  tagsEl.innerHTML = mapelSelected.map((m, i) =>
+    `<span class="tag-chip">${escapeHtmlMapel(m)}<button type="button" class="tag-chip-remove" data-idx="${i}" aria-label="Hapus ${escapeHtmlMapel(m)}">×</button></span>`
+  ).join('');
+  document.getElementById('mapel').value = mapelSelected.join(', ');
+}
+
+function addMapel(name) {
+  if (name && !mapelSelected.includes(name)) {
+    mapelSelected.push(name);
+    renderMapelTags();
+  }
+  const searchEl = document.getElementById('mapel_search');
+  searchEl.value = '';
+  renderMapelDropdown('');
+  searchEl.focus();
+}
+
+function removeMapel(index) {
+  mapelSelected.splice(index, 1);
+  renderMapelTags();
+}
+
+function renderMapelDropdown(query) {
+  const dropdownEl = document.getElementById('mapel_dropdown');
+  const q = query.trim().toLowerCase();
+  const filtered = MAPEL_LIST
+    .map((m, idx) => ({ m, idx }))
+    .filter(o => !mapelSelected.includes(o.m) && (!q || o.m.toLowerCase().includes(q)));
+  if (filtered.length === 0) {
+    dropdownEl.innerHTML = '<div class="tag-select-empty">Tidak ada hasil</div>';
+  } else {
+    dropdownEl.innerHTML = filtered.map(o =>
+      `<div class="tag-select-dropdown-item" data-idx="${o.idx}">${escapeHtmlMapel(o.m)}</div>`
+    ).join('');
+  }
+  dropdownEl.classList.add('show');
+}
+
+// Isi ulang tag dari string "A, B, C" (hasil prefill data lama) — mendukung juga
+// data lama satu-mapel-teks-bebas sebelum fitur multi-select ini ada.
+function setMapelFromString(str) {
+  mapelSelected = (str || '').split(',').map(s => s.trim()).filter(s => s && s !== '-');
+  renderMapelTags();
+}
+
+document.getElementById('mapel_search').addEventListener('focus', function() {
+  renderMapelDropdown(this.value);
+});
+document.getElementById('mapel_search').addEventListener('input', function() {
+  renderMapelDropdown(this.value);
+});
+document.getElementById('mapel_search').addEventListener('keydown', function(e) {
+  if (e.key === 'Backspace' && this.value === '' && mapelSelected.length > 0) {
+    removeMapel(mapelSelected.length - 1);
+  }
+});
+document.getElementById('mapel_dropdown').addEventListener('click', function(e) {
+  const item = e.target.closest('.tag-select-dropdown-item');
+  if (item) addMapel(MAPEL_LIST[parseInt(item.dataset.idx, 10)]);
+});
+document.getElementById('mapel_tags').addEventListener('click', function(e) {
+  const btn = e.target.closest('.tag-chip-remove');
+  if (btn) removeMapel(parseInt(btn.dataset.idx, 10));
+});
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('#mapel_tagselect')) {
+    document.getElementById('mapel_dropdown').classList.remove('show');
+  }
+});
+
 function setFieldVisible(fieldId, visible) {
   const el = document.getElementById(fieldId);
   if (el) el.classList.toggle('field-hidden', !visible);
@@ -776,17 +941,27 @@ function onUnsurPesertaChange() {
   const unsurChosen = !!unsur;
   GATE1_IDS.forEach(id => setFieldVisible(id, unsurChosen));
 
-  // NPSN & Mata Pelajaran cuma buat unsur sekolah
+  // NPSN & Mata Pelajaran cuma buat unsur sekolah.
+  // "Pasti bukan sekolah" = unsur SUDAH dipilih dan bukan guru_tendik — beda dengan
+  // "belum dipilih sama sekali" (unsur kosong), supaya NPSN/Mapel dari data lama
+  // (prefill NIK yang belum sempat diklasifikasi ulang) tidak ketiban "-" duluan.
   const isSekolah = UNSUR_SEKOLAH.includes(unsur);
+  const isDefinitelyBukanSekolah = unsurChosen && !isSekolah;
   setFieldVisible('field_npsn', isSekolah);
   document.getElementById('row_npsn_instansi').classList.toggle('row-single', !isSekolah);
-  if (!isSekolah) document.getElementById('npsn').value = '-';
-  else if (document.getElementById('npsn').value === '-') document.getElementById('npsn').value = '';
+  if (isDefinitelyBukanSekolah) document.getElementById('npsn').value = '-';
+  else if (isSekolah && document.getElementById('npsn').value === '-') document.getElementById('npsn').value = '';
 
   setFieldVisible('field_mapel', isSekolah);
   document.getElementById('row_mapel_jabatan').classList.toggle('row-single', !isSekolah);
-  if (!isSekolah) document.getElementById('mapel').value = '-';
-  else if (document.getElementById('mapel').value === '-') document.getElementById('mapel').value = '';
+  if (isDefinitelyBukanSekolah) {
+    mapelSelected = [];
+    renderMapelTags();
+    document.getElementById('mapel').value = '-';
+  } else if (isSekolah && document.getElementById('mapel').value === '-') {
+    mapelSelected = [];
+    renderMapelTags();
+  }
 
   // Label & placeholder Instansi menyesuaikan unsur
   const meta = LABEL_INSTANSI[unsur];
@@ -809,20 +984,25 @@ function onStatusKepegawaianChange() {
   const unsur = document.getElementById('unsur_peserta').value;
   const statusEl = document.querySelector('input[name="status_kepegawaian"]:checked');
   const isASN = !UNSUR_TANPA_STATUS.includes(unsur) && statusEl && statusEl.value === 'asn_pns';
+  // "Pasti bukan ASN" = unsur memang tidak butuh status (mahasiswa/praktisi) ATAU eksplisit pilih Non-ASN.
+  // Beda dengan "belum ditentukan" (status belum dijawab sama sekali) — supaya NIP/Golongan
+  // yang sudah terisi dari data lama (prefill NIK lama) tidak ketiban "-" sebelum sempat dijawab.
+  const isDefinitelyNonASN = UNSUR_TANPA_STATUS.includes(unsur) || (statusEl && statusEl.value === 'non_asn_pns');
 
   setFieldVisible('field_nip', isASN);
   document.getElementById('row_nip_nik').classList.toggle('row-single', !isASN);
   setFieldVisible('field_golongan', isASN);
 
-  if (!isASN) {
+  if (isDefinitelyNonASN) {
     document.getElementById('nip').value = '-';
     const golNone = document.getElementById('gol-none');
     if (golNone) golNone.checked = true;
-  } else {
+  } else if (isASN) {
     if (document.getElementById('nip').value === '-') document.getElementById('nip').value = '';
     const golNone = document.getElementById('gol-none');
     if (golNone && golNone.checked) golNone.checked = false;
   }
+  // else: status belum ditentukan (mis. baru prefill NIK lama) — biarkan value nip/golongan apa adanya
 }
 
 // Reset tampilan kondisional ke state awal (dipanggil dari clearFormFields())
@@ -841,6 +1021,9 @@ function resetUnsurPesertaFields() {
   document.getElementById('label_instansi').innerHTML = 'Instansi / Unit Kerja <span class="req">*</span>';
   document.getElementById('tooltip_instansi').textContent = 'Nama sekolah atau unit kerja tempat Anda bertugas. Tulis nama lengkap, contoh: SMA Negeri 1 Jakarta.';
   document.getElementById('instansi').placeholder = 'Nama sekolah / instansi';
+  mapelSelected = [];
+  renderMapelTags();
+  document.getElementById('mapel_dropdown').classList.remove('show');
 }
 </script>
 
@@ -1029,7 +1212,7 @@ function prefillForm(d) {
   setVal('nama', d.nama);
   setVal('nip', d.nip);
   setVal('nik', d.nik || document.getElementById('nikGateInput').value.trim());
-  setVal('mapel', d.mapel);
+  setMapelFromString(d.mapel);
   setVal('jabatan', d.jabatan);
   setVal('wa', d.wa);
   setVal('email', d.email);
