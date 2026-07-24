@@ -1234,35 +1234,49 @@ async function prosesGenerate(){
   if(!$('inFolder').value.trim()){ toast('Folder Drive belum diatur','error'); openConfig(); return; }
   const mapping=getMappingForGAS();
   if(!Object.keys(mapping).length){ toast('Mapping belum diatur — buka Pengaturan','error'); openConfig(); return; }
+  try{
+    await callGAS('mulaiGenerate',{
+      sheetUrl:$('inSheet').value.trim(),slideUrl:$('inSlide').value.trim(),tab:$('inTab').value.trim(),
+      folderUrl:$('inFolder').value.trim(),fileNameCol:$('fnameCol').value,judulSertifikat:$('inJudul').value.trim(),
+      mapping });
+    toast('Proses dimulai — boleh tutup tab, lanjut otomatis di background','success');
+  }catch(err){ toast('Error: '+err.message,'error'); return; }
+  await pollGenerate();
+}
+
+/* Polling progress generate. Dipanggil setelah mulaiGenerate, atau otomatis
+   dari cekJobBerjalan() kalau tab dibuka ulang saat job masih jalan. */
+async function pollGenerate(){
   const btnRun=$('btnRun');
   btnRun.disabled=true; $('btnSample').disabled=true;
   btnRun.innerHTML='<span class="spin-svg" style="width:16px;height:16px;display:inline-flex"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg></span> Memproses…';
   $('progressWrap').classList.add('show'); $('progressFill').classList.remove('done');
-
-  let startRow=0,batchNum=0,total=0;
   try{
     while(true){
-      batchNum++;
-      $('progressLabel').textContent='Membuat PDF — Batch '+batchNum;
-      const d=await callGAS('generate',{
-        sheetUrl:$('inSheet').value.trim(),slideUrl:$('inSlide').value.trim(),tab:$('inTab').value.trim(),
-        folderUrl:$('inFolder').value.trim(),fileNameCol:$('fnameCol').value,judulSertifikat:$('inJudul').value.trim(),
-        mapping,startRow,batchSize:20 });
-      total=d.total; startRow=d.endRow;
-      const pct=total?Math.round(startRow/total*100):100;
+      const [st,cek]=await Promise.all([
+        callGAS('statusGenerate',{}),
+        callGAS('cekBelumProses',{sheetUrl:$('inSheet').value.trim(),tab:$('inTab').value.trim()})
+      ]);
+      if(st.error) throw new Error(st.error);
+      const total=cek.total||0, sudah=cek.sudahProses||0;
+      const pct=total?Math.round(sudah/total*100):100;
       $('progressFill').style.width=pct+'%';
-      $('progressCount').textContent=startRow+' / '+total;
-      $('progressNote').textContent='Batch '+batchNum+' selesai — '+startRow+' dari '+total+' PDF';
-      if(d.done) break;
+      $('progressCount').textContent=sudah+' / '+total;
+      if(!st.berjalan){
+        $('progressFill').classList.add('done'); $('progressFill').style.width='100%';
+        $('progressLabel').textContent='Selesai!';
+        $('progressNote').textContent=(total||'Semua')+' PDF tersimpan di folder Drive.';
+        toast('PDF selesai dibuat!','success');
+        break;
+      }
+      $('progressLabel').textContent='Membuat PDF…';
+      $('progressNote').textContent=sudah+' dari '+total+' PDF tersimpan sejauh ini.';
+      await new Promise(r=>setTimeout(r,4000));
     }
-    $('progressFill').classList.add('done'); $('progressFill').style.width='100%';
-    $('progressLabel').textContent='Selesai!';
-    $('progressNote').textContent=(total||'Semua')+' PDF tersimpan di folder Drive.';
-    toast('PDF selesai dibuat!','success');
     await muatTabel();
   }catch(err){
     toast('Error: '+err.message,'error');
-    $('progressNote').textContent='⚠ Gagal di batch '+batchNum+'. Klik Run lagi untuk lanjut dari yang belum selesai.';
+    $('progressNote').textContent='⚠ '+err.message;
   }
   btnRun.disabled=false; $('btnSample').disabled=false;
   btnRun.innerHTML='<svg viewBox="0 0 24 24" style="fill:white;stroke:none"><polygon points="5 3 19 12 5 21 5 3"/></svg> Run — Jadikan PDF';
@@ -1342,29 +1356,59 @@ async function fetchKuota(){
 }
 
 async function prosesKirim(){
-  const btn=$('btnSend'); btn.disabled=true;
+  try{
+    await callGAS('mulaiKirim',{sheetUrl:$('inSheet').value.trim(),tab:$('inTab').value.trim(),judulSertifikat:$('inJudul').value.trim()});
+    toast('Pengiriman dimulai','success');
+  }catch(err){ toast('Error kirim: '+err.message,'error'); return; }
+  await pollKirim();
+}
+
+/* Polling progress kirim. Kalau kuota harian habis di tengah jalan, GAS
+   otomatis lanjut ~25 jam kemudian (saat kuota refresh) — polling berhenti
+   sopan di sini, gak perlu nunggu 25 jam dengan tab terbuka. Dipanggil
+   setelah mulaiKirim, atau otomatis dari cekJobBerjalan() kalau tab
+   dibuka ulang saat job masih jalan/menunggu refresh. */
+async function pollKirim(){
+  const btn=$('btnSend');
+  btn.disabled=true;
   btn.innerHTML='<span class="spin-svg" style="width:16px;height:16px;display:inline-flex"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg></span> Mengirim…';
   $('progressWrapK').classList.add('show'); $('progressFillK').classList.remove('done');
-  let startIndex=0,total=0,batchNum=0;
   try{
     while(true){
-      batchNum++;
-      $('progressLabelK').textContent='Mengirim — Batch '+batchNum;
-      const d=await callGAS('kirim',{sheetUrl:$('inSheet').value.trim(),tab:$('inTab').value.trim(),judulSertifikat:$('inJudul').value.trim(),startIndex,batchSize:20});
-      total=d.total; startIndex=d.endIndex;
-      const pct=total?Math.round(startIndex/total*100):100;
+      const [st,rows]=await Promise.all([
+        callGAS('statusKirim',{}),
+        callGAS('getRows',{sheetUrl:$('inSheet').value.trim(),tab:$('inTab').value.trim()})
+      ]);
+      if(st.error) throw new Error(st.error);
+      const total=rows.total||0, terkirim=rows.terkirim||0;
+      const pct=total?Math.round(terkirim/total*100):100;
       $('progressFillK').style.width=pct+'%';
-      $('progressCountK').textContent=startIndex+' / '+total;
-      $('progressNoteK').textContent='Batch '+batchNum+': '+d.sent+' terkirim'+(d.failedEmails&&d.failedEmails.length?' · '+d.failedEmails.length+' gagal':'');
-      if(d.done) break;
+      $('progressCountK').textContent=terkirim+' / '+total;
+
+      if(st.menungguRefresh){
+        $('progressLabelK').textContent='Kuota harian habis — menunggu refresh';
+        $('progressNoteK').textContent=terkirim+' / '+total+' terkirim. Sisanya lanjut otomatis ~25 jam lagi, gak perlu buka tab ini terus.';
+        break;
+      }
+      if(!st.berjalan){
+        $('progressFillK').classList.add('done'); $('progressFillK').style.width='100%';
+        $('progressLabelK').textContent='Selesai!';
+        $('progressNoteK').textContent = total===0
+          ? 'Tidak ada yang perlu dikirim (semua sudah / belum ada PDF).'
+          : terkirim+' dari '+total+' email terkirim.';
+        toast('Email selesai dikirim!','success');
+        break;
+      }
+      $('progressLabelK').textContent='Mengirim…';
+      $('progressNoteK').textContent=terkirim+' dari '+total+' terkirim sejauh ini.';
+      await new Promise(r=>setTimeout(r,4000));
     }
-    $('progressFillK').classList.add('done'); $('progressFillK').style.width='100%';
-    $('progressLabelK').textContent='Selesai!';
-    if(total===0) $('progressNoteK').textContent='Tidak ada yang perlu dikirim (semua sudah / belum ada PDF).';
-    toast('Email selesai dikirim!','success');
     await muatTabel();
     await fetchKuota();
-  }catch(err){ toast('Error kirim: '+err.message,'error'); $('progressNoteK').textContent='⚠ Gagal di batch '+batchNum+'.'; }
+  }catch(err){
+    toast('Error kirim: '+err.message,'error');
+    $('progressNoteK').textContent='⚠ '+err.message;
+  }
   btn.disabled=false;
   btn.innerHTML='<svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> Kirim ke yang belum';
 }
@@ -1430,6 +1474,15 @@ async function initManual(){
   $('dashboard').style.display='block';
   // kalau belum ada sumber sama sekali → buka config otomatis
   if(!$('inSheet').value.trim()){ openConfig(); }
+  // kalau ada job generate/kirim yang masih jalan di background (dimulai dari
+  // sesi sebelumnya, tab sempat ditutup) → sambung lagi tampilan progressnya
+  cekJobBerjalan();
+}
+
+async function cekJobBerjalan(){
+  if(!$('inSheet').value.trim()) return;
+  try{ const stG=await callGAS('statusGenerate',{}); if(stG.berjalan) pollGenerate(); }catch(e){}
+  try{ const stK=await callGAS('statusKirim',{}); if(stK.berjalan) pollKirim(); }catch(e){}
 }
 function onAppReady(user){ initManual(); }
 
