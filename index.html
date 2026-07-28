@@ -600,11 +600,40 @@
         </div>
       </div>
       <div class="field-row field-hidden" id="row_mapel_jabatan">
-        <div class="field" id="field_mapel">
+        <div class="field" id="field_jabatan_generic">
           <div class="label-wrap">
-            <label>Mata Pelajaran yang Diampu <span class="req">*</span></label>
+            <label>Jabatan <span class="req">*</span></label>
             <button type="button" class="info-btn" onclick="toggleTooltip(this)" aria-label="Info"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg></button>
-            <div class="tooltip-box">Isi satu atau lebih mata pelajaran yang Anda ampu. Klik untuk memilih dari daftar. Jika bukan guru atau tidak ada, boleh dikosongkan.</div>
+            <div class="tooltip-box">Jabatan fungsional atau struktural Anda, contoh: Guru Madya, Kepala Sekolah, Pengawas. Jika tidak ada, isi ( - ).</div>
+          </div>
+          <input type="text" id="jabatan_freetext" placeholder="Contoh: Guru Madya" oninput="syncJabatanFromFreetext()">
+        </div>
+        <div class="field field-hidden" id="field_jabatan_sekolah">
+          <div class="label-wrap">
+            <label>Penugasan <span class="req">*</span></label>
+            <button type="button" class="info-btn" onclick="toggleTooltip(this)" aria-label="Info"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg></button>
+            <div class="tooltip-box">Pilih jabatan Anda di sekolah. Kalau memilih Guru atau Wakil Kepala Sekolah, kolom Mata Pelajaran akan muncul.</div>
+          </div>
+          <select id="jabatan_sekolah_select" onchange="onJabatanSekolahChange()">
+            <option value="" disabled selected>-- Pilih jabatan --</option>
+            <option value="Kepala Sekolah">Kepala Sekolah</option>
+            <option value="Wakil Kepala Sekolah Bidang Kurikulum">Wakil Kepala Sekolah Bidang Kurikulum</option>
+            <option value="Wakil Kepala Sekolah Bidang Kesiswaan">Wakil Kepala Sekolah Bidang Kesiswaan</option>
+            <option value="Wakil Kepala Sekolah Bidang Sarana dan Prasarana">Wakil Kepala Sekolah Bidang Sarana dan Prasarana</option>
+            <option value="Wakil Kepala Sekolah Bidang Humas">Wakil Kepala Sekolah Bidang Humas</option>
+            <option value="Guru">Guru</option>
+            <option value="Kepala Tata Usaha (KTU)">Kepala Tata Usaha (KTU)</option>
+            <option value="Staf Tata Usaha / Administrasi Sekolah">Staf Tata Usaha / Administrasi Sekolah</option>
+            <option value="Operator Sekolah / Dapodik">Operator Sekolah / Dapodik</option>
+            <option value="lainnya">Lainnya...</option>
+          </select>
+          <input type="text" id="jabatan_lainnya" class="field-hidden" style="margin-top:8px" placeholder="Tulis penugasan Anda" oninput="syncJabatanSekolah()">
+        </div>
+        <div class="field field-hidden" id="field_mapel">
+          <div class="label-wrap">
+            <label id="label_mapel">Mata Pelajaran yang Diampu <span class="req">*</span></label>
+            <button type="button" class="info-btn" onclick="toggleTooltip(this)" aria-label="Info"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg></button>
+            <div class="tooltip-box" id="tooltip_mapel">Isi satu atau lebih mata pelajaran yang Anda ampu. Klik untuk memilih dari daftar. Jika bukan guru atau tidak ada, boleh dikosongkan.</div>
           </div>
           <div class="tag-select-tags" id="mapel_tags"></div>
           <div class="tag-select-wrap" id="mapel_tagselect">
@@ -613,13 +642,17 @@
           </div>
           <input type="text" id="mapel" style="display:none" aria-hidden="true">
         </div>
-        <div class="field">
+        <input type="text" id="jabatan" style="display:none" aria-hidden="true">
+        <input type="text" id="penugasan" style="display:none" aria-hidden="true">
+      </div>
+      <div class="field-row row-single field-hidden" id="row_jabatan_fungsional">
+        <div class="field" id="field_jabatan_fungsional">
           <div class="label-wrap">
-            <label>Jabatan <span class="req">*</span></label>
+            <label>Jabatan Fungsional <span style="color:var(--text-muted,#9CA3AF);font-weight:400">(opsional)</span></label>
             <button type="button" class="info-btn" onclick="toggleTooltip(this)" aria-label="Info"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg></button>
-            <div class="tooltip-box">Jabatan fungsional atau struktural Anda, contoh: Guru Madya, Kepala Sekolah, Pengawas. Jika tidak ada, isi ( - ).</div>
+            <div class="tooltip-box">Isi kalau Anda punya jabatan fungsional, contoh: Guru Ahli Pertama, Guru Ahli Muda. Kosongkan kalau tidak ada.</div>
           </div>
-          <input type="text" id="jabatan" placeholder="Contoh: Guru Madya">
+          <input type="text" id="jabatan_fungsional" placeholder="Contoh: Guru Ahli Muda" oninput="syncJabatanFungsional()">
         </div>
       </div>
       <div class="field-row field-hidden" id="row_wa_email">
@@ -831,7 +864,7 @@ const LABEL_INSTANSI = {
 // Bagian formulir yang baru muncul SETELAH Unsur Peserta dipilih
 // (progressive disclosure — sebelumnya cuma field_golongan/field_nip/field_npsn/field_mapel
 // yang kondisional, sekarang seluruh sisa formulir ikut digerbang oleh Unsur Peserta dulu)
-const GATE1_IDS = ['field_nama', 'row_nip_nik', 'row_mapel_jabatan', 'row_wa_email', 'card_instansi', 'card_wilayah', 'card_pernyataan'];
+const GATE1_IDS = ['field_nama', 'row_nip_nik', 'row_mapel_jabatan', 'row_jabatan_fungsional', 'row_wa_email', 'card_instansi', 'card_wilayah', 'card_pernyataan'];
 
 // ── MATA PELAJARAN — MULTI-SELECT TAG INPUT ──────────────────────
 const MAPEL_LIST = [
@@ -935,6 +968,104 @@ function setFieldVisible(fieldId, visible) {
   if (el) el.classList.toggle('field-hidden', !visible);
 }
 
+// Jabatan yang boleh punya Mata Pelajaran: Guru (wajib) + Wakil Kepala Sekolah (opsional).
+const JABATAN_DENGAN_MAPEL = ['Guru', 'Wakil Kepala Sekolah Bidang Kurikulum', 'Wakil Kepala Sekolah Bidang Kesiswaan', 'Wakil Kepala Sekolah Bidang Sarana dan Prasarana', 'Wakil Kepala Sekolah Bidang Humas'];
+
+function isMapelRequired() {
+  return document.getElementById('jabatan_sekolah_select').value === 'Guru';
+}
+
+function updateMapelVisibility(isSekolah) {
+  const jabatanSekolahVal = document.getElementById('jabatan_sekolah_select').value;
+  const mapelVisible = isSekolah && JABATAN_DENGAN_MAPEL.includes(jabatanSekolahVal);
+  const mapelRequired = isSekolah && jabatanSekolahVal === 'Guru';
+  setFieldVisible('field_mapel', mapelVisible);
+  document.getElementById('row_mapel_jabatan').classList.toggle('row-single', !mapelVisible);
+  document.getElementById('label_mapel').innerHTML = mapelRequired
+    ? 'Mata Pelajaran yang Diampu <span class="req">*</span>'
+    : 'Mata Pelajaran yang Diampu <span style="color:var(--text-muted,#9CA3AF);font-weight:400">(opsional)</span>';
+  document.getElementById('tooltip_mapel').textContent = mapelRequired
+    ? 'Isi satu atau lebih mata pelajaran yang Anda ampu. Klik untuk memilih dari daftar.'
+    : 'Opsional. Isi kalau Anda juga mengajar mata pelajaran tertentu, kosongkan kalau tidak.';
+  if (!mapelVisible) {
+    mapelSelected = [];
+    renderMapelTags();
+    document.getElementById('mapel').value = '-';
+  } else if (document.getElementById('mapel').value === '-') {
+    mapelSelected = [];
+    renderMapelTags();
+    document.getElementById('mapel').value = '';
+  }
+}
+
+const JABATAN_SEKOLAH_OPTIONS = ['Kepala Sekolah','Wakil Kepala Sekolah Bidang Kurikulum','Wakil Kepala Sekolah Bidang Kesiswaan','Wakil Kepala Sekolah Bidang Sarana dan Prasarana','Wakil Kepala Sekolah Bidang Humas','Guru','Kepala Tata Usaha (KTU)','Staf Tata Usaha / Administrasi Sekolah','Operator Sekolah / Dapodik'];
+
+// Jabatan Fungsional: opsional, nongol buat semua penugasan sekolah begitu penugasan dipilih.
+function updateJabatanFungsionalVisibility(isSekolah) {
+  const jabatanSekolahVal = document.getElementById('jabatan_sekolah_select').value;
+  const visible = isSekolah && !!jabatanSekolahVal;
+  setFieldVisible('row_jabatan_fungsional', visible);
+}
+
+// Set jabatan_freetext / jabatan_sekolah_select / jabatan_lainnya / #jabatan dari data lama (prefill).
+// Kolom "jabatan": free-text Jabatan (unsur non-sekolah) atau Jabatan Fungsional (unsur sekolah).
+function setJabatanFromString(unsur, jabatanStr) {
+  const val = (jabatanStr || '').trim();
+  document.getElementById('jabatan').value = val;
+  document.getElementById('jabatan_freetext').value = '';
+  document.getElementById('jabatan_fungsional').value = '';
+  if (UNSUR_SEKOLAH.includes(unsur)) {
+    document.getElementById('jabatan_fungsional').value = (val === '-') ? '' : val;
+  } else {
+    document.getElementById('jabatan_freetext').value = val;
+  }
+}
+
+// Kolom "penugasan": role di sekolah (Kepsek/Wakasek/Guru/dst), cuma buat unsur sekolah.
+function setPenugasanFromString(unsur, penugasanStr) {
+  const val = (penugasanStr || '').trim();
+  document.getElementById('penugasan').value = val;
+  document.getElementById('jabatan_sekolah_select').value = '';
+  document.getElementById('jabatan_lainnya').value = '';
+  if (UNSUR_SEKOLAH.includes(unsur)) {
+    if (JABATAN_SEKOLAH_OPTIONS.includes(val)) {
+      document.getElementById('jabatan_sekolah_select').value = val;
+    } else if (val && val !== '-') {
+      document.getElementById('jabatan_sekolah_select').value = 'lainnya';
+      document.getElementById('jabatan_lainnya').value = val;
+    }
+  }
+  setFieldVisible('jabatan_lainnya', document.getElementById('jabatan_sekolah_select').value === 'lainnya');
+}
+
+// Sinkronkan pilihan dropdown Jabatan Sekolah (+ input "Lainnya") ke hidden #jabatan.
+function onJabatanSekolahChange() {
+  const val = document.getElementById('jabatan_sekolah_select').value;
+  const isLainnya = val === 'lainnya';
+  setFieldVisible('jabatan_lainnya', isLainnya);
+  if (isLainnya) {
+    document.getElementById('penugasan').value = document.getElementById('jabatan_lainnya').value;
+  } else {
+    document.getElementById('penugasan').value = val;
+  }
+  const unsur = document.getElementById('unsur_peserta').value;
+  const isSekolah = UNSUR_SEKOLAH.includes(unsur);
+  updateMapelVisibility(isSekolah);
+  updateJabatanFungsionalVisibility(isSekolah);
+}
+
+function syncJabatanSekolah() {
+  document.getElementById('penugasan').value = document.getElementById('jabatan_lainnya').value;
+}
+
+function syncJabatanFromFreetext() {
+  document.getElementById('jabatan').value = document.getElementById('jabatan_freetext').value;
+}
+
+function syncJabatanFungsional() {
+  document.getElementById('jabatan').value = document.getElementById('jabatan_fungsional').value;
+}
+
 function onUnsurPesertaChange() {
   const unsur = document.getElementById('unsur_peserta').value;
   document.getElementById('unsur_peserta').classList.remove('error');
@@ -954,16 +1085,23 @@ function onUnsurPesertaChange() {
   if (isDefinitelyBukanSekolah) document.getElementById('npsn').value = '-';
   else if (isSekolah && document.getElementById('npsn').value === '-') document.getElementById('npsn').value = '';
 
-  setFieldVisible('field_mapel', isSekolah);
-  document.getElementById('row_mapel_jabatan').classList.toggle('row-single', !isSekolah);
+  // Jabatan: unsur sekolah pakai dropdown jabatan terkontrol (mapel cuma wajib buat Guru),
+  // unsur lain tetap pakai free-text jabatan seperti biasa.
+  setFieldVisible('field_jabatan_generic', !isSekolah);
+  setFieldVisible('field_jabatan_sekolah', isSekolah);
   if (isDefinitelyBukanSekolah) {
-    mapelSelected = [];
-    renderMapelTags();
-    document.getElementById('mapel').value = '-';
-  } else if (isSekolah && document.getElementById('mapel').value === '-') {
-    mapelSelected = [];
-    renderMapelTags();
+    document.getElementById('jabatan_sekolah_select').value = '';
+    document.getElementById('jabatan_lainnya').value = '';
+    document.getElementById('penugasan').value = '-';
+    document.getElementById('jabatan_fungsional').value = '';
+    setFieldVisible('jabatan_lainnya', false);
+    syncJabatanFromFreetext();
   }
+  // isSekolah tanpa "definitely": biarkan value select/lainnya/#jabatan/#penugasan apa adanya
+  // (bisa jadi baru di-prefill lewat setJabatanFromString/setPenugasanFromString) — jangan ditimpa di sini.
+
+  updateMapelVisibility(isSekolah);
+  updateJabatanFungsionalVisibility(isSekolah);
 
   // Label & placeholder Instansi menyesuaikan unsur
   const meta = LABEL_INSTANSI[unsur];
@@ -1014,9 +1152,15 @@ function resetUnsurPesertaFields() {
   setFieldVisible('field_status_kepegawaian', false);
   GATE1_IDS.forEach(id => setFieldVisible(id, false));
   setFieldVisible('field_npsn', true);
-  setFieldVisible('field_mapel', true);
+  setFieldVisible('field_mapel', false);
   setFieldVisible('field_nip', true);
   setFieldVisible('field_golongan', false);
+  setFieldVisible('field_jabatan_generic', true);
+  setFieldVisible('field_jabatan_sekolah', false);
+  setFieldVisible('jabatan_lainnya', false);
+  document.getElementById('jabatan_sekolah_select').selectedIndex = 0;
+  setFieldVisible('row_jabatan_fungsional', false);
+  document.getElementById('jabatan_fungsional').value = '';
   document.getElementById('row_npsn_instansi').classList.remove('row-single');
   document.getElementById('row_mapel_jabatan').classList.remove('row-single');
   document.getElementById('row_nip_nik').classList.remove('row-single');
@@ -1215,7 +1359,8 @@ function prefillForm(d) {
   setVal('nip', d.nip);
   setVal('nik', d.nik || document.getElementById('nikGateInput').value.trim());
   setMapelFromString(d.mapel);
-  setVal('jabatan', d.jabatan);
+  setJabatanFromString(d.unsur_peserta, d.jabatan);
+  setPenugasanFromString(d.unsur_peserta, d.penugasan);
   setVal('wa', d.wa);
   setVal('email', d.email);
   setVal('npsn', d.npsn);
@@ -1270,7 +1415,7 @@ function clearFormFields() {
 // ────────────────────────────────────────────────────────────────
 
 async function submitForm() {
-  const ids = ['unsur_peserta','nama','nip','nik','mapel','jabatan','wa','email','npsn','instansi','alamat','telp_instansi','provinsi','kabkota'];
+  const ids = ['unsur_peserta','nama','nip','nik','wa','email','npsn','instansi','alamat','telp_instansi','provinsi','kabkota'];
   let valid = true;
 
   const kegEl = document.getElementById('nama_kegiatan');
@@ -1282,6 +1427,25 @@ async function submitForm() {
     if (!el.value.trim()) { el.classList.add('error'); valid = false; }
     else el.classList.remove('error');
   });
+
+  // Jabatan: wajib buat unsur non-sekolah (free-text). Penugasan: wajib buat unsur sekolah (dropdown role).
+  // Jabatan Fungsional selalu opsional.
+  const isSekolahNow = UNSUR_SEKOLAH.includes(document.getElementById('unsur_peserta').value);
+  if (isSekolahNow) {
+    const penugasanEl = document.getElementById('penugasan');
+    if (!penugasanEl.value.trim()) { penugasanEl.classList.add('error'); valid = false; }
+    else penugasanEl.classList.remove('error');
+    document.getElementById('jabatan').classList.remove('error');
+  } else {
+    const jabatanEl = document.getElementById('jabatan');
+    if (!jabatanEl.value.trim()) { jabatanEl.classList.add('error'); valid = false; }
+    else jabatanEl.classList.remove('error');
+    document.getElementById('penugasan').classList.remove('error');
+  }
+
+  const mapelEl = document.getElementById('mapel');
+  if (isMapelRequired() && !mapelEl.value.trim()) { mapelEl.classList.add('error'); valid = false; }
+  else mapelEl.classList.remove('error');
 
   if (!document.querySelector('input[name="golongan"]:checked')) valid = false;
 
@@ -1313,6 +1477,7 @@ async function submitForm() {
     golongan: document.querySelector('input[name="golongan"]:checked')?.value || '',
     mapel: document.getElementById('mapel').value,
     jabatan: document.getElementById('jabatan').value,
+    penugasan: document.getElementById('penugasan').value,
     wa: document.getElementById('wa').value,
     email: document.getElementById('email').value,
     npsn: document.getElementById('npsn').value,

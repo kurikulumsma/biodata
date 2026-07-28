@@ -193,14 +193,23 @@ a.nav-item { display: flex; }
 .page { padding: 22px 22px 48px; }
 
 /* ── FILTER BAR ── */
-.filter-bar { display: flex; gap: 10px; margin-bottom: 14px; align-items: center; flex-wrap: wrap; }
-.search-wrap { position: relative; }
+.filter-bar { display: flex; gap: 10px; margin-bottom: 14px; align-items: center; flex-wrap: wrap; width: 100%; }
+.filter-select {
+  height: 40px; border: 1.5px solid var(--border);
+  border-radius: var(--r-md); padding: 0 12px;
+  font-family: inherit; font-size: 13px; font-weight: 500;
+  background: var(--surface); color: var(--text);
+  transition: border-color 0.15s; outline: none; cursor: pointer;
+  flex: 1 1 150px; min-width: 130px; max-width: 220px;
+}
+.filter-select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(0,87,217,0.08); }
+.search-wrap { position: relative; flex: 2 1 220px; min-width: 200px; }
 .search-wrap input {
   height: 40px; border: 1.5px solid var(--border);
   border-radius: var(--r-md); padding: 0 14px 0 38px;
   font-family: inherit; font-size: 13px;
   background: var(--surface); color: var(--text);
-  transition: border-color 0.15s; outline: none; min-width: 240px;
+  transition: border-color 0.15s; outline: none; width: 100%;
 }
 .search-wrap input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(0,87,217,0.08); }
 .search-wrap svg {
@@ -208,11 +217,16 @@ a.nav-item { display: flex; }
   width: 15px; height: 15px; stroke: var(--text-faint);
   fill: none; stroke-width: 2; stroke-linecap: round; pointer-events: none;
 }
-.badge-count {
-  background: var(--primary-light); color: var(--primary);
-  font-size: 11.5px; font-weight: 700; padding: 3px 11px;
-  border-radius: 999px; white-space: nowrap;
+.icon-btn-reset {
+  height: 40px; width: 40px; flex-shrink: 0;
+  border: 1.5px solid var(--border); background: var(--surface);
+  border-radius: var(--r-md); cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s;
 }
+.icon-btn-reset:hover { border-color: var(--primary); background: var(--primary-light); }
+.icon-btn-reset svg { width: 16px; height: 16px; stroke: var(--text-soft); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.icon-btn-reset:hover svg { stroke: var(--primary); }
 .filter-bar-right { margin-left: auto; display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
 .btn-unduh-excel {
   height: 38px; padding: 0 16px;
@@ -448,8 +462,11 @@ tbody td:first-child { padding-left: 18px; font-weight: 600; color: var(--text);
 }
 @media (max-width: 480px) {
   .filter-bar { flex-direction: column; align-items: flex-start; }
+  .search-wrap { width: 100%; }
   .search-wrap input { min-width: 100%; }
-  .filter-bar-right { margin-left: 0; }
+  .filter-select { width: 100%; max-width: none; }
+  .filter-bar-right { margin-left: 0; width: 100%; }
+  .btn-unduh-excel { width: 100%; justify-content: center; }
 }
 </style>
 </head>
@@ -536,7 +553,21 @@ tbody td:first-child { padding-left: 18px; font-weight: 600; color: var(--text);
           <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
           <input type="text" id="searchPeserta" placeholder="Cari nama, NIP, instansi, kabupaten/kota, dll..." oninput="applyTableFilters()" autocomplete="off">
         </div>
-        <span class="badge-count" id="badgePeserta">0</span>
+        <select class="filter-select" id="filterProvinsi" onchange="applyTableFilters()">
+          <option value="">Semua Provinsi</option>
+        </select>
+        <select class="filter-select" id="filterKabkota" onchange="applyTableFilters()">
+          <option value="">Semua Kab/Kota</option>
+        </select>
+        <select class="filter-select" id="filterUnsur" onchange="applyTableFilters()">
+          <option value="">Semua Unsur Peserta</option>
+        </select>
+        <select class="filter-select" id="filterMapel" onchange="applyTableFilters()">
+          <option value="">Semua Mapel</option>
+        </select>
+        <button class="icon-btn-reset" id="btnResetFilter" onclick="resetTableFilters()" title="Reset filter & pencarian">
+          <svg viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+        </button>
         <div class="filter-bar-right" id="filterBarRight" style="display:none;">
           <button class="btn-unduh-excel" onclick="unduhExcel()">
             <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
@@ -551,7 +582,7 @@ tbody td:first-child { padding-left: 18px; font-weight: 600; color: var(--text);
             <tr id="pesertaTableHead"></tr>
           </thead>
           <tbody id="pesertaTbody">
-            <tr><td colspan="16" class="td-loading">Memuat data...</td></tr>
+            <tr><td colspan="19" class="td-loading">Memuat data...</td></tr>
           </tbody>
         </table>
         <div class="pagination-wrap" id="paginationWrap" style="display:none; position:sticky; left:0; min-width:100%; width:max-content;">
@@ -654,12 +685,15 @@ function onAppReady(user) {
 
 // ─── LOAD & RENDER ───
 const TABLE_COLS = [
-  { key: 'created_at',    label: 'Update Terakhir' },
+  { key: 'updated_at',    label: 'Update Terakhir' },
   { key: 'nama',          label: 'Nama Lengkap' },
+  { key: 'nik',           label: 'NIK' },
   { key: 'nip',           label: 'NIP' },
   { key: 'golongan',      label: 'Pangkat/Golongan' },
-  { key: 'nik',           label: 'NIK' },
+  { key: 'unsur_peserta', label: 'Unsur Peserta' },
+  { key: 'status_kepegawaian', label: 'Status Kepegawaian' },
   { key: 'mapel',         label: 'Mata Pelajaran yang Diampu' },
+  { key: 'npsn',          label: 'NPSN' },
   { key: 'instansi',      label: 'Instansi/Unit Kerja' },
   { key: 'jabatan',       label: 'Jabatan' },
   { key: 'wa',            label: 'Nomor Telepon (WhatsApp)' },
@@ -668,6 +702,7 @@ const TABLE_COLS = [
   { key: 'kabkota',       label: 'Kabupaten/Kota' },
   { key: 'alamat',        label: 'Alamat Instansi/Unit Kerja' },
   { key: 'telp_instansi', label: 'No Telepon Instansi/Unit Kerja' },
+  { key: 'biodata_url',   label: 'Biodata' },
 ];
 
 function renderTableHeader() {
@@ -678,7 +713,7 @@ function renderTableHeader() {
 }
 
 function _skeletonRows(n = 8) {
-  const cols = 15; // TABLE_COLS.length + 1 aksi
+  const cols = 19; // TABLE_COLS.length + 1 aksi
   return Array.from({length: n}, (_, i) => `
     <tr class="sk-row">
       <td><span class="skeleton" style="display:inline-block;height:20px;width:72px;border-radius:5px;"></span></td>
@@ -687,6 +722,9 @@ function _skeletonRows(n = 8) {
       <td><span class="skeleton" style="display:inline-block;height:14px;width:60px;"></span></td>
       <td><span class="skeleton" style="display:inline-block;height:14px;width:100px;"></span></td>
       <td><span class="skeleton" style="display:inline-block;height:14px;width:90px;"></span></td>
+      <td><span class="skeleton" style="display:inline-block;height:14px;width:70px;"></span></td>
+      <td><span class="skeleton" style="display:inline-block;height:14px;width:120px;"></span></td>
+      <td><span class="skeleton" style="display:inline-block;height:14px;width:70px;"></span></td>
       <td><span class="skeleton" style="display:inline-block;height:14px;width:120px;"></span></td>
       <td><span class="skeleton" style="display:inline-block;height:14px;width:90px;"></span></td>
       <td><span class="skeleton" style="display:inline-block;height:14px;width:80px;"></span></td>
@@ -695,6 +733,7 @@ function _skeletonRows(n = 8) {
       <td><span class="skeleton" style="display:inline-block;height:14px;width:80px;"></span></td>
       <td><span class="skeleton" style="display:inline-block;height:14px;width:110px;"></span></td>
       <td><span class="skeleton" style="display:inline-block;height:14px;width:90px;"></span></td>
+      <td><span class="skeleton" style="display:inline-block;height:14px;width:60px;"></span></td>
       <td></td>
     </tr>
   `).join('');
@@ -705,27 +744,64 @@ async function loadPeserta() {
   renderTableHeader();
   tbody.innerHTML = _skeletonRows(8);
   try {
-    const res = await sb('peserta?order=created_at.desc');
+    const res = await sb('peserta?order=updated_at.desc');
     if (!res.ok) throw new Error('HTTP ' + res.status);
     const data = await res.json();
     allPeserta = data;
     renderTableHeader();
+    populateFilterOptions();
     applyTableFilters();
   } catch(e) {
-    tbody.innerHTML = `<tr><td colspan="16" class="td-loading">Gagal memuat data peserta.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="19" class="td-loading">Gagal memuat data peserta.</td></tr>`;
     console.error(e);
   }
 }
 
+function populateFilterOptions() {
+  const buildOptions = (selectId, values, defaultLabel, useLabelFn) => {
+    const sel = document.getElementById(selectId);
+    if (!sel) return;
+    const prevVal = sel.value;
+    const unique = [...new Set(values.filter(Boolean))].sort((a,b) => a.localeCompare(b, 'id'));
+    sel.innerHTML = `<option value="">${defaultLabel}</option>` + unique.map(v =>
+      `<option value="${escHtml(v)}">${escHtml(useLabelFn ? useLabelFn(v) : v)}</option>`
+    ).join('');
+    if (unique.includes(prevVal)) sel.value = prevVal;
+  };
+  buildOptions('filterProvinsi', allPeserta.map(p => p.provinsi), 'Semua Provinsi');
+  buildOptions('filterKabkota', allPeserta.map(p => p.kabkota), 'Semua Kab/Kota');
+  buildOptions('filterUnsur', allPeserta.map(p => p.unsur_peserta), 'Semua Unsur Peserta', labelUnsur);
+  buildOptions('filterMapel', allPeserta.map(p => p.mapel), 'Semua Mapel');
+}
+
 function applyTableFilters() {
   const q = (document.getElementById('searchPeserta')?.value || '').trim().toLowerCase();
-  const SEARCH_FIELDS = ['nama','nip','golongan','nik','mapel','instansi','jabatan','wa','email','provinsi','kabkota','alamat','telp_instansi'];
-  filteredPeserta = q
-    ? allPeserta.filter(p => SEARCH_FIELDS.some(f => (p[f] || '').toString().toLowerCase().includes(q)))
-    : [...allPeserta];
-  document.getElementById('badgePeserta').textContent = filteredPeserta.length;
+  const fProvinsi = document.getElementById('filterProvinsi')?.value || '';
+  const fKabkota = document.getElementById('filterKabkota')?.value || '';
+  const fUnsur = document.getElementById('filterUnsur')?.value || '';
+  const fMapel = document.getElementById('filterMapel')?.value || '';
+  const SEARCH_FIELDS = ['nama','nip','golongan','nik','mapel','npsn','instansi','jabatan','wa','email','provinsi','kabkota','alamat','telp_instansi'];
+  filteredPeserta = allPeserta.filter(p => {
+    if (fProvinsi && p.provinsi !== fProvinsi) return false;
+    if (fKabkota && p.kabkota !== fKabkota) return false;
+    if (fUnsur && p.unsur_peserta !== fUnsur) return false;
+    if (fMapel && p.mapel !== fMapel) return false;
+    if (!q) return true;
+    return SEARCH_FIELDS.some(f => (p[f] || '').toString().toLowerCase().includes(q))
+      || labelUnsur(p.unsur_peserta).toLowerCase().includes(q)
+      || labelStatus(p.status_kepegawaian).toLowerCase().includes(q);
+  });
   currentPage = 1;
   renderPeserta(filteredPeserta);
+}
+
+function resetTableFilters() {
+  document.getElementById('searchPeserta').value = '';
+  document.getElementById('filterProvinsi').value = '';
+  document.getElementById('filterKabkota').value = '';
+  document.getElementById('filterUnsur').value = '';
+  document.getElementById('filterMapel').value = '';
+  applyTableFilters();
 }
 
 function formatTs(ts) {
@@ -741,10 +817,27 @@ function escHtml(str) {
   return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
 
+// ─── LABEL MAPPING (kode Supabase → label enak dibaca) ───
+const LABEL_UNSUR_PESERTA = {
+  guru_tendik:    'Guru / Tendik Sekolah',
+  pengawas:       'Pengawas / Penilik Sekolah',
+  dinas:          'Dinas Pendidikan (Provinsi/Kab/Kota)',
+  kemendikdasmen: 'Kementerian Pendidikan Dasar dan Menengah',
+  kl_lain:        'Kementerian / Lembaga Lain',
+  mahasiswa:      'Perguruan Tinggi / Mahasiswa',
+  praktisi_swasta:'Praktisi / Swasta / Umum',
+};
+const LABEL_STATUS_KEPEGAWAIAN = {
+  asn_pns:     'ASN / PNS',
+  non_asn_pns: 'Non-ASN / PNS',
+};
+function labelUnsur(v) { return LABEL_UNSUR_PESERTA[v] || v || ''; }
+function labelStatus(v) { return LABEL_STATUS_KEPEGAWAIAN[v] || v || ''; }
+
 function renderPeserta(items) {
   const tbody = document.getElementById('pesertaTbody');
   if (!items.length) {
-    tbody.innerHTML = '<tr><td colspan="16" class="td-empty">Belum ada peserta terdaftar.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="19" class="td-empty">Belum ada peserta terdaftar.</td></tr>';
     document.getElementById('paginationWrap').style.display = 'none';
     return;
   }
@@ -764,14 +857,17 @@ function renderPeserta(items) {
       <td style="white-space:nowrap;">
         <span class="sync-badge">
           <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-          ${escHtml(formatTs(item.created_at))}
+          ${escHtml(formatTs(item.updated_at))}
         </span>
       </td>
       <td>${escHtml(item.nama || '-')}</td>
+      <td>${escHtml(item.nik || '-')}</td>
       <td>${escHtml(item.nip || '-')}</td>
       <td>${escHtml(item.golongan || '-')}</td>
-      <td>${escHtml(item.nik || '-')}</td>
+      <td>${escHtml(labelUnsur(item.unsur_peserta) || '-')}</td>
+      <td>${escHtml(labelStatus(item.status_kepegawaian) || '-')}</td>
       ${tdTrunc(item.mapel, 140)}
+      <td>${escHtml(item.npsn || '-')}</td>
       ${tdTrunc(item.instansi, 180)}
       ${tdTrunc(item.jabatan, 140)}
       <td>${escHtml(item.wa || '-')}</td>
@@ -780,6 +876,7 @@ function renderPeserta(items) {
       <td>${escHtml(item.kabkota || '-')}</td>
       ${tdTrunc(item.alamat, 180)}
       ${tdTrunc(item.telp_instansi, 120)}
+      <td>${item.biodata_url ? `<a href="${escHtml(item.biodata_url)}" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="color:var(--primary);font-weight:600;text-decoration:none;">Lihat</a>` : '-'}</td>
       <td>
         <div class="td-actions">
           ${isAdmin ? `<button class="icon-btn" title="Hapus peserta" onclick="event.stopPropagation();hapusPeserta(${item.id}, \`${escHtml(item.nama || '')}\`)">
@@ -858,11 +955,11 @@ async function hapusPesertaDariModal() {
 // ─── UNDUH EXCEL ───
 function unduhExcel() {
   if (!filteredPeserta.length) { showToast('Tidak ada data untuk diunduh.', 'error'); return; }
-  const HEADERS = ['No','Update Terakhir','Nama Lengkap','NIP','Pangkat/Golongan','NIK','Mata Pelajaran','Instansi/Unit Kerja','Jabatan','No. WhatsApp','Email','Provinsi','Kabupaten/Kota','Alamat Instansi','Telepon Instansi'];
+  const HEADERS = ['No','Update Terakhir','Nama Lengkap','NIK','NIP','Pangkat/Golongan','Unsur Peserta','Status Kepegawaian','Mata Pelajaran','NPSN','Instansi/Unit Kerja','Jabatan','No. WhatsApp','Email','Provinsi','Kabupaten/Kota','Alamat Instansi','Telepon Instansi','Biodata'];
   const rows = filteredPeserta.map((p,i) => [
-    i+1, formatTs(p.created_at), p.nama||'', p.nip||'', p.golongan||'', p.nik||'',
-    p.mapel||'', p.instansi||'', p.jabatan||'', p.wa||'', p.email||'',
-    p.provinsi||'', p.kabkota||'', p.alamat||'', p.telp_instansi||''
+    i+1, formatTs(p.updated_at), p.nama||'', p.nik||'', p.nip||'', p.golongan||'', labelUnsur(p.unsur_peserta)||'', labelStatus(p.status_kepegawaian)||'',
+    p.mapel||'', p.npsn||'', p.instansi||'', p.jabatan||'', p.wa||'', p.email||'',
+    p.provinsi||'', p.kabkota||'', p.alamat||'', p.telp_instansi||'', p.biodata_url||''
   ]);
   const wb = XLSX.utils.book_new();
   const ws = XLSX.utils.aoa_to_sheet([HEADERS, ...rows]);
@@ -900,13 +997,14 @@ function openPesertaModal(p) {
 
   const GROUPS = [
     { label: 'Identitas', fields: [
-      ['Nama Lengkap', p.nama], ['NIP', p.nip],
-      ['Pangkat / Golongan', p.golongan], ['NIK', p.nik],
+      ['Nama Lengkap', p.nama], ['NIK', p.nik], ['NIP', p.nip],
+      ['Pangkat / Golongan', p.golongan], ['Unsur Peserta', labelUnsur(p.unsur_peserta)],
+      ['Status Kepegawaian', labelStatus(p.status_kepegawaian)],
     ]},
     { label: 'Tugas & Instansi', fields: [
-      ['Mata Pelajaran', p.mapel], ['Jabatan', p.jabatan],
+      ['Mata Pelajaran', p.mapel], ['Jabatan', p.jabatan], ['NPSN', p.npsn],
       ['Instansi / Unit Kerja', p.instansi], ['Alamat Instansi', p.alamat],
-      ['Telepon Instansi', p.telp_instansi],
+      ['Telepon Instansi', p.telp_instansi], ['Biodata', p.biodata_url],
     ]},
     { label: 'Kontak Pribadi', fields: [
       ['No. WhatsApp', p.wa], ['Email', p.email],
@@ -921,9 +1019,12 @@ function openPesertaModal(p) {
     if (gi > 0) html += `<div class="detail-section-divider"></div>`;
     html += `<div class="detail-group"><div class="detail-group-label">${g.label}</div>`;
     g.fields.forEach(([label, val]) => {
+      const valHtml = (label === 'Biodata' && val)
+        ? `<a href="${escHtml(val)}" target="_blank" rel="noopener" style="color:var(--primary);font-weight:600;text-decoration:none;">Lihat Dokumen</a>`
+        : escHtml(val || '—');
       html += `<div class="detail-row-new">
         <div class="detail-label-new">${label}</div>
-        <div class="detail-value-new${!val ? ' empty' : ''}">${escHtml(val || '—')}</div>
+        <div class="detail-value-new${!val ? ' empty' : ''}">${valHtml}</div>
       </div>`;
     });
     html += `</div>`;
