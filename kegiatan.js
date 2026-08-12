@@ -205,6 +205,7 @@ function filterKegiatan() {
 // ─── RIGHT PANEL LOGIC ───
 let calYear = new Date().getFullYear();
 let calMonth = new Date().getMonth();
+let _calDayItems = {}; // day (angka) -> [{id, nama_kegiatan, lokasi}]
 
 function updateRightPanel(kegiatanData) {
   updateRingkasan(kegiatanData);
@@ -230,20 +231,25 @@ function renderCalendar(kegiatanData) {
   const label = BULAN_NAMES[calMonth] + ' ' + calYear;
   document.getElementById('calMonthLabel').textContent = label;
 
-  // Collect event dates for this month
-  const eventDays = new Set();
+  // Collect event dates for this month (1 hari maupun rentang, sama-sama pakai bulet+pill),
+  // sekaligus simpan kegiatan apa saja yang jatuh di tiap tanggal (untuk fitur klik)
+  const dayItems = {};
   (kegiatanData || allKegiatan).forEach(item => {
     const p = parseTanggalKegiatan(item.nama_kegiatan);
     if (p.tglBuka && p.tglTutup) {
       let d = new Date(p.tglBuka);
       while (d <= p.tglTutup) {
         if (d.getFullYear() === calYear && d.getMonth() === calMonth) {
-          eventDays.add(d.getDate());
+          const day = d.getDate();
+          if (!dayItems[day]) dayItems[day] = [];
+          dayItems[day].push({ id: item.id, nama_kegiatan: item.nama_kegiatan, lokasi: item.lokasi });
         }
         d.setDate(d.getDate() + 1);
       }
     }
   });
+  _calDayItems = dayItems;
+  const eventDays = new Set(Object.keys(dayItems).map(Number));
 
   const today = new Date();
   const firstDay = new Date(calYear, calMonth, 1);
@@ -256,15 +262,29 @@ function renderCalendar(kegiatanData) {
 
   // Prev month blanks
   for (let i = startDow - 1; i >= 0; i--) {
-    html += `<div class="cal-day other-month empty"><div class="cal-day-num">${prevDays - i}</div><div class="cal-day-dot"></div></div>`;
+    html += `<div class="cal-day other-month empty"><div class="cal-day-num">${prevDays - i}</div></div>`;
   }
 
   for (let d = 1; d <= daysInMonth; d++) {
     const isToday = d === today.getDate() && calMonth === today.getMonth() && calYear === today.getFullYear();
-    const hasEvent = eventDays.has(d);
-    html += `<div class="cal-day ${isToday ? 'today' : ''} ${hasEvent ? 'has-event' : ''}">
+    const inRange = eventDays.has(d);
+    let rangeClasses = '';
+    let clickAttr = '';
+    if (inRange) {
+      const dow = (startDow + d - 1) % 7; // 0=Sen ... 6=Min
+      // Bulet solid cuma di ujung pita yang benar-benar tersambung (bukan per-item),
+      // supaya tanggal tengah dari rentang beberapa hari nggak ikut kebuletin.
+      const prevInRange = d > 1 && eventDays.has(d - 1);
+      const nextInRange = d < daysInMonth && eventDays.has(d + 1);
+      rangeClasses = 'in-range';
+      if (dow === 0 || !prevInRange) rangeClasses += ' range-cap-start';
+      if (dow === 6 || !nextInRange) rangeClasses += ' range-cap-end';
+      if (!prevInRange) rangeClasses += ' range-start';
+      if (!nextInRange) rangeClasses += ' range-end';
+      clickAttr = ` onclick="calDayClick(${d})"`;
+    }
+    html += `<div class="cal-day ${isToday ? 'today' : ''} ${rangeClasses}"${clickAttr}>
       <div class="cal-day-num">${d}</div>
-      <div class="cal-day-dot"></div>
     </div>`;
   }
 
@@ -272,10 +292,17 @@ function renderCalendar(kegiatanData) {
   const totalCells = Math.ceil((startDow + daysInMonth) / 7) * 7;
   let nextDay = 1;
   for (let i = startDow + daysInMonth; i < totalCells; i++) {
-    html += `<div class="cal-day other-month empty"><div class="cal-day-num">${nextDay++}</div><div class="cal-day-dot"></div></div>`;
+    html += `<div class="cal-day other-month empty"><div class="cal-day-num">${nextDay++}</div></div>`;
   }
 
   document.getElementById('calGrid').innerHTML = html;
+}
+
+function calDayClick(day) {
+  const items = _calDayItems[day];
+  if (!items || !items.length) return;
+  const item = items[0];
+  lihatPesertaKegiatan(item.id, item.nama_kegiatan, item.lokasi);
 }
 
 function calPrev() { calMonth--; if (calMonth < 0) { calMonth = 11; calYear--; } renderCalendar(); }
