@@ -455,7 +455,7 @@ async function lihatPesertaKegiatan(kegiatanId, namaKegiatan, lokasi) {
   document.getElementById('badgeDetailPeserta').textContent = '0';
   document.getElementById('topbarTitle').textContent = 'Peserta: ' + namaKegiatan;
   try {
-    const res = await sb(`kegiatan_peserta?kegiatan_id=eq.${kegiatanId}&select=created_at,peserta(id,nama,nip,golongan,nik,mapel,instansi,jabatan,wa,provinsi,kabkota,alamat,telp_instansi)&order=created_at.asc`);
+    const res = await sb(`kegiatan_peserta?kegiatan_id=eq.${kegiatanId}&select=created_at,peserta(id,nama,nip,nik,golongan,unsur_peserta,status_kepegawaian,mapel,npsn,instansi,jabatan,wa,email,provinsi,kabkota,alamat,telp_instansi,biodata_url)&order=created_at.asc`);
     const data = await res.json();
     const tbody = document.getElementById('detailPesertaTbody');
     document.getElementById('badgeDetailPeserta').textContent = data.length;
@@ -637,39 +637,91 @@ function showDetailPeserta(p) {
   _editPesertaId = p.id || null;
   _modalCurrentPeserta = p;
 
+  // Avatar inisial
+  document.getElementById('modalDetailAvatar').textContent = getInitials(p.nama) || '?';
+  document.getElementById('modalDetailNama').textContent = p.nama || 'Detail Peserta';
+  const subEl = document.getElementById('modalDetailSub');
+  if (subEl) subEl.textContent = [p.jabatan, p.instansi].filter(Boolean).join(' · ') || 'Peserta';
+
+  // Badge unsur peserta
+  const unsurLabel = labelUnsur(p.unsur_peserta);
+  const badgeEl = document.getElementById('modalDetailBadge');
+  if (unsurLabel) {
+    badgeEl.innerHTML = `<svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>${escHtml(unsurLabel)}`;
+    badgeEl.style.display = 'inline-flex';
+  } else { badgeEl.style.display = 'none'; }
+
+  // Quick actions WA / Email
+  let quickHtml = '';
+  if (p.wa) quickHtml += `<a class="md-quick-btn wa" href="${waLink(p.wa)}" target="_blank" rel="noopener">
+    <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.362 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+    Chat WA</a>`;
+  if (p.email) quickHtml += `<a class="md-quick-btn email" href="mailto:${escHtml(p.email)}">
+    <svg viewBox="0 0 24 24"><path d="M22 6l-10 7L2 6"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg>
+    Email</a>`;
+  const quickEl = document.getElementById('modalDetailQuickActions');
+  quickEl.innerHTML = quickHtml;
+  quickEl.style.display = quickHtml ? 'flex' : 'none';
+
   const GROUPS = [
     { label: 'Identitas', fields: [
-      ['Nama Lengkap', p.nama], ['NIP', p.nip],
-      ['Pangkat / Golongan', p.golongan], ['NIK', p.nik],
+      ['Nama Lengkap', p.nama], ['NIK', p.nik, 'mono'], ['NIP', p.nip, 'mono'],
+      ['Pangkat / Golongan', p.golongan], ['Unsur Peserta', unsurLabel],
+      ['Status Kepegawaian', labelStatus(p.status_kepegawaian), 'chip'],
     ]},
     { label: 'Tugas & Instansi', fields: [
-      ['Mata Pelajaran', p.mapel], ['Jabatan', p.jabatan],
+      ['Mata Pelajaran', p.mapel], ['Jabatan', p.jabatan], ['NPSN', p.npsn, 'mono'],
       ['Instansi / Unit Kerja', p.instansi], ['Alamat Instansi', p.alamat],
-      ['Telepon Instansi', p.telp_instansi],
+      ['Telepon Instansi', p.telp_instansi], ['Biodata', p.biodata_url, 'link'],
     ]},
     { label: 'Kontak Pribadi', fields: [
-      ['No. WhatsApp', p.wa],
+      ['No. WhatsApp', p.wa, 'wa'], ['Email', p.email, 'email'],
     ]},
     { label: 'Wilayah', fields: [
       ['Provinsi', p.provinsi], ['Kabupaten / Kota', p.kabkota],
     ]},
   ];
+
   let rows = '';
-  GROUPS.forEach((g, gi) => {
-    if (gi > 0) rows += `<div class="detail-section-divider"></div>`;
-    rows += `<div class="detail-group"><div class="detail-group-label">${g.label}</div>`;
-    g.fields.forEach(([label, val]) => {
+  GROUPS.forEach(g => {
+    rows += `<div class="detail-group"><div class="detail-group-label"><span class="icon-circle">${DETAIL_GROUP_ICONS[g.label] || ''}</span>${g.label}</div>`;
+    g.fields.forEach(([label, val, type]) => {
+      const isEmpty = !val;
+      let valHtml;
+      if (isEmpty) {
+        valHtml = '—';
+      } else if (type === 'link') {
+        valHtml = `<a href="${escHtml(val)}" target="_blank" rel="noopener" class="detail-value-link">
+          <svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          Lihat Dokumen</a>`;
+      } else if (type === 'wa') {
+        valHtml = `<a href="${waLink(val)}" target="_blank" rel="noopener" class="detail-value-link">
+          <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.362 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          ${escHtml(val)}</a>`;
+      } else if (type === 'email') {
+        valHtml = `<a href="mailto:${escHtml(val)}" class="detail-value-link">
+          <svg viewBox="0 0 24 24"><path d="M22 6l-10 7L2 6"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg>
+          ${escHtml(val)}</a>`;
+      } else if (type === 'chip') {
+        valHtml = `<span class="detail-value-chip">${escHtml(val)}</span>`;
+      } else {
+        valHtml = escHtml(val);
+      }
+      const mono = type === 'mono' ? ' mono' : '';
+      const copyBtn = isEmpty ? '' : `<button type="button" class="detail-copy-btn" title="Salin ${escHtml(label)}" onclick="copyToClipboard('${String(val).replace(/'/g, "\\'")}','${label}')">
+        <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+      </button>`;
       rows += `<div class="detail-row-new">
         <div class="detail-label-new">${label}</div>
-        <div class="detail-value-new${!val ? ' empty' : ''}">${escHtml(val || '—')}</div>
+        <div class="detail-value-wrap">
+          <div class="detail-value-new${isEmpty ? ' empty' : ''}${mono}">${valHtml}</div>
+          ${copyBtn}
+        </div>
       </div>`;
     });
     rows += `</div>`;
   });
 
-  document.getElementById('modalDetailNama').textContent = p.nama || 'Detail Peserta';
-  const subEl = document.getElementById('modalDetailSub');
-  if (subEl) subEl.textContent = [p.jabatan, p.instansi].filter(Boolean).join(' · ') || 'Peserta';
   document.getElementById('modalDetailBody').innerHTML = rows;
 
   // Tampilkan tombol hapus hanya untuk admin
@@ -1014,6 +1066,53 @@ function escHtml(str) {
   return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
 
+// ─── LABEL & HELPER MODAL DETAIL (samakan dengan datapeserta.html) ───
+const LABEL_UNSUR_PESERTA = {
+  guru_tendik:    'Guru / Tendik Sekolah',
+  pengawas:       'Pengawas / Penilik Sekolah',
+  dinas:          'Dinas Pendidikan (Provinsi/Kab/Kota)',
+  kemendikdasmen: 'Kementerian Pendidikan Dasar dan Menengah',
+  kl_lain:        'Kementerian / Lembaga Lain',
+  mahasiswa:      'Perguruan Tinggi / Mahasiswa',
+  praktisi_swasta:'Praktisi / Swasta / Umum',
+};
+const LABEL_STATUS_KEPEGAWAIAN = {
+  asn_pns:     'ASN / PNS',
+  non_asn_pns: 'Non-ASN / PNS',
+};
+function labelUnsur(v) { return LABEL_UNSUR_PESERTA[v] || v || ''; }
+function labelStatus(v) { return LABEL_STATUS_KEPEGAWAIAN[v] || v || ''; }
+
+function getInitials(nama) {
+  if (!nama) return '';
+  const parts = String(nama).trim().split(/\s+/).filter(Boolean);
+  if (!parts.length) return '';
+  return (parts[0][0] + (parts.length > 1 ? parts[parts.length - 1][0] : '')).toUpperCase();
+}
+
+function waLink(wa) {
+  let digits = String(wa).replace(/\D/g, '');
+  if (digits.startsWith('0')) digits = '62' + digits.slice(1);
+  else if (!digits.startsWith('62')) digits = '62' + digits;
+  return `https://wa.me/${digits}`;
+}
+
+function copyToClipboard(text, label) {
+  const done = ok => showToast(ok ? `${label} disalin.` : 'Gagal menyalin.', ok ? 'success' : 'error');
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(() => done(true)).catch(() => done(false));
+  } else {
+    done(false);
+  }
+}
+
+const DETAIL_GROUP_ICONS = {
+  'Identitas': '<svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',
+  'Tugas & Instansi': '<svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>',
+  'Kontak Pribadi': '<svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.362 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>',
+  'Wilayah': '<svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>',
+};
+
 // ─── EDIT KEGIATAN ───
 let _editKegiatanId = null;
 
@@ -1090,26 +1189,23 @@ async function doEditKegiatan() {
 
 // ─── UNDUH EXCEL PESERTA ───
 function unduhExcelPeserta() {
-  if (!allDetailPeserta.length) return;
+  if (!allDetailPeserta.length) { showToast('Tidak ada data untuk diunduh.', 'error'); return; }
   const rows = allDetailPeserta;
-  const headers = ['No','Timestamp','Nama Lengkap','NIP','NIK','Golongan','Mapel','Instansi/Unit Kerja','Jabatan','Provinsi','Kabupaten/Kota','Alamat','No WA','Telp Instansi'];
-  const escCsv = v => {
-    const s = (v === null || v === undefined) ? '' : String(v);
-    return s.includes(',') || s.includes('"') || s.includes('\n') ? `"${s.replace(/"/g,'""')}"` : s;
-  };
+  const HEADERS = ['No','Waktu Daftar','Nama Lengkap','NIK','NIP','Pangkat/Golongan','Unsur Peserta','Status Kepegawaian','Mata Pelajaran','NPSN','Instansi/Unit Kerja','Jabatan','No. WhatsApp','Email','Provinsi','Kabupaten/Kota','Alamat Instansi','Telepon Instansi','Biodata'];
   const dataRows = rows.map((row, i) => {
     const p = row.peserta || {};
-    return [i+1, formatTs(row.created_at), p.nama||'', p.nip||'', p.nik||'', p.golongan||'', p.mapel||'', p.instansi||'', p.jabatan||'', p.provinsi||'', p.kabkota||'', p.alamat||'', p.wa||'', p.telp_instansi||''].map(escCsv).join(',');
+    return [
+      i+1, formatTs(row.created_at), p.nama||'', p.nik||'', p.nip||'', p.golongan||'', labelUnsur(p.unsur_peserta)||'', labelStatus(p.status_kepegawaian)||'',
+      p.mapel||'', p.npsn||'', p.instansi||'', p.jabatan||'', p.wa||'', p.email||'',
+      p.provinsi||'', p.kabkota||'', p.alamat||'', p.telp_instansi||'', p.biodata_url||''
+    ];
   });
-  const csvContent = [headers.join(','), ...dataRows].join('\r\n');
-  const BOM = '\uFEFF';
-  const blob = new Blob([BOM + csvContent], { type: 'text/csv;charset=utf-8;' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  const namaFile = (_detailKegiatanNama || 'peserta').replace(/[/\\?%*:|"<>]/g, '-');
-  a.href = url; a.download = `Peserta - ${namaFile}.csv`;
-  document.body.appendChild(a); a.click(); document.body.removeChild(a);
-  URL.revokeObjectURL(url);
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.aoa_to_sheet([HEADERS, ...dataRows]);
+  ws['!cols'] = HEADERS.map((h,ci) => ({ wch: Math.min(Math.max(h.length, ...dataRows.map(r=>String(r[ci]||'').length)) + 2, 50) }));
+  XLSX.utils.book_append_sheet(wb, ws, 'Peserta Kegiatan');
+  const namaFile = (_detailKegiatanNama || 'peserta').replace(/[/\\?*:|"<>]/g, '-');
+  XLSX.writeFile(wb, `Peserta - ${namaFile}.xlsx`);
   showToast('File Excel berhasil diunduh.', 'success');
 }
 
